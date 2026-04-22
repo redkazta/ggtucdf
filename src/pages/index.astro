@@ -1,17 +1,861 @@
 ---
+import { ELEGIDO_TOLERANCE_SEC } from "../config/elegido";
+import { TRACK_SRC, VIDEO_CLIPS } from "../data/videoClips";
 
+const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta
+      name="description"
+      content="garguttieneunchingodeferia.com"
+    />
+    <title>garguttieneunchingodeferia.com</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        background: #0a0a0a;
+        color: #f5f5f5;
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+        overflow-x: hidden;
+      }
+      .stage {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        z-index: 0;
+        isolation: isolate;
+      }
+      .clip-grid-main {
+        position: relative;
+        width: 100%;
+        height: 100dvh;
+        box-sizing: border-box;
+      }
+      .reel-wrap {
+        position: relative;
+        height: 100%;
+        min-width: 0;
+        z-index: 1;
+      }
+      .reel-pad {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #050505;
+        border-radius: 6px;
+        transition: box-shadow 0.2s ease;
+      }
+      .reel-wrap video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 0.22s ease;
+      }
+      .reel-wrap video.is-visible {
+        opacity: 1;
+      }
+      @media (min-width: 768px) {
+        .clip-grid-main {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-rows: minmax(0, 1fr);
+          gap: 4px;
+          padding: 4px;
+        }
+        .reel-wrap {
+          width: 100%;
+        }
+        .reel-wrap:not(.is-hero) video.is-visible {
+          opacity: 0.4;
+        }
+        .reel-wrap.is-hero video.is-visible {
+          opacity: 1;
+        }
+        .reel-wrap.is-hero .reel-pad {
+          box-shadow:
+            0 0 0 2px #d4af37,
+            0 0 16px rgba(212, 175, 55, 0.4),
+            inset 0 0 0 1px rgba(255, 248, 220, 0.25);
+          z-index: 3;
+        }
+        .reel-wrap.is-aligned:not(.is-hero) .reel-pad {
+          box-shadow:
+            0 0 0 1px rgba(212, 175, 55, 0.65),
+            0 0 12px rgba(212, 175, 55, 0.22);
+        }
+        .reel-wrap.is-hero.is-aligned .reel-pad {
+          box-shadow:
+            0 0 0 3px #e8c85c,
+            0 0 20px rgba(232, 200, 92, 0.45),
+            inset 0 0 0 1px rgba(255, 248, 220, 0.35);
+        }
+      }
+      @media (max-width: 767px) {
+        .clip-grid-main {
+          display: block;
+          height: 100dvh;
+        }
+        .clip-grid-main .reel-wrap {
+          width: 100%;
+          height: 100%;
+        }
+        .clip-grid-main .reel-wrap:not([data-reel="0"]) {
+          display: none;
+        }
+        .reel-wrap video.is-visible {
+          opacity: 1;
+        }
+      }
+      .bouncer-layer {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 6;
+        overflow: hidden;
+        contain: strict;
+      }
+      .bouncer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: min(8vw, 66px);
+        aspect-ratio: 9 / 16;
+        border-radius: 4px;
+        overflow: hidden;
+        contain: strict;
+        border: 1px solid rgba(212, 175, 55, 0.32);
+      }
+      .bouncer video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      @media (max-width: 767px) {
+        .bouncer-layer {
+          display: block;
+        }
+        /* 8 minireels en móvil; proporción táctil (vmin + tope px). */
+        .bouncer {
+          width: clamp(48px, 19vmin, 92px);
+          border-radius: 3px;
+        }
+        .bouncer:nth-child(n + 9) {
+          display: none !important;
+        }
+      }
+      .domain-wrap {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        pointer-events: none;
+      }
+      .domain {
+        margin: 0;
+        max-width: calc(100vw - 1rem);
+        box-sizing: border-box;
+        font-size: clamp(1.7rem, 4.5vmin + 2.05vw, 4.15rem);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-align: center;
+        padding: clamp(0.35rem, 0.75vw, 0.5rem);
+        line-height: 1.06;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        pointer-events: auto;
+        animation: zoom-pulse 3.6s ease-in-out infinite;
+        transform-origin: center;
+        text-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.92),
+          0 0 0.65rem rgba(0, 0, 0, 0.68),
+          0 0 1.35rem rgba(0, 0, 0, 0.52),
+          0 0 2.5rem rgba(0, 0, 0, 0.4);
+        opacity: 0.3;
+      }
+      .domain::-webkit-scrollbar {
+        height: 3px;
+      }
+      .domain::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+      }
+      @keyframes zoom-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.03);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .domain {
+          animation: none;
+        }
+      }
+      .start-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: grid;
+        place-items: center;
+        background: rgba(10, 10, 10, 0.92);
+        backdrop-filter: blur(6px);
+      }
+      .start-screen[hidden] {
+        display: none;
+      }
+      .start-inner {
+        text-align: center;
+        max-width: 28rem;
+        padding: 1.5rem;
+        pointer-events: auto;
+      }
+      .start-inner p {
+        margin: 0 0 1.25rem;
+        line-height: 1.45;
+        color: #c8c8c8;
+        font-size: 0.95rem;
+      }
+      .start-btn {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: #f5f5f5;
+        color: #0a0a0a;
+        font: inherit;
+        font-weight: 700;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+      .start-btn:hover {
+        background: #fff;
+      }
+      .start-btn:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
+      }
+      .err-msg {
+        position: fixed;
+        bottom: 4.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 25;
+        margin: 0;
+        max-width: min(32rem, 92vw);
+        text-align: center;
+        font-size: 0.85rem;
+        color: #f09090;
+        min-height: 1.25em;
+        pointer-events: none;
+      }
+      .elegido-toast {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(120%);
+        z-index: 30;
+        padding: 0.65rem 1.25rem;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #f0d875, #d4af37);
+        color: #1a1200;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        font-size: 0.8rem;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          transform 0.35s ease,
+          opacity 0.35s ease;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+      }
+      .elegido-toast.is-on {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage" aria-hidden="true">
+      <div class="clip-grid-main" id="clip-grid-main">
+        {
+          [0, 1, 2, 3].map((reel) => (
+            <div class="reel-wrap" data-reel={reel}>
+              <div class="reel-pad">
+                <video
+                  class="clip"
+                  muted
+                  playsinline
+                  preload="metadata"
+                  disablepictureinpicture
+                />
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <div class="bouncer-layer" id="bouncer-layer" aria-hidden="true">
+        {
+          Array.from({ length: 18 }, (_, i) => (
+            <div class="bouncer" data-bouncer={i}>
+              <video muted playsinline loop preload="none" disablepictureinpicture />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="domain-wrap" id="domain-wrap">
+      <p class="domain">garguttieneunchingodeferia.com</p>
+    </div>
+
+    <div class="start-screen" id="start-screen" role="dialog" aria-modal="true" aria-labelledby="start-title">
+      <div class="start-inner">
+        <p id="start-title">Entra para escuchar la rola. Los videos van al azar; a veces coincidirán con lo que escuchas.</p>
+        <button type="button" class="start-btn" id="start-btn">Entrar</button>
+      </div>
+    </div>
+
+    <p class="err-msg" id="err-msg" role="status"></p>
+
+    <div class="elegido-toast" id="elegido-toast" aria-live="polite">Elegido</div>
+
+    <audio id="track" preload="auto" loop src={TRACK_SRC}></audio>
+
+    <script
+      define:vars={{
+        videoClipsJson,
+        trackSrc: TRACK_SRC,
+        elegidoToleranceSec: ELEGIDO_TOLERANCE_SEC,
+      }}
+    >
+      const VIDEO_CLIPS = JSON.parse(videoClipsJson);
+      const ELEGIDO_COOLDOWN_MS = 15_000;
+      const ELEGIDO_TOAST_MS = 4_000;
+      const REEL_COUNT = 4;
+      const BOUNCER_COUNT = 18;
+      const BOUNCER_COUNT_MOBILE = 8;
+      const BASE_BOUNCER_DESKTOP = 8.5;
+      const BASE_BOUNCER_MOBILE = 13;
+      const DESKTOP_MQ = "(min-width: 768px)";
+
+      const startScreen = document.getElementById("start-screen");
+      const startBtn = document.getElementById("start-btn");
+      const errMsg = document.getElementById("err-msg");
+      const audioEl = document.getElementById("track");
+      const elegidoToast = document.getElementById("elegido-toast");
+      const bouncerLayer = document.getElementById("bouncer-layer");
+
+      /** @type {HTMLElement[]} */
+      const reelWraps = [];
+      /** @type {HTMLVideoElement[]} */
+      const videos = [];
+      for (let r = 0; r < REEL_COUNT; r++) {
+        const w = document.querySelector(`.reel-wrap[data-reel="${r}"]`);
+        const v = w?.querySelector("video");
+        if (!(w instanceof HTMLElement) || !(v instanceof HTMLVideoElement)) {
+          throw new Error("DOM reels incompleto");
+        }
+        reelWraps.push(w);
+        videos.push(v);
+      }
+
+      if (
+        !startScreen ||
+        !startBtn ||
+        !errMsg ||
+        !(audioEl instanceof HTMLAudioElement) ||
+        !elegidoToast ||
+        !bouncerLayer
+      ) {
+        throw new Error("DOM inicial incompleto");
+      }
+
+      audioEl.src = trackSrc;
+      audioEl.loop = true;
+
+      /** Espera a conocer la duración para poder saltar a un punto aleatorio (cada visita distinta). */
+      function waitForTrackDuration(a, timeoutMs = 10_000) {
+        if (Number.isFinite(a.duration) && a.duration > 0 && !Number.isNaN(a.duration)) {
+          return Promise.resolve();
+        }
+        return new Promise((resolve, reject) => {
+          let settled = false;
+          const t = window.setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            a.removeEventListener("loadedmetadata", onMeta);
+            a.removeEventListener("durationchange", onMeta);
+            reject(new Error("timeout"));
+          }, timeoutMs);
+          function onMeta() {
+            if (settled) return;
+            if (Number.isFinite(a.duration) && a.duration > 0 && !Number.isNaN(a.duration)) {
+              settled = true;
+              window.clearTimeout(t);
+              a.removeEventListener("loadedmetadata", onMeta);
+              a.removeEventListener("durationchange", onMeta);
+              resolve();
+            }
+          }
+          a.addEventListener("loadedmetadata", onMeta);
+          a.addEventListener("durationchange", onMeta);
+        });
+      }
+
+      function isDesktop() {
+        return window.matchMedia(DESKTOP_MQ).matches;
+      }
+
+      function activeReelCount() {
+        return isDesktop() ? REEL_COUNT : 1;
+      }
+
+      let started = false;
+      let stopClips = false;
+      /** @type {({ id: string; src: string; clipStartSec: number; clipEndSec: number; alignedSongStartSec?: number; alignedSongEndSec?: number } | null)[]} */
+      const reelClip = Array(REEL_COUNT).fill(null);
+      const reelArmed = Array(REEL_COUNT).fill(false);
+      /** Reel “héroe” en escritorio (borde dorado fuerte); en móvil siempre 0. */
+      let heroReel = 0;
+      let elegidoCooldownUntil = 0;
+      let elegidoHideTimer = 0;
+      let bouncerRaf = 0;
+      /** @type {null | (() => void)} */
+      let bouncerVisibilityCleanup = null;
+
+      /** Columnas fijas 1–4 en orden DOM (sin shuffle: evita glitches y desfaces). */
+      function applyReelLayout() {
+        if (!isDesktop()) {
+          reelWraps.forEach((wrap) => {
+            wrap.style.gridColumn = "";
+          });
+          return;
+        }
+        for (let r = 0; r < REEL_COUNT; r++) {
+          reelWraps[r].style.gridColumn = `${r + 1} / span 1`;
+        }
+      }
+
+      function pickRandomClip() {
+        if (VIDEO_CLIPS.length === 0) return null;
+        const i = Math.floor(Math.random() * VIDEO_CLIPS.length);
+        return VIDEO_CLIPS[i];
+      }
+
+      function pickDistinctClips(n) {
+        if (VIDEO_CLIPS.length === 0) return [];
+        const pool = [...VIDEO_CLIPS];
+        const out = [];
+        while (out.length < n && pool.length > 0) {
+          const j = Math.floor(Math.random() * pool.length);
+          out.push(pool[j]);
+          pool.splice(j, 1);
+        }
+        while (out.length < n) {
+          out.push(pickRandomClip());
+        }
+        return out;
+      }
+
+      function getQuarterCapSec() {
+        const d = audioEl.duration;
+        if (!Number.isFinite(d) || d <= 0) return Number.POSITIVE_INFINITY;
+        return d / 4;
+      }
+
+      function clipPlaybackEnd(clip, reelIndex) {
+        const natural = clip.clipEndSec;
+        if (!isDesktop() || reelIndex !== heroReel) return natural;
+        const cap = getQuarterCapSec();
+        if (!Number.isFinite(cap)) return natural;
+        return Math.min(natural, clip.clipStartSec + cap);
+      }
+
+      function clipHasElegidoMeta(c) {
+        return (
+          c.alignedSongStartSec != null &&
+          c.alignedSongEndSec != null &&
+          Number.isFinite(c.alignedSongStartSec) &&
+          Number.isFinite(c.alignedSongEndSec)
+        );
+      }
+
+      function isInElegidoWindow(t, c) {
+        if (!clipHasElegidoMeta(c)) return false;
+        const lo = Math.max(0, c.alignedSongStartSec - elegidoToleranceSec);
+        const hi = c.alignedSongEndSec + elegidoToleranceSec;
+        return t >= lo && t <= hi;
+      }
+
+      function showElegidoToast() {
+        elegidoToast.classList.add("is-on");
+        window.clearTimeout(elegidoHideTimer);
+        elegidoHideTimer = window.setTimeout(() => {
+          elegidoToast.classList.remove("is-on");
+        }, ELEGIDO_TOAST_MS);
+      }
+
+      function refreshReelDecor() {
+        const t = audioEl.currentTime;
+        for (let r = 0; r < REEL_COUNT; r++) {
+          const wrap = reelWraps[r];
+          const c = reelClip[r];
+          const aligned = !!(c && clipHasElegidoMeta(c) && isInElegidoWindow(t, c));
+          wrap.classList.toggle("is-aligned", aligned);
+          wrap.classList.toggle("is-hero", isDesktop() && r === heroReel);
+        }
+      }
+
+      function onAudioTimeupdate() {
+        refreshReelDecor();
+        if (!started || stopClips) return;
+        const heroClip = reelClip[heroReel];
+        if (!heroClip || !clipHasElegidoMeta(heroClip)) return;
+        const t = audioEl.currentTime;
+        if (!isInElegidoWindow(t, heroClip)) return;
+        if (performance.now() < elegidoCooldownUntil) return;
+        elegidoCooldownUntil = performance.now() + ELEGIDO_COOLDOWN_MS;
+        showElegidoToast();
+      }
+
+      function beginReelPlayback(reelIndex, clip) {
+        const v = videos[reelIndex];
+        v.currentTime = clip.clipStartSec;
+        reelArmed[reelIndex] = true;
+        void v.play().catch(() => {});
+      }
+
+      function loadReelSource(reelIndex, clip) {
+        const v = videos[reelIndex];
+        const onMeta = () => {
+          v.removeEventListener("loadedmetadata", onMeta);
+          beginReelPlayback(reelIndex, clip);
+        };
+        const targetHref = new URL(clip.src, window.location.origin).href;
+        if (v.src && v.currentSrc === targetHref) {
+          v.pause();
+          beginReelPlayback(reelIndex, clip);
+        } else {
+          v.addEventListener("loadedmetadata", onMeta, { once: true });
+          v.src = clip.src;
+          v.load();
+        }
+      }
+
+      function scheduleReel(reelIndex, clipOverride) {
+        if (stopClips || VIDEO_CLIPS.length === 0) return;
+        if (reelIndex >= activeReelCount()) return;
+        const next = clipOverride ?? pickRandomClip();
+        if (!next) return;
+        reelArmed[reelIndex] = false;
+        reelClip[reelIndex] = next;
+        videos[reelIndex].classList.add("is-visible");
+        loadReelSource(reelIndex, next);
+      }
+
+      function onReelTimeupdate(reelIndex) {
+        if (!reelArmed[reelIndex]) return;
+        const clip = reelClip[reelIndex];
+        if (!clip || stopClips) return;
+        const v = videos[reelIndex];
+        const end = clipPlaybackEnd(clip, reelIndex);
+        if (v.currentTime < end - 0.08) return;
+
+        reelArmed[reelIndex] = false;
+        v.pause();
+
+        if (isDesktop() && reelIndex === heroReel) {
+          const prevHero = heroReel;
+          heroReel = (heroReel + 1) % REEL_COUNT;
+          refreshReelDecor();
+          requestAnimationFrame(() => {
+            if (stopClips) return;
+            scheduleReel(prevHero);
+            videos[heroReel].pause();
+            scheduleReel(heroReel);
+          });
+        } else {
+          requestAnimationFrame(() => {
+            if (stopClips) return;
+            scheduleReel(reelIndex);
+          });
+        }
+      }
+
+      function onReelEnded(reelIndex) {
+        if (!reelArmed[reelIndex]) return;
+        reelArmed[reelIndex] = false;
+        if (stopClips) return;
+        scheduleReel(reelIndex);
+      }
+
+      function stopBouncers() {
+        cancelAnimationFrame(bouncerRaf);
+        bouncerRaf = 0;
+        if (bouncerVisibilityCleanup) {
+          bouncerVisibilityCleanup();
+          bouncerVisibilityCleanup = null;
+        }
+        bouncerLayer.querySelectorAll("video").forEach((v) => {
+          if (v instanceof HTMLVideoElement) {
+            v.pause();
+            v.removeAttribute("src");
+            v.load();
+          }
+        });
+      }
+
+      function startBouncers() {
+        stopBouncers();
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const allEls = Array.from(bouncerLayer.querySelectorAll(".bouncer"));
+        if (allEls.length !== BOUNCER_COUNT) return;
+        const mobile = !isDesktop();
+        const els = mobile ? allEls.slice(0, BOUNCER_COUNT_MOBILE) : allEls;
+
+        const w0 = window.innerWidth;
+        const h0 = window.innerHeight;
+        const bwEst = mobile
+          ? Math.min(Math.max(48, w0 * 0.19), 92)
+          : Math.min(w0 * 0.08, 66);
+        const bhEst = bwEst * (16 / 9);
+
+        function pickSpeedTarget(forMobile) {
+          const u = Math.random();
+          if (forMobile) {
+            return 0.38 + Math.pow(u, 0.65) * 1.05;
+          }
+          return 0.32 + Math.pow(u, 0.7) * 0.95;
+        }
+
+        function smoothstep01(t) {
+          const x = Math.min(1, Math.max(0, t));
+          return x * x * (3 - 2 * x);
+        }
+
+        const t0 = performance.now();
+
+        /** @type {{ el: HTMLElement; x: number; y: number; vx: number; vy: number; speedMul: number; speedFrom: number; speedTo: number; transStart: number; transDuration: number; nextShiftAt: number }[]} */
+        const state = els.map((el, i) => {
+          if (!(el instanceof HTMLElement)) throw new Error("bouncer");
+          const v = el.querySelector("video");
+          if (!(v instanceof HTMLVideoElement)) throw new Error("bouncer video");
+          v.defaultMuted = true;
+          v.muted = true;
+          v.preload = "none";
+          v.playsInline = true;
+          v.disablePictureInPicture = true;
+          const reelN = (i % 4) + 1;
+          window.setTimeout(() => {
+            if (!started || stopClips) return;
+            v.src = `/videos/${reelN}.mp4`;
+            v.load();
+            void v.play().catch(() => {});
+          }, i * (mobile ? 55 : 40));
+          const angle = Math.random() * Math.PI * 2;
+          const mag = mobile ? 0.55 + Math.random() * 1.15 : 0.65 + Math.random() * 0.95;
+          const m0 = pickSpeedTarget(mobile);
+          return {
+            el,
+            x: Math.random() * Math.max(8, w0 - bwEst - 8),
+            y: Math.random() * Math.max(8, h0 - bhEst - 8),
+            vx: Math.cos(angle) * mag,
+            vy: Math.sin(angle) * mag,
+            speedMul: m0,
+            speedFrom: m0,
+            speedTo: m0,
+            transStart: t0,
+            transDuration: 1,
+            nextShiftAt: t0 + (1800 + Math.random() * 11200),
+          };
+        });
+
+        let bwCached = bwEst;
+        let bhCached = bhEst;
+        let layoutFrame = 0;
+
+        const syncBouncerSize = () => {
+          const sample = state[0]?.el;
+          if (sample instanceof HTMLElement) {
+            bwCached = sample.offsetWidth || bwEst;
+            bhCached = sample.offsetHeight || bhEst;
+          }
+        };
+        syncBouncerSize();
+
+        const onResize = () => {
+          syncBouncerSize();
+        };
+        window.addEventListener("resize", onResize, { passive: true });
+
+        const onVisibility = () => {
+          if (document.hidden) {
+            cancelAnimationFrame(bouncerRaf);
+            bouncerRaf = 0;
+            for (const b of state) {
+              const v = b.el.querySelector("video");
+              if (v instanceof HTMLVideoElement) v.pause();
+            }
+          } else if (started && !stopClips) {
+            for (const b of state) {
+              const v = b.el.querySelector("video");
+              if (v instanceof HTMLVideoElement) void v.play().catch(() => {});
+            }
+            if (!bouncerRaf) bouncerRaf = requestAnimationFrame(tick);
+          }
+        };
+        document.addEventListener("visibilitychange", onVisibility);
+
+        bouncerVisibilityCleanup = () => {
+          window.removeEventListener("resize", onResize);
+          document.removeEventListener("visibilitychange", onVisibility);
+        };
+
+        function tick() {
+          if (!started || stopClips) return;
+          if (document.hidden) return;
+
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          const mobNow = !isDesktop();
+          const baseNow = mobNow ? BASE_BOUNCER_MOBILE : BASE_BOUNCER_DESKTOP;
+          layoutFrame++;
+          if (layoutFrame % 45 === 0) syncBouncerSize();
+          const bw = bwCached;
+          const bh = bhCached;
+
+          const now = performance.now();
+          for (const b of state) {
+            if (now >= b.nextShiftAt) {
+              b.speedFrom = b.speedMul;
+              b.speedTo = pickSpeedTarget(mobNow);
+              b.transStart = now;
+              b.transDuration =
+                480 +
+                Math.random() * (mobNow ? 9200 : 7800);
+              const holdAfter =
+                900 + Math.random() * (mobNow ? 13000 : 11000);
+              b.nextShiftAt = now + b.transDuration + holdAfter;
+            }
+            const td = Math.max(1, b.transDuration);
+            const prog = Math.min(1, (now - b.transStart) / td);
+            b.speedMul = b.speedFrom + (b.speedTo - b.speedFrom) * smoothstep01(prog);
+
+            const step = baseNow * b.speedMul;
+            b.x += b.vx * step;
+            b.y += b.vy * step;
+            if (b.x <= 0) {
+              b.x = 0;
+              b.vx *= -1;
+            }
+            if (b.x + bw >= w) {
+              b.x = Math.max(0, w - bw);
+              b.vx *= -1;
+            }
+            if (b.y <= 0) {
+              b.y = 0;
+              b.vy *= -1;
+            }
+            if (b.y + bh >= h) {
+              b.y = Math.max(0, h - bh);
+              b.vy *= -1;
+            }
+            b.el.style.transform = `translate3d(${b.x | 0}px,${b.y | 0}px,0)`;
+          }
+          bouncerRaf = requestAnimationFrame(tick);
+        }
+        bouncerRaf = requestAnimationFrame(tick);
+      }
+
+      function wireReel(reelIndex) {
+        const v = videos[reelIndex];
+        v.defaultMuted = true;
+        v.muted = true;
+        v.addEventListener("timeupdate", () => onReelTimeupdate(reelIndex));
+        v.addEventListener("ended", () => onReelEnded(reelIndex));
+        v.addEventListener("error", () => {
+          if (!started || stopClips || VIDEO_CLIPS.length === 0) return;
+          errMsg.textContent = "Un video no cargó; saltando al siguiente.";
+          window.setTimeout(() => {
+            errMsg.textContent = "";
+          }, 3200);
+          window.setTimeout(() => scheduleReel(reelIndex), 200);
+        });
+      }
+
+      for (let i = 0; i < REEL_COUNT; i++) wireReel(i);
+
+      audioEl.addEventListener("timeupdate", onAudioTimeupdate);
+
+      window.addEventListener("resize", () => {
+        if (!started) return;
+        applyReelLayout();
+      });
+
+      startBtn.addEventListener("click", async () => {
+        errMsg.textContent = "";
+        try {
+          await waitForTrackDuration(audioEl);
+        } catch {
+          errMsg.textContent =
+            "No se pudo leer la duración del audio. Comprueba public/audio/track.mp3.";
+          return;
+        }
+        const dur = audioEl.duration;
+        if (Number.isFinite(dur) && dur > 0) {
+          audioEl.currentTime = Math.random() * dur;
+        }
+        try {
+          await audioEl.play();
+        } catch {
+          errMsg.textContent =
+            "No se pudo reproducir el audio. Comprueba que exista la pista en public/audio/ y vuelve a intentar.";
+          return;
+        }
+        started = true;
+        stopClips = false;
+        heroReel = isDesktop() ? Math.floor(Math.random() * REEL_COUNT) : 0;
+        applyReelLayout();
+        startScreen.hidden = true;
+        if (VIDEO_CLIPS.length > 0) {
+          if (isDesktop()) {
+            const batch = pickDistinctClips(REEL_COUNT);
+            for (let i = 0; i < REEL_COUNT; i++) {
+              scheduleReel(i, batch[i] ?? pickRandomClip());
+            }
+          } else {
+            scheduleReel(0);
+          }
+          startBouncers();
+          refreshReelDecor();
+        }
+      });
+    </script>
+  </body>
 </html>
