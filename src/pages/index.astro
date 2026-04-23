@@ -221,38 +221,38 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             .yt-cta {
                 position: fixed;
                 left: 50%;
-                bottom: max(1.8rem, env(safe-area-inset-bottom, 0px));
+                bottom: max(3.6rem, env(safe-area-inset-bottom, 0px));
                 z-index: 100;
                 transform: translateX(-50%);
                 box-sizing: border-box;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 78px;
-                height: 78px;
+                width: 156px;
+                height: 156px;
                 padding: 0;
                 text-decoration: none;
                 color: #fff;
                 background: rgba(10, 10, 10, 0.75);
                 border: 1px solid rgba(255, 255, 255, 0.12);
-                border-radius: 18px;
+                border-radius: 36px;
                 cursor: pointer;
                 -webkit-tap-highlight-color: transparent;
                 transition: background 0.2s, transform 0.1s;
             }
             .yt-cta svg {
                 display: block;
-                width: 45px;
-                height: 45px;
+                width: 90px;
+                height: 90px;
             }
             @media (max-width: 767px) {
                 .yt-cta {
-                    width: 75px;
-                    height: 75px;
+                    width: 150px;
+                    height: 150px;
                 }
                 .yt-cta svg {
-                    width: 42px;
-                    height: 42px;
+                    width: 84px;
+                    height: 84px;
                 }
             }
             .yt-cta:hover {
@@ -298,7 +298,8 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             }
             .err-msg {
                 position: fixed;
-                bottom: 4.5rem;
+                /* Por encima del CTA: bottom del botón + altura + margen */
+                bottom: calc(3.6rem + 156px + 0.75rem);
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 25;
@@ -312,7 +313,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             }
             @media (max-width: 767px) {
                 .err-msg {
-                    bottom: 5.25rem;
+                    bottom: calc(3.6rem + 150px + 0.75rem);
                 }
             }
         </style>
