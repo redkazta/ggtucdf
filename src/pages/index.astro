@@ -1,8 +1,9 @@
 ---
 import { ELEGIDO_TOLERANCE_SEC } from "../config/elegido";
-import { TRACK_SRC, VIDEO_CLIPS } from "../data/videoClips";
+import { REEL_VIDEO_URLS, TRACK_SRC, VIDEO_CLIPS } from "../data/videoClips";
 
 const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
+const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
 ---
 
 <html lang="es">
@@ -169,14 +170,16 @@ const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: thin;
                 pointer-events: auto;
-                /* animation: zoom-pulse 3.6s ease-in-out infinite; ELIMINADA */
+                animation: zoom-pulse 3.6s ease-in-out infinite;
                 transform-origin: center;
                 text-shadow:
                     0 1px 3px rgba(0, 0, 0, 0.92),
                     0 0 0.65rem rgba(0, 0, 0, 0.68),
                     0 0 1.35rem rgba(0, 0, 0, 0.52),
                     0 0 2.5rem rgba(0, 0, 0, 0.4);
-                opacity: 0.7;
+                opacity: 1;
+                -webkit-text-stroke: 0.3px rgba(0, 0, 0, 0.9);
+                text-stroke: 0.3px rgba(0, 0, 0, 0.9);
                 box-shadow: 0 0 8px 2px #d4af37;
             }
             .domain::-webkit-scrollbar {
@@ -314,11 +317,13 @@ const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
         <script
             define:vars={{
                 videoClipsJson,
+                reelVideoUrlsJson,
                 trackSrc: TRACK_SRC,
                 elegidoToleranceSec: ELEGIDO_TOLERANCE_SEC,
             }}
         >
             const VIDEO_CLIPS = JSON.parse(videoClipsJson);
+            const REEL_VIDEO_URLS = JSON.parse(reelVideoUrlsJson);
             const ELEGIDO_COOLDOWN_MS = 15_000;
             const ELEGIDO_TOAST_MS = 4_000;
             const REEL_COUNT = 4; // En escritorio siempre 4; en móvil se muestra 1 cambiante
@@ -709,7 +714,7 @@ const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
                     window.setTimeout(
                         () => {
                             if (!started || stopClips) return;
-                            v.src = `/videos/${reelN}.mp4`;
+                            v.src = REEL_VIDEO_URLS[reelN - 1];
                             v.load();
                             void v.play().catch(() => {});
                         },
