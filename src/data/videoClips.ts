@@ -19,6 +19,14 @@ export const REEL_VIDEO_URLS = [
   "https://coilzxaisyuvcsdbywrk.supabase.co/storage/v1/object/public/videos/IMG_9569.MOV",
 ] as const;
 
+/** H.264 en `public/videos/` — mucho más baratos que los MOV; solo para minireels flotantes. */
+export const REEL_BOUNCER_VIDEO_URLS = [
+  "/videos/1.mp4",
+  "/videos/2.mp4",
+  "/videos/3.mp4",
+  "/videos/4.mp4",
+] as const;
+
 export const VIDEO_CLIPS: VideoClip[] = [
   {
     id: "1-hook",

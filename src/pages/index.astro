@@ -1,8 +1,14 @@
 ---
-import { REEL_VIDEO_URLS, TRACK_SRC, VIDEO_CLIPS } from "../data/videoClips";
+import {
+  REEL_BOUNCER_VIDEO_URLS,
+  REEL_VIDEO_URLS,
+  TRACK_SRC,
+  VIDEO_CLIPS,
+} from "../data/videoClips";
 
 const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
 const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
+const reelBouncerVideoUrlsJson = JSON.stringify([...REEL_BOUNCER_VIDEO_URLS]);
 ---
 
 <html lang="es">
@@ -128,7 +134,10 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 .bouncer-layer {
                     display: block;
                 }
-                /* 4 minireels; proporción táctil (vmin + tope px). */
+                .bouncer:nth-child(n + 3) {
+                    display: none !important;
+                }
+                /* 2 minireels en móvil; 4 en escritorio. Proporción táctil (vmin + tope px). */
                 .bouncer {
                     width: clamp(48px, 19vmin, 92px);
                     border-radius: 3px;
@@ -491,15 +500,18 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             define:vars={{
                 videoClipsJson,
                 reelVideoUrlsJson,
+                reelBouncerVideoUrlsJson,
             }}
         >
             const VIDEO_CLIPS = JSON.parse(videoClipsJson);
             const REEL_VIDEO_URLS = JSON.parse(reelVideoUrlsJson);
+            const REEL_BOUNCER_VIDEO_URLS = JSON.parse(reelBouncerVideoUrlsJson);
             const REEL_COUNT = 4; // En escritorio siempre 4; en móvil se muestra 1 cambiante
             const BOUNCER_COUNT = 4;
-            const BOUNCER_COUNT_MOBILE = 4;
-            const BASE_BOUNCER_DESKTOP = 28;
-            const BASE_BOUNCER_MOBILE = 36;
+            const BOUNCER_COUNT_MOBILE = 2;
+            // Leve + ~20% más viveza (respecto a la pasada bajada; MP4 bouncers alivian decodificación)
+            const BASE_BOUNCER_DESKTOP = 10.2;
+            const BASE_BOUNCER_MOBILE = 13.2;
             const DESKTOP_MQ = "(min-width: 768px)";
 
             const errMsg = document.getElementById("err-msg");
@@ -865,9 +877,9 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 function pickSpeedTarget(forMobile) {
                     const u = Math.random();
                     if (forMobile) {
-                        return 1.1 + Math.pow(u, 0.35) * 5.2;
+                        return 0.75 + Math.pow(u, 0.52) * 0.58;
                     }
-                    return 1.2 + Math.pow(u, 0.3) * 5.0;
+                    return 0.78 + Math.pow(u, 0.52) * 0.48;
                 }
 
                 function smoothstep01(t) {
@@ -877,8 +889,8 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
 
                 const t0 = performance.now();
                 const bTransMs = (m) =>
-                    200 + Math.random() * (m ? 2200 : 1800);
-                const bHoldMs = (m) => 100 + Math.random() * (m ? 360 : 320);
+                    640 + Math.random() * (m ? 1800 : 1600);
+                const bHoldMs = (m) => 360 + Math.random() * (m ? 600 : 540);
 
                 /** @type {{ el: HTMLElement; x: number; y: number; vx: number; vy: number; speedMul: number; speedFrom: number; speedTo: number; transStart: number; transDuration: number; nextShiftAt: number }[]} */
                 const state = els.map((el, i) => {
@@ -896,16 +908,16 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                     window.setTimeout(
                         () => {
                             if (!started || stopClips) return;
-                            v.src = REEL_VIDEO_URLS[reelN - 1];
+                            v.src = REEL_BOUNCER_VIDEO_URLS[reelN - 1];
                             v.load();
                             void v.play().catch(() => {});
                         },
-                        i * (mobile ? 28 : 22),
+                        i * (mobile ? 120 : 100),
                     );
                     const angle = Math.random() * Math.PI * 2;
                     const mag = mobile
-                        ? 0.85 + Math.random() * 1.35
-                        : 0.9 + Math.random() * 1.1;
+                        ? 0.27 + Math.random() * 0.4
+                        : 0.3 + Math.random() * 0.36;
                     const m0 = pickSpeedTarget(mobile);
                     return {
                         el,
@@ -918,7 +930,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                         speedTo: m0,
                         transStart: t0,
                         transDuration: 1,
-                        nextShiftAt: t0 + 250 + Math.random() * 700,
+                        nextShiftAt: t0 + 1100 + Math.random() * 1800,
                     };
                 });
 
@@ -979,7 +991,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                         ? BASE_BOUNCER_MOBILE
                         : BASE_BOUNCER_DESKTOP;
                     layoutFrame++;
-                    if (layoutFrame % 45 === 0) syncBouncerSize();
+                    if (layoutFrame % 60 === 0) syncBouncerSize();
                     const bw = bwCached;
                     const bh = bhCached;
 
