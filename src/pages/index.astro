@@ -273,12 +273,12 @@ const KAZTA_IG_LOGO =
                 right: max(0.55rem, env(safe-area-inset-right, 0px));
                 bottom: max(0.55rem, env(safe-area-inset-bottom, 0px));
                 z-index: 100;
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.18rem;
-                max-width: min(260px, 88vw);
-                padding: 0;
+                display: block;
+                /* Reserva de espacio p/ línea; ancho = el del img (mismo que el logo) */
+                box-sizing: border-box;
+                width: max-content;
+                max-width: min(280px, 90vw);
+                padding: calc(0.3 * 2/3 * 1.4 * var(--kazta-logo-h) + 0.1rem) 0 0;
                 line-height: 1;
                 text-decoration: none;
                 color: rgba(240, 240, 240, 0.88);
@@ -290,28 +290,32 @@ const KAZTA_IG_LOGO =
                     filter 0.2s;
             }
             .kazta-ig-cta__eyebrow {
+                position: absolute;
+                top: 0.08rem;
+                left: 0;
+                right: 0;
                 margin: 0;
-                margin-bottom: 0.02rem;
                 padding: 0;
-                align-self: flex-start;
+                box-sizing: border-box;
+                max-width: 100%;
                 text-align: left;
                 font: inherit;
                 font-weight: 600;
-                /* ~5× la versión previa: (2/3) × 1.25 × alto logo */
-                font-size: max(0.75rem, calc(2/3 * 1.25 * var(--kazta-logo-h)));
+                /* ~30% del tamaño grande anterior (≈ −70%) */
+                font-size: max(0.28rem, calc(0.3 * 2/3 * 1.25 * var(--kazta-logo-h)));
                 line-height: 1.12;
-                letter-spacing: 0.03em;
+                letter-spacing: 0.02em;
                 white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .kazta-ig-cta__logo {
                 display: block;
-                align-self: flex-start;
-                width: 100%;
+                width: auto;
+                height: var(--kazta-logo-h);
                 max-width: 100%;
-                height: auto;
-                max-height: 52px;
                 object-fit: contain;
-                object-position: left bottom;
+                object-position: left center;
                 image-rendering: auto;
             }
             @media (min-width: 768px) {
@@ -319,16 +323,12 @@ const KAZTA_IG_LOGO =
                     --kazta-logo-h: 64px;
                     right: max(0.75rem, env(safe-area-inset-right, 0px));
                     bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
-                    max-width: min(280px, 32vw);
                 }
                 .kazta-ig-cta__eyebrow {
                     font-size: max(
-                        0.8rem,
-                        calc(2/3 * 1.25 * var(--kazta-logo-h))
+                        0.3rem,
+                        calc(0.3 * 2/3 * 1.25 * var(--kazta-logo-h))
                     );
-                }
-                .kazta-ig-cta__logo {
-                    max-height: 64px;
                 }
             }
             .kazta-ig-cta:hover {
