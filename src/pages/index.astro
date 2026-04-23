@@ -128,13 +128,10 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 .bouncer-layer {
                     display: block;
                 }
-                /* 8 minireels en móvil; proporción táctil (vmin + tope px). */
+                /* 4 minireels; proporción táctil (vmin + tope px). */
                 .bouncer {
                     width: clamp(48px, 19vmin, 92px);
                     border-radius: 3px;
-                }
-                .bouncer:nth-child(n + 9) {
-                    display: none !important;
                 }
             }
             .domain-wrap {
@@ -373,7 +370,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             </div>
             <div class="bouncer-layer" id="bouncer-layer" aria-hidden="true">
                 {
-                    Array.from({ length: 18 }, (_, i) => (
+                    Array.from({ length: 4 }, (_, i) => (
                         <div class="bouncer" data-bouncer={i}>
                             <video
                                 muted
@@ -499,10 +496,10 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             const VIDEO_CLIPS = JSON.parse(videoClipsJson);
             const REEL_VIDEO_URLS = JSON.parse(reelVideoUrlsJson);
             const REEL_COUNT = 4; // En escritorio siempre 4; en móvil se muestra 1 cambiante
-            const BOUNCER_COUNT = 5; // Reducido a la mitad para optimizar rendimiento
-            const BOUNCER_COUNT_MOBILE = 5; // Reducido a la mitad para optimizar rendimiento
-            const BASE_BOUNCER_DESKTOP = 8.5;
-            const BASE_BOUNCER_MOBILE = 13;
+            const BOUNCER_COUNT = 4;
+            const BOUNCER_COUNT_MOBILE = 4;
+            const BASE_BOUNCER_DESKTOP = 28;
+            const BASE_BOUNCER_MOBILE = 36;
             const DESKTOP_MQ = "(min-width: 768px)";
 
             const errMsg = document.getElementById("err-msg");
@@ -867,11 +864,10 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
 
                 function pickSpeedTarget(forMobile) {
                     const u = Math.random();
-                    // Movimiento más extremo: rangos de velocidad ampliados
                     if (forMobile) {
-                        return 0.5 + Math.pow(u, 0.5) * 2.5; // Más rápido y errático en móvil
+                        return 1.1 + Math.pow(u, 0.35) * 5.2;
                     }
-                    return 0.7 + Math.pow(u, 0.4) * 3.0; // Más rápido y errático en escritorio
+                    return 1.2 + Math.pow(u, 0.3) * 5.0;
                 }
 
                 function smoothstep01(t) {
@@ -880,6 +876,9 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 }
 
                 const t0 = performance.now();
+                const bTransMs = (m) =>
+                    200 + Math.random() * (m ? 2200 : 1800);
+                const bHoldMs = (m) => 100 + Math.random() * (m ? 360 : 320);
 
                 /** @type {{ el: HTMLElement; x: number; y: number; vx: number; vy: number; speedMul: number; speedFrom: number; speedTo: number; transStart: number; transDuration: number; nextShiftAt: number }[]} */
                 const state = els.map((el, i) => {
@@ -901,12 +900,12 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                             v.load();
                             void v.play().catch(() => {});
                         },
-                        i * (mobile ? 55 : 40),
+                        i * (mobile ? 28 : 22),
                     );
                     const angle = Math.random() * Math.PI * 2;
                     const mag = mobile
-                        ? 0.55 + Math.random() * 1.15
-                        : 0.65 + Math.random() * 0.95;
+                        ? 0.85 + Math.random() * 1.35
+                        : 0.9 + Math.random() * 1.1;
                     const m0 = pickSpeedTarget(mobile);
                     return {
                         el,
@@ -919,7 +918,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                         speedTo: m0,
                         transStart: t0,
                         transDuration: 1,
-                        nextShiftAt: t0 + (1800 + Math.random() * 11200),
+                        nextShiftAt: t0 + 250 + Math.random() * 700,
                     };
                 });
 
@@ -990,10 +989,8 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                             b.speedFrom = b.speedMul;
                             b.speedTo = pickSpeedTarget(mobNow);
                             b.transStart = now;
-                            b.transDuration =
-                                480 + Math.random() * (mobNow ? 9200 : 7800);
-                            const holdAfter =
-                                900 + Math.random() * (mobNow ? 13000 : 11000);
+                            b.transDuration = bTransMs(mobNow);
+                            const holdAfter = bHoldMs(mobNow);
                             b.nextShiftAt = now + b.transDuration + holdAfter;
                         }
                         const td = Math.max(1, b.transDuration);
