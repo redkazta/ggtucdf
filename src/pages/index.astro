@@ -275,9 +275,9 @@ const KAZTA_IG_LOGO =
                 z-index: 100;
                 display: flex;
                 flex-direction: column;
-                align-items: flex-end;
-                gap: 0.12rem;
-                max-width: min(200px, 48vw);
+                align-items: flex-start;
+                gap: 0.18rem;
+                max-width: min(260px, 88vw);
                 padding: 0;
                 line-height: 1;
                 text-decoration: none;
@@ -293,21 +293,25 @@ const KAZTA_IG_LOGO =
                 margin: 0;
                 margin-bottom: 0.02rem;
                 padding: 0;
+                align-self: flex-start;
+                text-align: left;
                 font: inherit;
-                font-weight: 500;
-                /* Tamaño ~ (2/3) × (1/4) de la altura del logo */
-                font-size: max(0.5rem, calc(2/3 * 0.25 * var(--kazta-logo-h)));
-                line-height: 1.1;
-                letter-spacing: 0.02em;
+                font-weight: 600;
+                /* ~5× la versión previa: (2/3) × 1.25 × alto logo */
+                font-size: max(0.75rem, calc(2/3 * 1.25 * var(--kazta-logo-h)));
+                line-height: 1.12;
+                letter-spacing: 0.03em;
                 white-space: nowrap;
             }
             .kazta-ig-cta__logo {
                 display: block;
+                align-self: flex-start;
                 width: 100%;
+                max-width: 100%;
                 height: auto;
                 max-height: 52px;
                 object-fit: contain;
-                object-position: right bottom;
+                object-position: left bottom;
                 image-rendering: auto;
             }
             @media (min-width: 768px) {
@@ -315,12 +319,12 @@ const KAZTA_IG_LOGO =
                     --kazta-logo-h: 64px;
                     right: max(0.75rem, env(safe-area-inset-right, 0px));
                     bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
-                    max-width: min(240px, 28vw);
+                    max-width: min(280px, 32vw);
                 }
                 .kazta-ig-cta__eyebrow {
                     font-size: max(
-                        0.55rem,
-                        calc(2/3 * 0.25 * var(--kazta-logo-h))
+                        0.8rem,
+                        calc(2/3 * 1.25 * var(--kazta-logo-h))
                     );
                 }
                 .kazta-ig-cta__logo {
