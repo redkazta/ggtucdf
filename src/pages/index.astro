@@ -1,5 +1,4 @@
 ---
-import { ELEGIDO_TOLERANCE_SEC } from "../config/elegido";
 import { REEL_VIDEO_URLS, TRACK_SRC, VIDEO_CLIPS } from "../data/videoClips";
 
 const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
@@ -57,7 +56,6 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 overflow: hidden;
                 background: #050505;
                 border-radius: 6px;
-                transition: box-shadow 0.2s ease;
             }
             .reel-wrap video {
                 display: block;
@@ -77,31 +75,27 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 .reel-wrap {
                     width: 100%;
                 }
-                .reel-pad {
-                    box-shadow: 0 0 8px 2px #d4af37;
-                }
-                .reel-wrap.is-aligned:not(.is-hero) .reel-pad {
-                    box-shadow:
-                        0 0 0 1px rgba(212, 175, 55, 0.65),
-                        0 0 12px rgba(212, 175, 55, 0.22);
-                }
-                .reel-wrap.is-hero.is-aligned .reel-pad {
-                    box-shadow:
-                        0 0 0 3px #e8c85c,
-                        0 0 20px rgba(232, 200, 92, 0.45),
-                        inset 0 0 0 1px rgba(255, 248, 220, 0.35);
-                }
             }
             @media (max-width: 767px) {
                 .clip-grid-main {
                     display: block;
+                    position: relative;
                     height: 100dvh;
                 }
                 .clip-grid-main .reel-wrap {
+                    position: absolute;
+                    inset: 0;
                     width: 100%;
                     height: 100%;
                 }
-                /* Show all reels on mobile – removed hide rule */
+                .clip-grid-main .reel-wrap:not(.active) {
+                    visibility: hidden;
+                    z-index: 0;
+                }
+                .clip-grid-main .reel-wrap.active {
+                    visibility: visible;
+                    z-index: 1;
+                }
                 .reel-wrap video.is-visible {
                     opacity: 1;
                 }
@@ -123,7 +117,6 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 border-radius: 4px;
                 overflow: hidden;
                 contain: strict;
-                border: 1px solid rgba(212, 175, 55, 0.32);
             }
             .bouncer video {
                 width: 100%;
@@ -170,7 +163,6 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: thin;
                 pointer-events: auto;
-                animation: zoom-pulse 3.6s ease-in-out infinite;
                 transform-origin: center;
                 text-shadow:
                     0 1px 3px rgba(0, 0, 0, 0.92),
@@ -179,8 +171,6 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                     0 0 2.5rem rgba(0, 0, 0, 0.4);
                 opacity: 1;
                 -webkit-text-stroke: 0.3px rgba(0, 0, 0, 0.9);
-                text-stroke: 0.3px rgba(0, 0, 0, 0.9);
-                box-shadow: 0 0 8px 2px #d4af37;
             }
             .domain::-webkit-scrollbar {
                 height: 3px;
@@ -196,10 +186,10 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 z-index: 100;
                 width: 44px;
                 height: 44px;
-                border: 2px solid #d4af37;
+                border: 1px solid rgba(255, 255, 255, 0.2);
                 border-radius: 8px;
                 background: rgba(10, 10, 10, 0.85);
-                color: #d4af37;
+                color: #e0e0e0;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
@@ -209,7 +199,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                     transform 0.1s;
             }
             .sound-toggle:hover {
-                background: rgba(212, 175, 55, 0.15);
+                background: rgba(255, 255, 255, 0.08);
             }
             .sound-toggle:active {
                 transform: scale(0.95);
@@ -233,8 +223,25 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 min-height: 1.25em;
                 pointer-events: none;
             }
-            /* Elegido toast removed – replaced by YouTube button */
-            /* No longer needed */
+            .yt-button {
+                position: fixed;
+                bottom: 1rem;
+                right: 1rem;
+                z-index: 100;
+                display: block;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+            }
+            .yt-thumb {
+                display: block;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
         </style>
     </head>
     <body>
@@ -318,14 +325,10 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             define:vars={{
                 videoClipsJson,
                 reelVideoUrlsJson,
-                trackSrc: TRACK_SRC,
-                elegidoToleranceSec: ELEGIDO_TOLERANCE_SEC,
             }}
         >
             const VIDEO_CLIPS = JSON.parse(videoClipsJson);
             const REEL_VIDEO_URLS = JSON.parse(reelVideoUrlsJson);
-            const ELEGIDO_COOLDOWN_MS = 15_000;
-            const ELEGIDO_TOAST_MS = 4_000;
             const REEL_COUNT = 4; // En escritorio siempre 4; en móvil se muestra 1 cambiante
             const BOUNCER_COUNT = 5; // Reducido a la mitad para optimizar rendimiento
             const BOUNCER_COUNT_MOBILE = 5; // Reducido a la mitad para optimizar rendimiento
@@ -446,19 +449,11 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 return window.matchMedia(DESKTOP_MQ).matches;
             }
 
-            function activeReelCount() {
-                return isDesktop() ? REEL_COUNT : 1;
-            }
-
             let started = false;
             let stopClips = false;
-            /** @type {({ id: string; src: string; clipStartSec: number; clipEndSec: number; alignedSongStartSec?: number; alignedSongEndSec?: number } | null)[]} */
+            /** @type {({ id: string; src: string; clipStartSec: number; clipEndSec: number } | null)[]} */
             const reelClip = Array(REEL_COUNT).fill(null);
             const reelArmed = Array(REEL_COUNT).fill(false);
-            /** Reel “héroe” en escritorio (borde dorado fuerte); en móvil siempre 0. */
-            let heroReel = 0;
-            let elegidoCooldownUntil = 0;
-            let elegidoHideTimer = 0;
             let bouncerRaf = 0;
             /** @type {null | (() => void)} */
             let bouncerVisibilityCleanup = null;
@@ -476,10 +471,20 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 }
             }
 
-            function pickRandomClip() {
+            function pickRandomClip(excludeId) {
                 if (VIDEO_CLIPS.length === 0) return null;
-                const i = Math.floor(Math.random() * VIDEO_CLIPS.length);
-                return VIDEO_CLIPS[i];
+                let pool = VIDEO_CLIPS;
+                if (
+                    excludeId &&
+                    typeof excludeId === "string" &&
+                    VIDEO_CLIPS.length > 1
+                ) {
+                    const filtered = VIDEO_CLIPS.filter(
+                        (c) => c.id !== excludeId,
+                    );
+                    if (filtered.length) pool = filtered;
+                }
+                return pool[Math.floor(Math.random() * pool.length)];
             }
 
             function pickDistinctClips(n) {
@@ -497,81 +502,17 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 return out;
             }
 
-            function getQuarterCapSec() {
-                const d = audioEl.duration;
-                if (!Number.isFinite(d) || d <= 0)
-                    return Number.POSITIVE_INFINITY;
-                return d / 4;
-            }
-
-            function clipPlaybackEnd(clip, reelIndex) {
-                const natural = clip.clipEndSec;
-                if (!isDesktop() || reelIndex !== heroReel) return natural;
-                const cap = getQuarterCapSec();
-                if (!Number.isFinite(cap)) return natural;
-                return Math.min(natural, clip.clipStartSec + cap);
-            }
-
-            function clipHasElegidoMeta(c) {
-                return (
-                    c.alignedSongStartSec != null &&
-                    c.alignedSongEndSec != null &&
-                    Number.isFinite(c.alignedSongStartSec) &&
-                    Number.isFinite(c.alignedSongEndSec)
-                );
-            }
-
-            function isInElegidoWindow(t, c) {
-                if (!clipHasElegidoMeta(c)) return false;
-                const lo = Math.max(
-                    0,
-                    c.alignedSongStartSec - elegidoToleranceSec,
-                );
-                const hi = c.alignedSongEndSec + elegidoToleranceSec;
-                return t >= lo && t <= hi;
-            }
-
-            function showElegidoToast() {
-                elegidoToast.classList.add("is-on");
-                window.clearTimeout(elegidoHideTimer);
-                elegidoHideTimer = window.setTimeout(() => {
-                    elegidoToast.classList.remove("is-on");
-                }, ELEGIDO_TOAST_MS);
-            }
-
-            function refreshReelDecor() {
-                const t = audioEl.currentTime;
-                for (let r = 0; r < REEL_COUNT; r++) {
-                    const wrap = reelWraps[r];
-                    const c = reelClip[r];
-                    const aligned = !!(
-                        c &&
-                        clipHasElegidoMeta(c) &&
-                        isInElegidoWindow(t, c)
-                    );
-                    wrap.classList.toggle("is-aligned", aligned);
-                    wrap.classList.toggle(
-                        "is-hero",
-                        isDesktop() && r === heroReel,
-                    );
-                }
-            }
-
-            function onAudioTimeupdate() {
-                refreshReelDecor();
-                if (!started || stopClips) return;
-                const heroClip = reelClip[heroReel];
-                if (!heroClip || !clipHasElegidoMeta(heroClip)) return;
-                const t = audioEl.currentTime;
-                if (!isInElegidoWindow(t, heroClip)) return;
-                if (performance.now() < elegidoCooldownUntil) return;
-                elegidoCooldownUntil = performance.now() + ELEGIDO_COOLDOWN_MS;
-                showElegidoToast();
-            }
-
             function beginReelPlayback(reelIndex, clip) {
                 const v = videos[reelIndex];
-                v.currentTime = clip.clipStartSec;
+                const span = clip.clipEndSec - clip.clipStartSec;
+                const maxJitter = Math.min(1.8, Math.max(0, span * 0.45));
+                const start =
+                    clip.clipStartSec +
+                    (maxJitter > 0 ? Math.random() * maxJitter : 0);
+                v.currentTime = Math.min(
+                    clip.clipEndSec - 0.12,
+                    Math.max(clip.clipStartSec, start),
+                );
                 reelArmed[reelIndex] = true;
                 void v.play().catch(() => {});
             }
@@ -598,8 +539,10 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
 
             function scheduleReel(reelIndex, clipOverride) {
                 if (stopClips || VIDEO_CLIPS.length === 0) return;
-                if (reelIndex >= activeReelCount()) return;
-                const next = clipOverride ?? pickRandomClip();
+                if (reelIndex < 0 || reelIndex >= REEL_COUNT) return;
+                const priorId = reelClip[reelIndex]?.id;
+                const next =
+                    clipOverride ?? pickRandomClip(priorId ?? undefined);
                 if (!next) return;
                 reelArmed[reelIndex] = false;
                 reelClip[reelIndex] = next;
@@ -612,28 +555,16 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 const clip = reelClip[reelIndex];
                 if (!clip || stopClips) return;
                 const v = videos[reelIndex];
-                const end = clipPlaybackEnd(clip, reelIndex);
+                const end = clip.clipEndSec;
                 if (v.currentTime < end - 0.08) return;
 
                 reelArmed[reelIndex] = false;
                 v.pause();
-
-                if (isDesktop() && reelIndex === heroReel) {
-                    const prevHero = heroReel;
-                    heroReel = (heroReel + 1) % REEL_COUNT;
-                    refreshReelDecor();
-                    requestAnimationFrame(() => {
-                        if (stopClips) return;
-                        scheduleReel(prevHero);
-                        videos[heroReel].pause();
-                        scheduleReel(heroReel);
-                    });
-                } else {
-                    requestAnimationFrame(() => {
-                        if (stopClips) return;
-                        scheduleReel(reelIndex);
-                    });
-                }
+                const staggerMs = 40 + Math.floor(Math.random() * 220);
+                window.setTimeout(() => {
+                    if (stopClips) return;
+                    scheduleReel(reelIndex);
+                }, staggerMs);
             }
 
             function onReelEnded(reelIndex) {
@@ -870,17 +801,18 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             let reelInterval = null;
 
             function showNextReel() {
-                if (!isDesktop()) {
-                    const wraps = document.querySelectorAll(".reel-wrap");
-                    wraps[currentReelIndex].classList.remove("active");
-                    currentReelIndex = (currentReelIndex + 1) % REEL_COUNT;
-                    wraps[currentReelIndex].classList.add("active");
-                }
+                if (isDesktop()) return;
+                const wraps = document.querySelectorAll(".reel-wrap");
+                const prev = currentReelIndex;
+                if (reelArmed[prev]) reelArmed[prev] = false;
+                if (videos[prev]) videos[prev].pause();
+                wraps[prev].classList.remove("active");
+                currentReelIndex = (currentReelIndex + 1) % REEL_COUNT;
+                wraps[currentReelIndex].classList.add("active");
+                scheduleReel(currentReelIndex);
             }
 
             for (let i = 0; i < REEL_COUNT; i++) wireReel(i);
-
-            audioEl.addEventListener("timeupdate", onAudioTimeupdate);
 
             window.addEventListener("resize", () => {
                 if (!started) return;
@@ -904,28 +836,34 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
 
                 started = true;
                 stopClips = false;
-                heroReel = isDesktop()
-                    ? Math.floor(Math.random() * REEL_COUNT)
-                    : 0;
                 applyReelLayout();
                 if (VIDEO_CLIPS.length > 0) {
                     if (isDesktop()) {
                         const batch = pickDistinctClips(REEL_COUNT);
                         for (let i = 0; i < REEL_COUNT; i++) {
-                            scheduleReel(i, batch[i] ?? pickRandomClip());
+                            const c = batch[i] ?? pickRandomClip();
+                            const t = Math.floor(Math.random() * 500);
+                            window.setTimeout(() => {
+                                if (!started || stopClips) return;
+                                scheduleReel(i, c);
+                            }, t);
                         }
                     } else {
-                        // Inicializar carousel: mostrar primer reel y configurar intervalo
+                        // Carousel: un reel a la vez; el intervalo rota .active
+                        currentReelIndex = 0;
                         scheduleReel(0);
                         document
                             .querySelectorAll(".reel-wrap")
                             .forEach((w, idx) => {
                                 w.classList.toggle("active", idx === 0);
                             });
-                        reelInterval = setInterval(showNextReel, 4000); // Cambio cada 4s
+                        if (reelInterval) clearInterval(reelInterval);
+                        reelInterval = setInterval(
+                            showNextReel,
+                            3500 + Math.floor(Math.random() * 2000),
+                        );
                     }
                     startBouncers();
-                    refreshReelDecor();
                 }
             }
 
