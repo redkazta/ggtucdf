@@ -234,17 +234,16 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.55));
                 transition: transform 0.15s ease, filter 0.2s, opacity 0.2s;
             }
-            .yt-cta img {
+            .yt-cta__logo {
                 display: block;
-                width: 156px;
-                height: 156px;
-                object-fit: contain;
-                image-rendering: auto;
+                width: 152px;
+                height: 152px;
+                shape-rendering: geometricPrecision;
             }
             @media (max-width: 767px) {
-                .yt-cta img {
-                    width: 150px;
-                    height: 150px;
+                .yt-cta__logo {
+                    width: 144px;
+                    height: 144px;
                 }
             }
             .yt-cta:hover {
@@ -299,55 +298,41 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             }
             .sound-hint {
                 position: fixed;
-                /* Desde la esquina; la flecha apunta hacia el botón de sonido (por debajo, z-index menor) */
-                top: 0;
-                left: 0;
+                inset: 0;
                 z-index: 99;
-                width: 196px;
-                height: 140px;
-                max-width: 52vw;
-                box-sizing: border-box;
-                padding-top: max(2px, env(safe-area-inset-top, 0px));
-                padding-left: max(2px, env(safe-area-inset-left, 0px));
                 display: block;
                 pointer-events: none;
             }
             .sound-hint.is-dismissed {
                 display: none;
             }
-            @keyframes sound-hint-bounce {
+            @keyframes sound-hint-pulse {
                 0%,
                 100% {
                     transform: translate(0, 0);
                 }
                 50% {
-                    transform: translate(0.2rem, 0.2rem);
+                    transform: translate(-3px, -2px);
                 }
             }
-            .sound-hint__arrow {
-                display: block;
+            .sound-hint__inner {
                 width: 100%;
                 height: 100%;
                 color: #f0f0f0;
                 filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
-                animation: sound-hint-bounce 0.9s ease-in-out infinite;
+                animation: sound-hint-pulse 0.9s ease-in-out infinite;
+                will-change: transform;
                 overflow: visible;
             }
-            @media (max-width: 767px) {
-                .sound-hint {
-                    width: 168px;
-                    height: 120px;
-                }
-            }
             @media (prefers-reduced-motion: reduce) {
-                .sound-hint__arrow {
+                .sound-hint__inner {
                     animation: none;
                 }
             }
             .err-msg {
                 position: fixed;
                 /* Por encima del CTA: bottom del botón + altura + margen */
-                bottom: calc(3.6rem + 156px + 0.75rem);
+                bottom: calc(3.6rem + 152px + 0.75rem);
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 25;
@@ -361,7 +346,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             }
             @media (max-width: 767px) {
                 .err-msg {
-                    bottom: calc(3.6rem + 150px + 0.75rem);
+                    bottom: calc(3.6rem + 144px + 0.75rem);
                 }
             }
         </style>
@@ -440,35 +425,40 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
 
         <div class="sound-hint" id="soundHint" aria-hidden="true">
             <svg
-                class="sound-hint__arrow"
-                viewBox="0 0 100 100"
+                class="sound-hint__inner"
+                id="soundHintSvg"
                 xmlns="http://www.w3.org/2000/svg"
+                width="100%"
+                height="100%"
+                viewBox="0 0 400 400"
                 aria-hidden="true"
                 focusable="false"
             >
                 <defs>
                     <marker
-                        id="soundHintA"
+                        id="soundHintArrowEnd"
                         viewBox="0 0 10 10"
                         refX="9"
                         refY="5"
-                        markerWidth="7"
-                        markerHeight="7"
+                        markerWidth="10"
+                        markerHeight="10"
+                        markerUnits="userSpaceOnUse"
                         orient="auto"
                     >
                         <path d="M0 0 L10 5 L0 10 z" fill="currentColor"></path>
                     </marker>
                 </defs>
                 <line
-                    x1="2"
-                    y1="2"
-                    x2="38"
-                    y2="35"
+                    id="soundHintLine"
+                    x1="380"
+                    y1="380"
+                    x2="200"
+                    y2="200"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="3.5"
+                    stroke-width="2.75"
                     stroke-linecap="round"
-                    marker-end="url(#soundHintA)"></line>
+                    marker-end="url(#soundHintArrowEnd)"></line>
             </svg>
         </div>
 
@@ -479,13 +469,23 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             class="yt-cta"
             aria-label="Gargut en YouTube"
         >
-            <img
-                src="/brand/youtube.svg"
-                width="156"
-                height="156"
-                alt=""
-                decoding="async"
-            />
+            <svg
+                class="yt-cta__logo"
+                viewBox="0 0 24 24"
+                width="152"
+                height="152"
+                role="img"
+                aria-hidden="true"
+            >
+                <path
+                    fill="#FF0000"
+                    d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 7.07 0 9.313 0 9.313s0 2.244.502 3.13a3.016 3.016 0 0 0 2.122 2.135c1.871.5 9.377.5 9.377.5s7.505 0 9.377-.5a3.013 3.013 0 0 0 2.122-2.135C24 9.31 24 7.07 24 7.07s.004-2.24-.502-3.12z"
+                />
+                <path
+                    fill="#fff"
+                    d="M9.75 15.02L9.75 8.98L15.5 12L9.75 15.02z"
+                />
+            </svg>
         </a>
 
         <audio
@@ -518,7 +518,47 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             const soundOnIcon = document.getElementById("soundOnIcon");
             const soundOffIcon = document.getElementById("soundOffIcon");
             const soundHint = document.getElementById("soundHint");
+            const soundHintSvg = document.getElementById("soundHintSvg");
+            const soundHintLine = document.getElementById("soundHintLine");
             const bouncerLayer = document.getElementById("bouncer-layer");
+
+            /** GAP_PX: hueco entre la punta y el centro del icono. CORNER_INSET: inicio cerca de abajo-derecha. */
+            const SOUND_HINT_GAP_PX = 56;
+            const SOUND_HINT_CORNER_INSET = 24;
+
+            function updateSoundHintGeometry() {
+                if (!soundHint || !soundHintSvg || !soundHintLine || !soundToggle)
+                    return;
+                if (soundHint.classList.contains("is-dismissed")) return;
+                const hR = soundHint.getBoundingClientRect();
+                const w = hR.width;
+                const h = hR.height;
+                if (w < 2 || h < 2) return;
+                const bR = soundToggle.getBoundingClientRect();
+                const sx = w - SOUND_HINT_CORNER_INSET;
+                const sy = h - SOUND_HINT_CORNER_INSET;
+                const cx = bR.left - hR.left + bR.width * 0.5;
+                const cy = bR.top - hR.top + bR.height * 0.5;
+                const dx = cx - sx;
+                const dy = cy - sy;
+                const L = Math.hypot(dx, dy);
+                if (L < 16) return;
+                const ux = dx / L;
+                const uy = dy / L;
+                const ex = cx - ux * SOUND_HINT_GAP_PX;
+                const ey = cy - uy * SOUND_HINT_GAP_PX;
+                soundHintSvg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+                soundHintLine.setAttribute("x1", String(sx));
+                soundHintLine.setAttribute("y1", String(sy));
+                soundHintLine.setAttribute("x2", String(ex));
+                soundHintLine.setAttribute("y2", String(ey));
+            }
+
+            function scheduleSoundHintUpdate() {
+                requestAnimationFrame(() => {
+                    updateSoundHintGeometry();
+                });
+            }
 
             function dismissSoundHint() {
                 if (soundHint instanceof HTMLElement) {
@@ -587,6 +627,28 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
 
             if (soundToggle) {
                 soundToggle.addEventListener("click", onSoundButtonActivate);
+            }
+
+            scheduleSoundHintUpdate();
+            window.addEventListener("resize", scheduleSoundHintUpdate, {
+                passive: true,
+            });
+            if (typeof ResizeObserver !== "undefined" && soundHint) {
+                new ResizeObserver(() => {
+                    scheduleSoundHintUpdate();
+                }).observe(soundHint);
+            }
+            window.addEventListener(
+                "orientationchange",
+                scheduleSoundHintUpdate,
+                { passive: true },
+            );
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener(
+                    "resize",
+                    scheduleSoundHintUpdate,
+                    { passive: true },
+                );
             }
 
             /** Espera a conocer la duración para poder saltar a un punto aleatorio (cada visita distinta). */
