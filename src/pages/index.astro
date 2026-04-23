@@ -9,6 +9,8 @@ import {
 const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
 const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
 const reelBouncerVideoUrlsJson = JSON.stringify([...REEL_BOUNCER_VIDEO_URLS]);
+const KAZTA_IG_LOGO =
+  "https://coilzxaisyuvcsdbywrk.supabase.co/storage/v1/object/public/videos/WhatsApp%20Image%202026-04-23%20at%203.48.28%20PM.jpeg";
 ---
 
 <html lang="es">
@@ -265,6 +267,54 @@ const reelBouncerVideoUrlsJson = JSON.stringify([...REEL_BOUNCER_VIDEO_URLS]);
             .yt-cta:active {
                 transform: translateX(-50%) scale(0.97);
             }
+            .kazta-ig-cta {
+                position: fixed;
+                right: max(0.55rem, env(safe-area-inset-right, 0px));
+                bottom: max(0.55rem, env(safe-area-inset-bottom, 0px));
+                z-index: 100;
+                display: block;
+                max-width: min(200px, 48vw);
+                padding: 0;
+                line-height: 0;
+                text-decoration: none;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+                filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
+                transition:
+                    transform 0.15s ease,
+                    filter 0.2s;
+            }
+            .kazta-ig-cta__logo {
+                display: block;
+                width: 100%;
+                height: auto;
+                max-height: 52px;
+                object-fit: contain;
+                object-position: right bottom;
+                image-rendering: auto;
+            }
+            @media (min-width: 768px) {
+                .kazta-ig-cta {
+                    right: max(0.75rem, env(safe-area-inset-right, 0px));
+                    bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+                    max-width: min(240px, 28vw);
+                }
+                .kazta-ig-cta__logo {
+                    max-height: 64px;
+                }
+            }
+            .kazta-ig-cta:hover {
+                filter: drop-shadow(0 3px 14px rgba(0, 0, 0, 0.7));
+                transform: scale(1.03);
+            }
+            .kazta-ig-cta:focus-visible {
+                outline: 2px solid rgba(255, 255, 255, 0.55);
+                outline-offset: 3px;
+                border-radius: 4px;
+            }
+            .kazta-ig-cta:active {
+                transform: scale(0.98);
+            }
             .sound-cluster {
                 position: fixed;
                 top: max(0.5rem, env(safe-area-inset-top, 0px));
@@ -481,6 +531,24 @@ const reelBouncerVideoUrlsJson = JSON.stringify([...REEL_BOUNCER_VIDEO_URLS]);
                 src="/brand/youtube.svg"
                 width="152"
                 height="152"
+                alt=""
+                decoding="async"
+                fetchpriority="low"
+            />
+        </a>
+
+        <a
+            href="https://www.instagram.com/young_kazta/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="kazta-ig-cta"
+            aria-label="young_kazta en Instagram"
+        >
+            <img
+                class="kazta-ig-cta__logo"
+                src={KAZTA_IG_LOGO}
+                width="400"
+                height="120"
                 alt=""
                 decoding="async"
                 fetchpriority="low"
