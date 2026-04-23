@@ -145,32 +145,74 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 justify-content: center;
                 align-items: center;
                 width: 100%;
+                padding: 0.5rem;
+                box-sizing: border-box;
                 pointer-events: none;
+            }
+            /* Tipografía compartida (centro y CTA de YouTube) */
+            .brand-text {
+                font-size: clamp(1.7rem, 4.5vmin + 2.05vw, 4.15rem);
+                font-weight: 600;
+                letter-spacing: 0.02em;
+                line-height: 1.1;
+                color: #f5f5f5;
+                text-shadow:
+                    0 1px 3px rgba(0, 0, 0, 0.92),
+                    0 0 0.65rem rgba(0, 0, 0, 0.68),
+                    0 0 1.35rem rgba(0, 0, 0, 0.52),
+                    0 0 2.5rem rgba(0, 0, 0, 0.4);
+                -webkit-text-stroke: 0.4px #0a0a0a;
+                paint-order: stroke fill;
+            }
+            @keyframes brand-zoom-desk {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.4);
+                }
+            }
+            @keyframes brand-zoom-mob {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.18);
+                }
             }
             .domain {
                 margin: 0;
                 max-width: calc(100vw - 1rem);
                 box-sizing: border-box;
-                font-size: clamp(1.7rem, 4.5vmin + 2.05vw, 4.15rem);
-                font-weight: 600;
-                letter-spacing: 0.02em;
                 text-align: center;
                 padding: clamp(0.35rem, 0.75vw, 0.5rem);
-                line-height: 1.06;
                 white-space: nowrap;
                 overflow-x: auto;
                 overflow-y: hidden;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: thin;
                 pointer-events: auto;
-                transform-origin: center;
-                text-shadow:
-                    0 1px 3px rgba(0, 0, 0, 0.92),
-                    0 0 0.65rem rgba(0, 0, 0, 0.68),
-                    0 0 1.35rem rgba(0, 0, 0, 0.52),
-                    0 0 2.5rem rgba(0, 0, 0, 0.4);
-                opacity: 1;
-                -webkit-text-stroke: 0.3px rgba(0, 0, 0, 0.9);
+                transform-origin: center center;
+                display: inline-block;
+            }
+            .domain.brand-text {
+                animation: brand-zoom-desk 3.6s ease-in-out infinite;
+            }
+            @media (max-width: 767px) {
+                .brand-text {
+                    font-size: clamp(1.2rem, 3.1vmin + 1.1vw, 2.75rem);
+                }
+                .domain.brand-text {
+                    animation-name: brand-zoom-mob;
+                    animation-duration: 3.4s;
+                    white-space: normal;
+                    word-break: break-word;
+                    hyphens: auto;
+                    max-width: min(100vw - 0.5rem, 22rem);
+                    overflow-x: visible;
+                }
             }
             .domain::-webkit-scrollbar {
                 height: 3px;
@@ -178,6 +220,40 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             .domain::-webkit-scrollbar-thumb {
                 background: rgba(255, 255, 255, 0.2);
                 border-radius: 3px;
+            }
+            .yt-cta {
+                position: fixed;
+                left: 50%;
+                bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+                z-index: 100;
+                transform: translateX(-50%);
+                box-sizing: border-box;
+                max-width: min(98vw, 32rem);
+                padding: 0.35rem 0.5rem;
+                text-align: center;
+                text-decoration: none;
+                color: inherit;
+                background: transparent;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+                text-wrap: balance;
+            }
+            @media (max-width: 767px) {
+                .yt-cta {
+                    max-width: min(100vw - 0.5rem, 20rem);
+                    line-height: 1.12;
+                    padding: 0.4rem 0.35rem 0.5rem;
+                    bottom: max(0.4rem, env(safe-area-inset-bottom, 0px));
+                    white-space: normal;
+                }
+            }
+            .yt-cta:hover {
+                background: rgba(0, 0, 0, 0.2);
+            }
+            .yt-cta:active {
+                background: rgba(0, 0, 0, 0.35);
             }
             .sound-toggle {
                 position: fixed;
@@ -223,24 +299,10 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 min-height: 1.25em;
                 pointer-events: none;
             }
-            .yt-button {
-                position: fixed;
-                bottom: 1rem;
-                right: 1rem;
-                z-index: 100;
-                display: block;
-                width: 48px;
-                height: 48px;
-                border-radius: 50%;
-                overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
-            }
-            .yt-thumb {
-                display: block;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
+            @media (max-width: 767px) {
+                .err-msg {
+                    bottom: 6.25rem;
+                }
             }
         </style>
     </head>
@@ -281,7 +343,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
         </div>
 
         <div class="domain-wrap" id="domain-wrap">
-            <p class="domain">garguttieneunchingodeferia.com</p>
+            <p class="domain brand-text">garguttieneunchingodeferia.com</p>
         </div>
 
         <p class="err-msg" id="err-msg" role="status"></p>
@@ -303,14 +365,9 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
             href="https://www.youtube.com/@Garguttt"
             target="_blank"
             rel="noopener"
-            class="yt-button"
-        >
-            <img
-                src="/youtube-profile.jpg"
-                alt="Gargut YouTube"
-                class="yt-thumb"
-            />
-        </a>
+            class="yt-cta brand-text"
+            aria-label="Gargut en YouTube"
+            >garguttieneunchingodeferia.com</a>
 
         <audio
             id="track"
