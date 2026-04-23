@@ -149,7 +149,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 box-sizing: border-box;
                 pointer-events: none;
             }
-            /* Tipografía compartida (centro y CTA de YouTube) */
+            /* Tipografía del título (CTA de YouTube va a 1/4 abajo) */
             .brand-text {
                 font-size: clamp(1.7rem, 4.5vmin + 2.05vw, 4.15rem);
                 font-weight: 600;
@@ -163,6 +163,16 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                     0 0 2.5rem rgba(0, 0, 0, 0.4);
                 -webkit-text-stroke: 0.4px #0a0a0a;
                 paint-order: stroke fill;
+            }
+            .yt-cta.brand-text {
+                font-size: clamp(0.425rem, 1.125vmin + 0.5125vw, 1.0375rem);
+                line-height: 1.2;
+                -webkit-text-stroke: 0.1px #0a0a0a;
+                text-shadow:
+                    0 0.25px 0.75px rgba(0, 0, 0, 0.92),
+                    0 0 0.16rem rgba(0, 0, 0, 0.68),
+                    0 0 0.34rem rgba(0, 0, 0, 0.52),
+                    0 0 0.625rem rgba(0, 0, 0, 0.4);
             }
             @keyframes brand-zoom-desk {
                 0%,
@@ -201,10 +211,8 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 animation: brand-zoom-desk 3.6s ease-in-out infinite;
             }
             @media (max-width: 767px) {
-                .brand-text {
-                    font-size: clamp(1.2rem, 3.1vmin + 1.1vw, 2.75rem);
-                }
                 .domain.brand-text {
+                    font-size: clamp(1.2rem, 3.1vmin + 1.1vw, 2.75rem);
                     animation-name: brand-zoom-mob;
                     animation-duration: 3.4s;
                     white-space: normal;
@@ -212,6 +220,9 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                     hyphens: auto;
                     max-width: min(100vw - 0.5rem, 22rem);
                     overflow-x: visible;
+                }
+                .yt-cta.brand-text {
+                    font-size: clamp(0.3rem, 0.775vmin + 0.275vw, 0.6875rem);
                 }
             }
             .domain::-webkit-scrollbar {
