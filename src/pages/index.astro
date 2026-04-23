@@ -226,7 +226,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 transform: translateX(-50%);
                 box-sizing: content-box;
                 display: block;
-                padding: 6px;
+                padding: 0;
                 text-decoration: none;
                 line-height: 0;
                 cursor: pointer;
@@ -239,6 +239,7 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 width: 156px;
                 height: 156px;
                 object-fit: contain;
+                image-rendering: auto;
             }
             @media (max-width: 767px) {
                 .yt-cta img {
@@ -297,9 +298,18 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                 fill: currentColor;
             }
             .sound-hint {
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                position: fixed;
+                /* Desde la esquina; la flecha apunta hacia el botón de sonido (por debajo, z-index menor) */
+                top: 0;
+                left: 0;
+                z-index: 99;
+                width: 196px;
+                height: 140px;
+                max-width: 52vw;
+                box-sizing: border-box;
+                padding-top: max(2px, env(safe-area-inset-top, 0px));
+                padding-left: max(2px, env(safe-area-inset-left, 0px));
+                display: block;
                 pointer-events: none;
             }
             .sound-hint.is-dismissed {
@@ -311,21 +321,22 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                     transform: translate(0, 0);
                 }
                 50% {
-                    transform: translate(-6px, 2px);
+                    transform: translate(0.2rem, 0.2rem);
                 }
             }
             .sound-hint__arrow {
                 display: block;
-                width: 34px;
-                height: 34px;
+                width: 100%;
+                height: 100%;
                 color: #f0f0f0;
                 filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
                 animation: sound-hint-bounce 0.9s ease-in-out infinite;
+                overflow: visible;
             }
             @media (max-width: 767px) {
-                .sound-hint__arrow {
-                    width: 30px;
-                    height: 30px;
+                .sound-hint {
+                    width: 168px;
+                    height: 120px;
                 }
             }
             @media (prefers-reduced-motion: reduce) {
@@ -425,24 +436,40 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                     ></path>
                 </svg>
             </button>
-            <div class="sound-hint" id="soundHint" aria-hidden="true">
-                <svg
-                    class="sound-hint__arrow"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                    focusable="false"
-                >
-                    <path
-                        d="M19 4L9 12L19 20"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    ></path>
-                </svg>
-            </div>
+        </div>
+
+        <div class="sound-hint" id="soundHint" aria-hidden="true">
+            <svg
+                class="sound-hint__arrow"
+                viewBox="0 0 100 100"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <defs>
+                    <marker
+                        id="soundHintA"
+                        viewBox="0 0 10 10"
+                        refX="9"
+                        refY="5"
+                        markerWidth="7"
+                        markerHeight="7"
+                        orient="auto"
+                    >
+                        <path d="M0 0 L10 5 L0 10 z" fill="currentColor"></path>
+                    </marker>
+                </defs>
+                <line
+                    x1="2"
+                    y1="2"
+                    x2="38"
+                    y2="35"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3.5"
+                    stroke-linecap="round"
+                    marker-end="url(#soundHintA)"></line>
+            </svg>
         </div>
 
         <a
@@ -546,24 +573,21 @@ const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
                     if (soundOffIcon) soundOffIcon.style.display = "none";
                 }
                 dismissSoundHint();
-                audioEl.play().catch(() => {});
-                window.removeEventListener("click", enableAudio);
-                window.removeEventListener("keydown", enableAudio);
-                window.removeEventListener("touchstart", enableAudio);
+                void audioEl.play();
             }
 
-            soundToggle.addEventListener("click", (e) => {
+            function onSoundButtonActivate(e) {
                 e.stopPropagation();
-                if (audioEl.muted) {
+                if (audioEl.muted || !soundEnabled) {
                     enableAudio();
                 } else {
                     toggleSound();
                 }
-            });
+            }
 
-            window.addEventListener("click", enableAudio);
-            window.addEventListener("keydown", enableAudio);
-            window.addEventListener("touchstart", enableAudio);
+            if (soundToggle) {
+                soundToggle.addEventListener("click", onSoundButtonActivate);
+            }
 
             /** Espera a conocer la duración para poder saltar a un punto aleatorio (cada visita distinta). */
             function waitForTrackDuration(a, timeoutMs = 10_000) {
