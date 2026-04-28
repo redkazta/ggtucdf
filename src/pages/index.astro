@@ -6,6 +6,7 @@ import {
   TRACK_SRC,
   KAZTA_IG_LOGO,
   YOUTUBE_URL,
+  SPOTIFY_URL,
   INSTAGRAM_URL,
   SITE_TITLE,
   SITE_DESCRIPTION,
@@ -45,19 +46,61 @@ import {
     </style>
 
     <style>
-      .cta-yt {
-        position: fixed; left: 50%;
-        bottom: max(3.6rem, env(safe-area-inset-bottom, 0px));
-        z-index: 100; transform: translateX(-50%);
-        display: block; padding: 0; text-decoration: none; line-height: 0;
-        cursor: pointer; -webkit-tap-highlight-color: transparent;
-        filter: drop-shadow(0 3px 12px rgba(0,0,0,0.55));
-        transition: transform 0.15s ease, filter 0.2s, opacity 0.2s;
+      .cta-stack {
+        position: fixed;
+        left: 50%;
+        bottom: max(1.2rem, env(safe-area-inset-bottom, 0px));
+        z-index: 100;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+        width: max-content;
+        max-width: 96vw;
+        pointer-events: none;
       }
-      .cta-yt:hover { filter: drop-shadow(0 4px 16px rgba(0,0,0,0.65)); transform: translateX(-50%) scale(1.03); }
-      .cta-yt:active { transform: translateX(-50%) scale(0.97); }
-      .cta-yt__logo { display: block; width: 152px; height: 152px; object-fit: contain; }
-      @media (max-width: 767px) { .cta-yt__logo { width: 144px; height: 144px; } }
+      .cta-stack > * { pointer-events: auto; }
+
+      .cta-icon {
+        display: block;
+        line-height: 0;
+        text-decoration: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        filter: drop-shadow(0 3px 12px rgba(0,0,0,0.55));
+        transition: transform 0.15s ease, filter 0.2s;
+      }
+      .cta-icon:hover { filter: drop-shadow(0 4px 16px rgba(0,0,0,0.65)); transform: scale(1.06); }
+      .cta-icon:active { transform: scale(0.96); }
+      .cta-icon__logo { display: block; width: 88px; height: 88px; object-fit: contain; }
+      @media (max-width: 767px) { .cta-icon__logo { width: 76px; height: 76px; } }
+      @media (min-width: 1200px) { .cta-icon__logo { width: 96px; height: 96px; } }
+
+      .cta-label {
+        font-family: "Archivo Black", sans-serif;
+        font-style: italic;
+        text-transform: uppercase;
+        color: #ffffff;
+        text-align: center;
+        line-height: 1.05;
+        letter-spacing: 0.04em;
+        text-shadow: 0 4px 18px rgba(0,0,0,0.9);
+        pointer-events: none;
+        user-select: none;
+      }
+      .cta-label--big {
+        font-size: clamp(1.1rem, 3.2vmin, 1.6rem);
+      }
+      .cta-label--small {
+        font-size: clamp(0.78rem, 2.2vmin, 1.05rem);
+        color: #e0e0e0;
+      }
+      .cta-arrows {
+        font-size: clamp(1rem, 2.6vmin, 1.4rem);
+        letter-spacing: -0.1em;
+        line-height: 1;
+      }
 
       .cta-ig {
         position: fixed;
@@ -93,11 +136,10 @@ import {
       .sound-toggle svg { width: 22px; height: 22px; fill: currentColor; }
 
       .err-msg {
-        position: fixed; bottom: calc(3.6rem + 152px + 0.75rem); left: 50%;
+        position: fixed; bottom: calc(50% - 8rem); left: 50%;
         transform: translateX(-50%); z-index: 25; max-width: min(32rem, 92vw);
         text-align: center; font-size: 0.85rem; color: #f09090; pointer-events: none;
       }
-      @media (max-width: 767px) { .err-msg { bottom: calc(3.6rem + 144px + 0.75rem); } }
     </style>
   </head>
 
@@ -118,23 +160,38 @@ import {
       </button>
     </div>
 
-    <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="cta-yt" aria-label="Gargut en YouTube">
-      <img class="cta-yt__logo" src="/brand/youtube.svg" width="152" height="152" alt="" decoding="async" fetchpriority="low" />
-    </a>
+    <div class="cta-stack">
+      <a href={SPOTIFY_URL} target="_blank" rel="noopener" class="cta-icon" aria-label="Escuchar en Spotify">
+        <img class="cta-icon__logo" src="/brand/spotify.svg" width="88" height="88" alt="" decoding="async" />
+      </a>
+
+      <div class="cta-label cta-label--big">
+        <span class="cta-arrows">&#171;&#171;</span> YO TE KIERO SOLO <span class="cta-arrows">&#187;&#187;</span>
+      </div>
+      <div class="cta-label cta-label--big" style="color:#ff3333;">OUT!!!</div>
+
+      <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="cta-icon" aria-label="Gargut en YouTube">
+        <img class="cta-icon__logo" src="/brand/youtube.svg" width="88" height="88" alt="" decoding="async" />
+      </a>
+
+      <div class="cta-label cta-label--small">
+        <span class="cta-arrows">&#8593;&#8593;</span> VER VISUALIZER <span class="cta-arrows">&#8593;&#8593;</span>
+      </div>
+    </div>
 
     <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
       <span class="cta-ig__eyebrow">Hecho por:</span>
-      <img class="cta-ig__logo" src={KAZTA_IG_LOGO} width="400" height="120" alt="" decoding="async" fetchpriority="low" />
+      <img class="cta-ig__logo" src={KAZTA_IG_LOGO} width="400" height="120" alt="" decoding="async" />
     </a>
 
     <audio id="track" preload="auto" loop playsinline autoplay muted src={TRACK_SRC}></audio>
 
     <script>
       (function() {
-        const audio = document.getElementById("track");
+        const audio = document.getElementById("track") as HTMLAudioElement | null;
         const btn = document.getElementById("soundToggle");
-        const onIcon = document.getElementById("soundOnIcon");
-        const offIcon = document.getElementById("soundOffIcon");
+        const onIcon = document.getElementById("soundOnIcon") as HTMLElement | null;
+        const offIcon = document.getElementById("soundOffIcon") as HTMLElement | null;
         if (!audio || !btn || !onIcon || !offIcon) return;
 
         let soundEnabled = false;
