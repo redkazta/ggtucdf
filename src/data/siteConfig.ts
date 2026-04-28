@@ -11,4 +11,4 @@ export const SPOTIFY_URL =
   "https://open.spotify.com/intl-es/track/4KvIxXUbDzMicaBr2opF9e?si=ece662d11f1a48c0";
 export const INSTAGRAM_URL = "https://www.instagram.com/young_kazta/";
 export const SITE_TITLE = "garguttieneunchingodeferia.com";
-export const SITE_DESCRIPTION = "WILDGVNGFREESTYLECOLECTIVO";
+export const SITE_DESCRIPTION = "ESCRIBELO TODO JUNTO,ESCRIBELO TODO EN APA";
