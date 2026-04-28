@@ -90,13 +90,13 @@ const { videoUrl, title } = Astro.props;
                   if (isMobile) {
                     durBase = 200 + Math.random() * 400; // 200-600ms, triple fast
                     if (r < 0.55) {
-                      targetScale = 0.88 + Math.random() * 0.04; // ~88-92%, high probability
+                      targetScale = 1.0 + Math.random() * 0.125; // 80% -> 90%, high probability
                     } else if (r < 0.82) {
-                      targetScale = 0.78 + Math.random() * 0.06; // ~78-84%
+                      targetScale = 0.9 + Math.random() * 0.1; // 72% -> 80%
                     } else if (r < 0.94) {
-                      targetScale = 0.65 + Math.random() * 0.08; // ~65-73%
+                      targetScale = 0.75 + Math.random() * 0.1; // 60% -> 68%
                     } else {
-                      targetScale = 0.35 + Math.random() * 0.12; // ~35-47%, aggressive rare
+                      targetScale = 0.45 + Math.random() * 0.15; // 36% -> 48%, aggressive rare
                     }
                   } else {
                     durBase = 180 + Math.random() * 380; // 180-560ms, triple fast
@@ -217,7 +217,7 @@ const { videoUrl, title } = Astro.props;
 
   @media (max-width: 767px) {
     .hero__title {
-      font-size: clamp(0.32rem, 2.6vw, 0.72rem);
+      font-size: clamp(0.72rem, 5.2vw, 1.15rem);
       white-space: nowrap;
       width: 80vw;
       min-width: 40vw;
