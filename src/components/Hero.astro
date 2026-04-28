@@ -213,17 +213,21 @@ const { videoUrl, title } = Astro.props;
     white-space: nowrap;
     overflow: visible;
     will-change: transform;
+    transform-origin: center center;
+    display: inline-block;
   }
 
   @media (max-width: 767px) {
     .hero__title {
-      font-size: clamp(0.72rem, 5.2vw, 1.15rem);
+      font-size: clamp(0.5rem, 2.5vw, 0.8rem);
       white-space: nowrap;
       width: 80vw;
       min-width: 40vw;
       max-width: 90vw;
       overflow: visible;
       -webkit-text-stroke-width: 0.35px;
+      transform-origin: center center;
+      display: inline-block;
     }
   }
 
