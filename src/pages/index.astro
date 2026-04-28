@@ -1,1239 +1,161 @@
 ---
+import Hero from "../components/Hero.astro";
+import RegisterSW from "../components/RegisterSW.astro";
 import {
-  REEL_BOUNCER_VIDEO_URLS,
-  REEL_VIDEO_URLS,
+  HERO_VIDEO_URL,
   TRACK_SRC,
-  VIDEO_CLIPS,
-} from "../data/videoClips";
-
-const videoClipsJson = JSON.stringify(VIDEO_CLIPS);
-const reelVideoUrlsJson = JSON.stringify([...REEL_VIDEO_URLS]);
-const reelBouncerVideoUrlsJson = JSON.stringify([...REEL_BOUNCER_VIDEO_URLS]);
-const KAZTA_IG_LOGO =
-  "https://coilzxaisyuvcsdbywrk.supabase.co/storage/v1/object/public/videos/WhatsApp%20Image%202026-04-23%20at%203.48.28%20PM.jpeg";
+  KAZTA_IG_LOGO,
+  YOUTUBE_URL,
+  INSTAGRAM_URL,
+  SITE_TITLE,
+  SITE_DESCRIPTION,
+} from "../data/siteConfig";
 ---
 
 <html lang="es">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="generator" content={Astro.generator} />
-        <meta name="description" content="garguttieneunchingodeferia.com" />
-        <title>garguttieneunchingodeferia.com</title>
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <style>
-            * {
-                box-sizing: border-box;
-            }
-            body {
-                margin: 0;
-                min-height: 100dvh;
-                background: #0a0a0a;
-                color: #f5f5f5;
-                font-family:
-                    system-ui,
-                    -apple-system,
-                    Segoe UI,
-                    Roboto,
-                    sans-serif;
-                overflow-x: hidden;
-            }
-            .stage {
-                position: fixed;
-                inset: 0;
-                overflow: hidden;
-                z-index: 0;
-                isolation: isolate;
-            }
-            .clip-grid-main {
-                position: relative;
-                width: 100%;
-                height: 100dvh;
-                box-sizing: border-box;
-            }
-            .reel-wrap {
-                position: relative;
-                height: 100%;
-                min-width: 0;
-                z-index: 1;
-            }
-            .reel-pad {
-                position: relative;
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-                background: #050505;
-                border-radius: 6px;
-            }
-            .reel-wrap video {
-                display: block;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                opacity: 0.7;
-            }
-            @media (min-width: 768px) {
-                .clip-grid-main {
-                    display: grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                    grid-template-rows: minmax(0, 1fr);
-                    gap: 4px;
-                    padding: 4px;
-                }
-                .reel-wrap {
-                    width: 100%;
-                }
-            }
-            @media (max-width: 767px) {
-                .clip-grid-main {
-                    display: block;
-                    position: relative;
-                    height: 100dvh;
-                }
-                .clip-grid-main .reel-wrap {
-                    position: absolute;
-                    inset: 0;
-                    width: 100%;
-                    height: 100%;
-                }
-                .clip-grid-main .reel-wrap:not(.active) {
-                    visibility: hidden;
-                    z-index: 0;
-                }
-                .clip-grid-main .reel-wrap.active {
-                    visibility: visible;
-                    z-index: 1;
-                }
-                .reel-wrap video.is-visible {
-                    opacity: 1;
-                }
-            }
-            .bouncer-layer {
-                position: fixed;
-                inset: 0;
-                pointer-events: none;
-                z-index: 6;
-                overflow: hidden;
-                contain: strict;
-            }
-            .bouncer {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: min(8vw, 66px);
-                aspect-ratio: 9 / 16;
-                border-radius: 4px;
-                overflow: hidden;
-                contain: strict;
-            }
-            .bouncer video {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                display: block;
-            }
-            @media (max-width: 767px) {
-                .bouncer-layer {
-                    display: block;
-                }
-                .bouncer:nth-child(n + 3) {
-                    display: none !important;
-                }
-                /* 2 minireels en móvil; 4 en escritorio. Proporción táctil (vmin + tope px). */
-                .bouncer {
-                    width: clamp(48px, 19vmin, 92px);
-                    border-radius: 3px;
-                }
-            }
-            .domain-wrap {
-                position: fixed;
-                inset: 0;
-                z-index: 10;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 100%;
-                padding: 0.5rem;
-                box-sizing: border-box;
-                pointer-events: none;
-            }
-            .brand-text {
-                font-size: clamp(1.7rem, 4.5vmin + 2.05vw, 4.15rem);
-                font-weight: 600;
-                letter-spacing: 0.02em;
-                line-height: 1.1;
-                color: #f5f5f5;
-                text-shadow:
-                    0 1px 3px rgba(0, 0, 0, 0.92),
-                    0 0 0.65rem rgba(0, 0, 0, 0.68),
-                    0 0 1.35rem rgba(0, 0, 0, 0.52),
-                    0 0 2.5rem rgba(0, 0, 0, 0.4);
-                -webkit-text-stroke: 0.4px #0a0a0a;
-                paint-order: stroke fill;
-            }
-            @keyframes brand-zoom-desk {
-                0%,
-                100% {
-                    transform: scale(1);
-                }
-                50% {
-                    transform: scale(1.4);
-                }
-            }
-            @keyframes brand-zoom-mob {
-                0%,
-                100% {
-                    transform: scale(1);
-                }
-                50% {
-                    transform: scale(1.18);
-                }
-            }
-            .domain {
-                margin: 0;
-                max-width: calc(100vw - 1rem);
-                box-sizing: border-box;
-                text-align: center;
-                padding: clamp(0.35rem, 0.75vw, 0.5rem);
-                white-space: nowrap;
-                overflow-x: auto;
-                overflow-y: hidden;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: thin;
-                pointer-events: auto;
-                transform-origin: center center;
-                display: inline-block;
-            }
-            .domain.brand-text {
-                animation: brand-zoom-desk 3.6s ease-in-out infinite;
-            }
-            @media (max-width: 767px) {
-                .domain.brand-text {
-                    font-size: clamp(1.2rem, 3.1vmin + 1.1vw, 2.75rem);
-                    animation-name: brand-zoom-mob;
-                    animation-duration: 3.4s;
-                    white-space: normal;
-                    word-break: break-word;
-                    hyphens: auto;
-                    max-width: min(100vw - 0.5rem, 22rem);
-                    overflow-x: visible;
-                }
-            }
-            .domain::-webkit-scrollbar {
-                height: 3px;
-            }
-            .domain::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 3px;
-            }
-            .yt-cta {
-                position: fixed;
-                left: 50%;
-                bottom: max(3.6rem, env(safe-area-inset-bottom, 0px));
-                z-index: 100;
-                transform: translateX(-50%);
-                box-sizing: content-box;
-                display: block;
-                padding: 0;
-                text-decoration: none;
-                line-height: 0;
-                cursor: pointer;
-                -webkit-tap-highlight-color: transparent;
-                filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.55));
-                transition: transform 0.15s ease, filter 0.2s, opacity 0.2s;
-            }
-            .yt-cta__logo {
-                display: block;
-                width: 152px;
-                height: 152px;
-                object-fit: contain;
-                image-rendering: auto;
-            }
-            @media (max-width: 767px) {
-                .yt-cta__logo {
-                    width: 144px;
-                    height: 144px;
-                }
-            }
-            .yt-cta:hover {
-                filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.65));
-                transform: translateX(-50%) scale(1.03);
-            }
-            .yt-cta:focus-visible {
-                outline: 2px solid rgba(255, 255, 255, 0.55);
-                outline-offset: 4px;
-                border-radius: 4px;
-            }
-            .yt-cta:active {
-                transform: translateX(-50%) scale(0.97);
-            }
-            .kazta-ig-cta {
-                --kazta-logo-h: 52px;
-                position: fixed;
-                right: max(0.55rem, env(safe-area-inset-right, 0px));
-                bottom: max(0.55rem, env(safe-area-inset-bottom, 0px));
-                z-index: 100;
-                display: block;
-                /* Reserva de espacio p/ línea; ancho = el del img (mismo que el logo) */
-                box-sizing: border-box;
-                width: max-content;
-                max-width: min(280px, 90vw);
-                padding: calc(0.3 * 2/3 * 1.4 * var(--kazta-logo-h) + 0.1rem) 0 0;
-                line-height: 1;
-                text-decoration: none;
-                color: rgba(240, 240, 240, 0.88);
-                cursor: pointer;
-                -webkit-tap-highlight-color: transparent;
-                filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55));
-                transition:
-                    transform 0.15s ease,
-                    filter 0.2s;
-            }
-            .kazta-ig-cta__eyebrow {
-                position: absolute;
-                top: 0.08rem;
-                left: 0;
-                right: 0;
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                max-width: 100%;
-                text-align: left;
-                font: inherit;
-                font-weight: 600;
-                /* ~30% del tamaño grande anterior (≈ −70%) */
-                font-size: max(0.28rem, calc(0.3 * 2/3 * 1.25 * var(--kazta-logo-h)));
-                line-height: 1.12;
-                letter-spacing: 0.02em;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .kazta-ig-cta__logo {
-                display: block;
-                width: auto;
-                height: var(--kazta-logo-h);
-                max-width: 100%;
-                object-fit: contain;
-                object-position: left center;
-                image-rendering: auto;
-            }
-            @media (min-width: 768px) {
-                .kazta-ig-cta {
-                    --kazta-logo-h: 64px;
-                    right: max(0.75rem, env(safe-area-inset-right, 0px));
-                    bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
-                }
-                .kazta-ig-cta__eyebrow {
-                    font-size: max(
-                        0.3rem,
-                        calc(0.3 * 2/3 * 1.25 * var(--kazta-logo-h))
-                    );
-                }
-            }
-            .kazta-ig-cta:hover {
-                filter: drop-shadow(0 3px 14px rgba(0, 0, 0, 0.7));
-                transform: scale(1.03);
-            }
-            .kazta-ig-cta:focus-visible {
-                outline: 2px solid rgba(255, 255, 255, 0.55);
-                outline-offset: 3px;
-                border-radius: 4px;
-            }
-            .kazta-ig-cta:active {
-                transform: scale(0.98);
-            }
-            .sound-cluster {
-                position: fixed;
-                top: max(0.5rem, env(safe-area-inset-top, 0px));
-                left: max(0.5rem, env(safe-area-inset-left, 0px));
-                z-index: 100;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 0.1rem;
-            }
-            .sound-toggle {
-                position: relative;
-                flex-shrink: 0;
-                width: 44px;
-                height: 44px;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                border-radius: 8px;
-                background: rgba(10, 10, 10, 0.85);
-                color: #e0e0e0;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition:
-                    background 0.2s,
-                    transform 0.1s;
-            }
-            .sound-toggle:hover {
-                background: rgba(255, 255, 255, 0.08);
-            }
-            .sound-toggle:active {
-                transform: scale(0.95);
-            }
-            .sound-toggle svg {
-                width: 22px;
-                height: 22px;
-                fill: currentColor;
-            }
-            .sound-hint {
-                position: fixed;
-                inset: 0;
-                z-index: 99;
-                display: block;
-                pointer-events: none;
-            }
-            .sound-hint.is-dismissed {
-                display: none;
-            }
-            @keyframes sound-hint-pulse {
-                0%,
-                100% {
-                    transform: translate(0, 0);
-                }
-                50% {
-                    transform: translate(-4px, -3px);
-                }
-            }
-            .sound-hint__inner {
-                width: 100%;
-                height: 100%;
-                color: #f0f0f0;
-                filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
-                animation: sound-hint-pulse 0.9s ease-in-out infinite;
-                will-change: transform;
-                overflow: visible;
-            }
-            @media (prefers-reduced-motion: reduce) {
-                .sound-hint__inner {
-                    animation: none;
-                }
-            }
-            .err-msg {
-                position: fixed;
-                /* Por encima del CTA: bottom del botón + altura + margen */
-                bottom: calc(3.6rem + 152px + 0.75rem);
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 25;
-                margin: 0;
-                max-width: min(32rem, 92vw);
-                text-align: center;
-                font-size: 0.85rem;
-                color: #f09090;
-                min-height: 1.25em;
-                pointer-events: none;
-            }
-            @media (max-width: 767px) {
-                .err-msg {
-                    bottom: calc(3.6rem + 144px + 0.75rem);
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="stage" aria-hidden="true">
-            <div class="clip-grid-main" id="clip-grid-main">
-                {
-                    [0, 1, 2, 3].map((reel) => (
-                        <div class="reel-wrap" data-reel={reel}>
-                            <div class="reel-pad">
-                                <video
-                                    class="clip"
-                                    muted
-                                    playsinline
-                                    preload="metadata"
-                                    disablepictureinpicture
-                                />
-                            </div>
-                        </div>
-                    ))
-                }
-            </div>
-            <div class="bouncer-layer" id="bouncer-layer" aria-hidden="true">
-                {
-                    Array.from({ length: 4 }, (_, i) => (
-                        <div class="bouncer" data-bouncer={i}>
-                            <video
-                                muted
-                                playsinline
-                                loop
-                                preload="none"
-                                disablepictureinpicture
-                            />
-                        </div>
-                    ))
-                }
-            </div>
-        </div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={SITE_DESCRIPTION} />
+    <title>{SITE_TITLE}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-        <div class="domain-wrap" id="domain-wrap">
-            <p class="domain brand-text">garguttieneunchingodeferia.com</p>
-        </div>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+    />
 
-        <p class="err-msg" id="err-msg" role="status"></p>
+    <style is:global>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body {
+        background: #000000;
+        color: #f5f5f5;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        overflow-x: hidden;
+        min-height: 100dvh;
+      }
+    </style>
 
-        <div class="sound-cluster" id="soundCluster">
-            <button
-                class="sound-toggle"
-                id="soundToggle"
-                type="button"
-                aria-label="Activar o desactivar sonido"
-            >
-                <svg
-                    id="soundOnIcon"
-                    viewBox="0 0 24 24"
-                    style="display: none"
-                    aria-hidden="true"
-                >
-                    <path
-                        d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"
-                    ></path>
-                </svg>
-                <svg
-                    id="soundOffIcon"
-                    viewBox="0 0 24 24"
-                    style="display: block"
-                    aria-hidden="true"
-                >
-                    <path
-                        d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"
-                    ></path>
-                </svg>
-            </button>
-        </div>
+    <style>
+      .cta-yt {
+        position: fixed; left: 50%;
+        bottom: max(3.6rem, env(safe-area-inset-bottom, 0px));
+        z-index: 100; transform: translateX(-50%);
+        display: block; padding: 0; text-decoration: none; line-height: 0;
+        cursor: pointer; -webkit-tap-highlight-color: transparent;
+        filter: drop-shadow(0 3px 12px rgba(0,0,0,0.55));
+        transition: transform 0.15s ease, filter 0.2s, opacity 0.2s;
+      }
+      .cta-yt:hover { filter: drop-shadow(0 4px 16px rgba(0,0,0,0.65)); transform: translateX(-50%) scale(1.03); }
+      .cta-yt:active { transform: translateX(-50%) scale(0.97); }
+      .cta-yt__logo { display: block; width: 152px; height: 152px; object-fit: contain; }
+      @media (max-width: 767px) { .cta-yt__logo { width: 144px; height: 144px; } }
 
-        <div class="sound-hint" id="soundHint" aria-hidden="true">
-            <svg
-                class="sound-hint__inner"
-                id="soundHintSvg"
-                xmlns="http://www.w3.org/2000/svg"
-                width="100%"
-                height="100%"
-                viewBox="0 0 400 400"
-                aria-hidden="true"
-                focusable="false"
-            >
-                <defs>
-                    <marker
-                        id="soundHintArrowEnd"
-                        viewBox="0 0 10 10"
-                        refX="9"
-                        refY="5"
-                        markerWidth="14"
-                        markerHeight="14"
-                        markerUnits="userSpaceOnUse"
-                        orient="auto"
-                    >
-                        <path d="M0 0 L10 5 L0 10 z" fill="currentColor"></path>
-                    </marker>
-                </defs>
-                <line
-                    id="soundHintLine"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="0"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="3.85"
-                    stroke-linecap="round"
-                    marker-end="url(#soundHintArrowEnd)"></line>
-            </svg>
-        </div>
+      .cta-ig {
+        position: fixed;
+        right: max(0.75rem, env(safe-area-inset-right, 0px));
+        bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+        z-index: 100; display: block; width: max-content;
+        max-width: min(280px, 90vw); text-decoration: none;
+        color: rgba(240,240,240,0.88); cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        filter: drop-shadow(0 2px 10px rgba(0,0,0,0.55));
+        transition: transform 0.15s ease, filter 0.2s;
+      }
+      .cta-ig:hover { filter: drop-shadow(0 3px 14px rgba(0,0,0,0.7)); transform: scale(1.03); }
+      .cta-ig:active { transform: scale(0.98); }
+      .cta-ig__eyebrow { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; line-height: 1.1; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .cta-ig__logo { display: block; height: 52px; width: auto; max-width: 100%; object-fit: contain; object-position: left center; }
+      @media (min-width: 768px) { .cta-ig__logo { height: 64px; } }
 
-        <a
-            href="https://www.youtube.com/@Garguttt"
-            target="_blank"
-            rel="noopener"
-            class="yt-cta"
-            aria-label="Gargut en YouTube"
-        >
-            <img
-                class="yt-cta__logo"
-                src="/brand/youtube.svg"
-                width="152"
-                height="152"
-                alt=""
-                decoding="async"
-                fetchpriority="low"
-            />
-        </a>
+      .sound-cluster {
+        position: fixed;
+        top: max(0.5rem, env(safe-area-inset-top, 0px));
+        left: max(0.5rem, env(safe-area-inset-left, 0px));
+        z-index: 100; display: flex; align-items: center; gap: 0.1rem;
+      }
+      .sound-toggle {
+        width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px; background: rgba(10,10,10,0.85); color: #e0e0e0;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background 0.2s, transform 0.1s;
+      }
+      .sound-toggle:hover { background: rgba(255,255,255,0.08); }
+      .sound-toggle:active { transform: scale(0.95); }
+      .sound-toggle svg { width: 22px; height: 22px; fill: currentColor; }
 
-        <a
-            href="https://www.instagram.com/young_kazta/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="kazta-ig-cta"
-            aria-label="Hecho por: young_kazta, abrir Instagram"
-        >
-            <span class="kazta-ig-cta__eyebrow">Hecho por:</span>
-            <img
-                class="kazta-ig-cta__logo"
-                src={KAZTA_IG_LOGO}
-                width="400"
-                height="120"
-                alt=""
-                decoding="async"
-                fetchpriority="low"
-            />
-        </a>
+      .err-msg {
+        position: fixed; bottom: calc(3.6rem + 152px + 0.75rem); left: 50%;
+        transform: translateX(-50%); z-index: 25; max-width: min(32rem, 92vw);
+        text-align: center; font-size: 0.85rem; color: #f09090; pointer-events: none;
+      }
+      @media (max-width: 767px) { .err-msg { bottom: calc(3.6rem + 144px + 0.75rem); } }
+    </style>
+  </head>
 
-        <audio
-            id="track"
-            preload="auto"
-            loop
-            playsinline
-            autoplay
-            muted
-            src={TRACK_SRC}></audio>
+  <body>
+    <RegisterSW />
+    <Hero videoUrl={HERO_VIDEO_URL} title={SITE_TITLE} />
 
-        <script
-            define:vars={{
-                videoClipsJson,
-                reelVideoUrlsJson,
-                reelBouncerVideoUrlsJson,
-            }}
-        >
-            const VIDEO_CLIPS = JSON.parse(videoClipsJson);
-            const REEL_VIDEO_URLS = JSON.parse(reelVideoUrlsJson);
-            const REEL_BOUNCER_VIDEO_URLS = JSON.parse(reelBouncerVideoUrlsJson);
-            const REEL_COUNT = 4; // En escritorio siempre 4; en móvil se muestra 1 cambiante
-            const BOUNCER_COUNT = 4;
-            const BOUNCER_COUNT_MOBILE = 2;
-            // Leve + ~20% más viveza (respecto a la pasada bajada; MP4 bouncers alivian decodificación)
-            const BASE_BOUNCER_DESKTOP = 10.2;
-            const BASE_BOUNCER_MOBILE = 13.2;
-            const DESKTOP_MQ = "(min-width: 768px)";
+    <p class="err-msg" id="err-msg" role="status"></p>
 
-            const errMsg = document.getElementById("err-msg");
-            const audioEl = document.getElementById("track");
-            const soundToggle = document.getElementById("soundToggle");
-            const soundOnIcon = document.getElementById("soundOnIcon");
-            const soundOffIcon = document.getElementById("soundOffIcon");
-            const soundHint = document.getElementById("soundHint");
-            const soundHintSvg = document.getElementById("soundHintSvg");
-            const soundHintLine = document.getElementById("soundHintLine");
-            const bouncerLayer = document.getElementById("bouncer-layer");
+    <div class="sound-cluster">
+      <button class="sound-toggle" id="soundToggle" type="button" aria-label="Activar o desactivar sonido">
+        <svg id="soundOnIcon" viewBox="0 0 24 24" style="display:none" aria-hidden="true">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path>
+        </svg>
+        <svg id="soundOffIcon" viewBox="0 0 24 24" style="display:block" aria-hidden="true">
+          <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path>
+        </svg>
+      </button>
+    </div>
 
-            /** Cola corta, punta a GAP_PX del centro. Punto-auxiliar K en zona inf-derecha (no esquina) p/diagonal natural. Escala +40% en trazo/punta. */
-            const SOUND_HINT_GAP_PX = 44;
-            const SOUND_HINT_TAIL_PX = 58;
-            const SOUND_HINT_STROKE = 2.75 * 1.4;
-            const SOUND_ANCHOR_X_FRAC = 0.76;
-            const SOUND_ANCHOR_Y_FRAC = 0.66;
+    <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="cta-yt" aria-label="Gargut en YouTube">
+      <img class="cta-yt__logo" src="/brand/youtube.svg" width="152" height="152" alt="" decoding="async" fetchpriority="low" />
+    </a>
 
-            function updateSoundHintGeometry() {
-                if (!soundHint || !soundHintSvg || !soundHintLine || !soundToggle)
-                    return;
-                if (soundHint.classList.contains("is-dismissed")) return;
-                const hR = soundHint.getBoundingClientRect();
-                const w = hR.width;
-                const h = hR.height;
-                if (w < 2 || h < 2) return;
-                const bR = soundToggle.getBoundingClientRect();
-                const cx = bR.left - hR.left + bR.width * 0.5;
-                const cy = bR.top - hR.top + bR.height * 0.5;
-                let kx = w * SOUND_ANCHOR_X_FRAC;
-                let ky = h * SOUND_ANCHOR_Y_FRAC;
-                let dxk = cx - kx;
-                let dyk = cy - ky;
-                let L = Math.hypot(dxk, dyk);
-                if (L < 20) {
-                    kx = w * 0.72;
-                    ky = h * 0.7;
-                    dxk = cx - kx;
-                    dyk = cy - ky;
-                    L = Math.hypot(dxk, dyk);
-                }
-                if (L < 12) return;
-                const ux = dxk / L;
-                const uy = dyk / L;
-                const bx = cx - ux * SOUND_HINT_GAP_PX;
-                const by = cy - uy * SOUND_HINT_GAP_PX;
-                const ax = bx - ux * SOUND_HINT_TAIL_PX;
-                const ay = by - uy * SOUND_HINT_TAIL_PX;
-                soundHintSvg.setAttribute("viewBox", `0 0 ${w} ${h}`);
-                soundHintLine.setAttribute("x1", String(ax));
-                soundHintLine.setAttribute("y1", String(ay));
-                soundHintLine.setAttribute("x2", String(bx));
-                soundHintLine.setAttribute("y2", String(by));
-                soundHintLine.setAttribute(
-                    "stroke-width",
-                    String(SOUND_HINT_STROKE),
-                );
-            }
+    <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
+      <span class="cta-ig__eyebrow">Hecho por:</span>
+      <img class="cta-ig__logo" src={KAZTA_IG_LOGO} width="400" height="120" alt="" decoding="async" fetchpriority="low" />
+    </a>
 
-            function scheduleSoundHintUpdate() {
-                requestAnimationFrame(() => {
-                    updateSoundHintGeometry();
-                });
-            }
+    <audio id="track" preload="auto" loop playsinline autoplay muted src={TRACK_SRC}></audio>
 
-            function dismissSoundHint() {
-                if (soundHint instanceof HTMLElement) {
-                    soundHint.classList.add("is-dismissed");
-                }
-            }
+    <script>
+      (function() {
+        const audio = document.getElementById("track");
+        const btn = document.getElementById("soundToggle");
+        const onIcon = document.getElementById("soundOnIcon");
+        const offIcon = document.getElementById("soundOffIcon");
+        if (!audio || !btn || !onIcon || !offIcon) return;
 
-            /** @type {HTMLElement[]} */
-            const reelWraps = [];
-            /** @type {HTMLVideoElement[]} */
-            const videos = [];
-            for (let r = 0; r < REEL_COUNT; r++) {
-                const w = document.querySelector(
-                    `.reel-wrap[data-reel="${r}"]`,
-                );
-                const v = w?.querySelector("video");
-                if (
-                    !(w instanceof HTMLElement) ||
-                    !(v instanceof HTMLVideoElement)
-                ) {
-                    throw new Error("DOM reels incompleto");
-                }
-                reelWraps.push(w);
-                videos.push(v);
-            }
+        let soundEnabled = false;
+        function update() {
+          onIcon.style.display = soundEnabled ? "block" : "none";
+          offIcon.style.display = soundEnabled ? "none" : "block";
+        }
 
-            if (
-                !errMsg ||
-                !(audioEl instanceof HTMLAudioElement) ||
-                !bouncerLayer
-            ) {
-                throw new Error("DOM inicial incompleto");
-            }
-
-            audioEl.loop = true;
-
-            // Control de sonido con botón
-            let soundEnabled = false;
-
-            function toggleSound() {
-                soundEnabled = !soundEnabled;
-                audioEl.muted = !soundEnabled;
-                soundOnIcon.style.display = soundEnabled ? "block" : "none";
-                soundOffIcon.style.display = soundEnabled ? "none" : "block";
-            }
-
-            function enableAudio() {
-                if (audioEl.muted) {
-                    audioEl.muted = false;
-                    soundEnabled = true;
-                    if (soundOnIcon) soundOnIcon.style.display = "block";
-                    if (soundOffIcon) soundOffIcon.style.display = "none";
-                }
-                dismissSoundHint();
-                void audioEl.play();
-            }
-
-            function onSoundButtonActivate(e) {
-                e.stopPropagation();
-                if (audioEl.muted || !soundEnabled) {
-                    enableAudio();
-                } else {
-                    toggleSound();
-                }
-            }
-
-            if (soundToggle) {
-                soundToggle.addEventListener("click", onSoundButtonActivate);
-            }
-
-            scheduleSoundHintUpdate();
-            window.addEventListener("resize", scheduleSoundHintUpdate, {
-                passive: true,
-            });
-            if (typeof ResizeObserver !== "undefined" && soundHint) {
-                new ResizeObserver(() => {
-                    scheduleSoundHintUpdate();
-                }).observe(soundHint);
-            }
-            window.addEventListener(
-                "orientationchange",
-                scheduleSoundHintUpdate,
-                { passive: true },
-            );
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener(
-                    "resize",
-                    scheduleSoundHintUpdate,
-                    { passive: true },
-                );
-            }
-
-            /** Espera a conocer la duración para poder saltar a un punto aleatorio (cada visita distinta). */
-            function waitForTrackDuration(a, timeoutMs = 10_000) {
-                if (
-                    Number.isFinite(a.duration) &&
-                    a.duration > 0 &&
-                    !Number.isNaN(a.duration)
-                ) {
-                    return Promise.resolve();
-                }
-                return new Promise((resolve, reject) => {
-                    let settled = false;
-                    const t = window.setTimeout(() => {
-                        if (settled) return;
-                        settled = true;
-                        a.removeEventListener("loadedmetadata", onMeta);
-                        a.removeEventListener("durationchange", onMeta);
-                        reject(new Error("timeout"));
-                    }, timeoutMs);
-                    function onMeta() {
-                        if (settled) return;
-                        if (
-                            Number.isFinite(a.duration) &&
-                            a.duration > 0 &&
-                            !Number.isNaN(a.duration)
-                        ) {
-                            settled = true;
-                            window.clearTimeout(t);
-                            a.removeEventListener("loadedmetadata", onMeta);
-                            a.removeEventListener("durationchange", onMeta);
-                            resolve();
-                        }
-                    }
-                    a.addEventListener("loadedmetadata", onMeta);
-                    a.addEventListener("durationchange", onMeta);
-                });
-            }
-
-            function isDesktop() {
-                return window.matchMedia(DESKTOP_MQ).matches;
-            }
-
-            let started = false;
-            let stopClips = false;
-            /** @type {({ id: string; src: string; clipStartSec: number; clipEndSec: number } | null)[]} */
-            const reelClip = Array(REEL_COUNT).fill(null);
-            const reelArmed = Array(REEL_COUNT).fill(false);
-            let bouncerRaf = 0;
-            /** @type {null | (() => void)} */
-            let bouncerVisibilityCleanup = null;
-
-            /** Columnas fijas 1–4 en orden DOM (sin shuffle: evita glitches y desfaces). */
-            function applyReelLayout() {
-                if (!isDesktop()) {
-                    reelWraps.forEach((wrap) => {
-                        wrap.style.gridColumn = "";
-                    });
-                    return;
-                }
-                for (let r = 0; r < REEL_COUNT; r++) {
-                    reelWraps[r].style.gridColumn = `${r + 1} / span 1`;
-                }
-            }
-
-            function pickRandomClip(excludeId) {
-                if (VIDEO_CLIPS.length === 0) return null;
-                let pool = VIDEO_CLIPS;
-                if (
-                    excludeId &&
-                    typeof excludeId === "string" &&
-                    VIDEO_CLIPS.length > 1
-                ) {
-                    const filtered = VIDEO_CLIPS.filter(
-                        (c) => c.id !== excludeId,
-                    );
-                    if (filtered.length) pool = filtered;
-                }
-                return pool[Math.floor(Math.random() * pool.length)];
-            }
-
-            function pickDistinctClips(n) {
-                if (VIDEO_CLIPS.length === 0) return [];
-                const pool = [...VIDEO_CLIPS];
-                const out = [];
-                while (out.length < n && pool.length > 0) {
-                    const j = Math.floor(Math.random() * pool.length);
-                    out.push(pool[j]);
-                    pool.splice(j, 1);
-                }
-                while (out.length < n) {
-                    out.push(pickRandomClip());
-                }
-                return out;
-            }
-
-            function beginReelPlayback(reelIndex, clip) {
-                const v = videos[reelIndex];
-                const span = clip.clipEndSec - clip.clipStartSec;
-                const maxJitter = Math.min(1.8, Math.max(0, span * 0.45));
-                const start =
-                    clip.clipStartSec +
-                    (maxJitter > 0 ? Math.random() * maxJitter : 0);
-                v.currentTime = Math.min(
-                    clip.clipEndSec - 0.12,
-                    Math.max(clip.clipStartSec, start),
-                );
-                reelArmed[reelIndex] = true;
-                void v.play().catch(() => {});
-            }
-
-            function loadReelSource(reelIndex, clip) {
-                const v = videos[reelIndex];
-                const onMeta = () => {
-                    v.removeEventListener("loadedmetadata", onMeta);
-                    beginReelPlayback(reelIndex, clip);
-                };
-                const targetHref = new URL(clip.src, window.location.origin)
-                    .href;
-                if (v.src && v.currentSrc === targetHref) {
-                    v.pause();
-                    beginReelPlayback(reelIndex, clip);
-                } else {
-                    v.addEventListener("loadedmetadata", onMeta, {
-                        once: true,
-                    });
-                    v.src = clip.src;
-                    v.load();
-                }
-            }
-
-            function scheduleReel(reelIndex, clipOverride) {
-                if (stopClips || VIDEO_CLIPS.length === 0) return;
-                if (reelIndex < 0 || reelIndex >= REEL_COUNT) return;
-                const priorId = reelClip[reelIndex]?.id;
-                const next =
-                    clipOverride ?? pickRandomClip(priorId ?? undefined);
-                if (!next) return;
-                reelArmed[reelIndex] = false;
-                reelClip[reelIndex] = next;
-                videos[reelIndex].classList.add("is-visible");
-                loadReelSource(reelIndex, next);
-            }
-
-            function onReelTimeupdate(reelIndex) {
-                if (!reelArmed[reelIndex]) return;
-                const clip = reelClip[reelIndex];
-                if (!clip || stopClips) return;
-                const v = videos[reelIndex];
-                const end = clip.clipEndSec;
-                if (v.currentTime < end - 0.08) return;
-
-                reelArmed[reelIndex] = false;
-                v.pause();
-                const staggerMs = 40 + Math.floor(Math.random() * 220);
-                window.setTimeout(() => {
-                    if (stopClips) return;
-                    scheduleReel(reelIndex);
-                }, staggerMs);
-            }
-
-            function onReelEnded(reelIndex) {
-                if (!reelArmed[reelIndex]) return;
-                reelArmed[reelIndex] = false;
-                if (stopClips) return;
-                scheduleReel(reelIndex);
-            }
-
-            function stopBouncers() {
-                cancelAnimationFrame(bouncerRaf);
-                bouncerRaf = 0;
-                if (bouncerVisibilityCleanup) {
-                    bouncerVisibilityCleanup();
-                    bouncerVisibilityCleanup = null;
-                }
-                bouncerLayer.querySelectorAll("video").forEach((v) => {
-                    if (v instanceof HTMLVideoElement) {
-                        v.pause();
-                        v.removeAttribute("src");
-                        v.load();
-                    }
-                });
-            }
-
-            function startBouncers() {
-                stopBouncers();
-                if (
-                    window.matchMedia("(prefers-reduced-motion: reduce)")
-                        .matches
-                )
-                    return;
-                const allEls = Array.from(
-                    bouncerLayer.querySelectorAll(".bouncer"),
-                );
-                if (allEls.length !== BOUNCER_COUNT) return;
-                const mobile = !isDesktop();
-                const els = mobile
-                    ? allEls.slice(0, BOUNCER_COUNT_MOBILE)
-                    : allEls;
-
-                const w0 = window.innerWidth;
-                const h0 = window.innerHeight;
-                const bwEst = mobile
-                    ? Math.min(Math.max(48, w0 * 0.19), 92)
-                    : Math.min(w0 * 0.08, 66);
-                const bhEst = bwEst * (16 / 9);
-
-                function pickSpeedTarget(forMobile) {
-                    const u = Math.random();
-                    if (forMobile) {
-                        return 0.75 + Math.pow(u, 0.52) * 0.58;
-                    }
-                    return 0.78 + Math.pow(u, 0.52) * 0.48;
-                }
-
-                function smoothstep01(t) {
-                    const x = Math.min(1, Math.max(0, t));
-                    return x * x * (3 - 2 * x);
-                }
-
-                const t0 = performance.now();
-                const bTransMs = (m) =>
-                    640 + Math.random() * (m ? 1800 : 1600);
-                const bHoldMs = (m) => 360 + Math.random() * (m ? 600 : 540);
-
-                /** @type {{ el: HTMLElement; x: number; y: number; vx: number; vy: number; speedMul: number; speedFrom: number; speedTo: number; transStart: number; transDuration: number; nextShiftAt: number }[]} */
-                const state = els.map((el, i) => {
-                    if (!(el instanceof HTMLElement))
-                        throw new Error("bouncer");
-                    const v = el.querySelector("video");
-                    if (!(v instanceof HTMLVideoElement))
-                        throw new Error("bouncer video");
-                    v.defaultMuted = true;
-                    v.muted = true;
-                    v.preload = "none";
-                    v.playsInline = true;
-                    v.disablePictureInPicture = true;
-                    const reelN = (i % 4) + 1;
-                    window.setTimeout(
-                        () => {
-                            if (!started || stopClips) return;
-                            v.src = REEL_BOUNCER_VIDEO_URLS[reelN - 1];
-                            v.load();
-                            void v.play().catch(() => {});
-                        },
-                        i * (mobile ? 120 : 100),
-                    );
-                    const angle = Math.random() * Math.PI * 2;
-                    const mag = mobile
-                        ? 0.27 + Math.random() * 0.4
-                        : 0.3 + Math.random() * 0.36;
-                    const m0 = pickSpeedTarget(mobile);
-                    return {
-                        el,
-                        x: Math.random() * Math.max(8, w0 - bwEst - 8),
-                        y: Math.random() * Math.max(8, h0 - bhEst - 8),
-                        vx: Math.cos(angle) * mag,
-                        vy: Math.sin(angle) * mag,
-                        speedMul: m0,
-                        speedFrom: m0,
-                        speedTo: m0,
-                        transStart: t0,
-                        transDuration: 1,
-                        nextShiftAt: t0 + 1100 + Math.random() * 1800,
-                    };
-                });
-
-                let bwCached = bwEst;
-                let bhCached = bhEst;
-                let layoutFrame = 0;
-
-                const syncBouncerSize = () => {
-                    const sample = state[0]?.el;
-                    if (sample instanceof HTMLElement) {
-                        bwCached = sample.offsetWidth || bwEst;
-                        bhCached = sample.offsetHeight || bhEst;
-                    }
-                };
-                syncBouncerSize();
-
-                const onResize = () => {
-                    syncBouncerSize();
-                };
-                window.addEventListener("resize", onResize, { passive: true });
-
-                const onVisibility = () => {
-                    if (document.hidden) {
-                        cancelAnimationFrame(bouncerRaf);
-                        bouncerRaf = 0;
-                        for (const b of state) {
-                            const v = b.el.querySelector("video");
-                            if (v instanceof HTMLVideoElement) v.pause();
-                        }
-                    } else if (started && !stopClips) {
-                        for (const b of state) {
-                            const v = b.el.querySelector("video");
-                            if (v instanceof HTMLVideoElement)
-                                void v.play().catch(() => {});
-                        }
-                        if (!bouncerRaf)
-                            bouncerRaf = requestAnimationFrame(tick);
-                    }
-                };
-                document.addEventListener("visibilitychange", onVisibility);
-
-                bouncerVisibilityCleanup = () => {
-                    window.removeEventListener("resize", onResize);
-                    document.removeEventListener(
-                        "visibilitychange",
-                        onVisibility,
-                    );
-                };
-
-                function tick() {
-                    if (!started || stopClips) return;
-                    if (document.hidden) return;
-
-                    const w = window.innerWidth;
-                    const h = window.innerHeight;
-                    const mobNow = !isDesktop();
-                    const baseNow = mobNow
-                        ? BASE_BOUNCER_MOBILE
-                        : BASE_BOUNCER_DESKTOP;
-                    layoutFrame++;
-                    if (layoutFrame % 60 === 0) syncBouncerSize();
-                    const bw = bwCached;
-                    const bh = bhCached;
-
-                    const now = performance.now();
-                    for (const b of state) {
-                        if (now >= b.nextShiftAt) {
-                            b.speedFrom = b.speedMul;
-                            b.speedTo = pickSpeedTarget(mobNow);
-                            b.transStart = now;
-                            b.transDuration = bTransMs(mobNow);
-                            const holdAfter = bHoldMs(mobNow);
-                            b.nextShiftAt = now + b.transDuration + holdAfter;
-                        }
-                        const td = Math.max(1, b.transDuration);
-                        const prog = Math.min(1, (now - b.transStart) / td);
-                        b.speedMul =
-                            b.speedFrom +
-                            (b.speedTo - b.speedFrom) * smoothstep01(prog);
-
-                        const step = baseNow * b.speedMul;
-                        b.x += b.vx * step;
-                        b.y += b.vy * step;
-                        if (b.x <= 0) {
-                            b.x = 0;
-                            b.vx *= -1;
-                        }
-                        if (b.x + bw >= w) {
-                            b.x = Math.max(0, w - bw);
-                            b.vx *= -1;
-                        }
-                        if (b.y <= 0) {
-                            b.y = 0;
-                            b.vy *= -1;
-                        }
-                        if (b.y + bh >= h) {
-                            b.y = Math.max(0, h - bh);
-                            b.vy *= -1;
-                        }
-                        b.el.style.transform = `translate3d(${b.x | 0}px,${b.y | 0}px,0)`;
-                    }
-                    bouncerRaf = requestAnimationFrame(tick);
-                }
-                bouncerRaf = requestAnimationFrame(tick);
-            }
-
-            function wireReel(reelIndex) {
-                const v = videos[reelIndex];
-                v.defaultMuted = true;
-                v.muted = true;
-                v.addEventListener("timeupdate", () =>
-                    onReelTimeupdate(reelIndex),
-                );
-                v.addEventListener("ended", () => onReelEnded(reelIndex));
-                v.addEventListener("error", () => {
-                    if (!started || stopClips || VIDEO_CLIPS.length === 0)
-                        return;
-                    errMsg.textContent =
-                        "Un video no cargó; saltando al siguiente.";
-                    window.setTimeout(() => {
-                        errMsg.textContent = "";
-                    }, 3200);
-                    window.setTimeout(() => scheduleReel(reelIndex), 200);
-                });
-            }
-
-            // Lógica para carousel de 1 reel en móvil
-            let currentReelIndex = 0;
-            let reelInterval = null;
-
-            function showNextReel() {
-                if (isDesktop()) return;
-                const wraps = document.querySelectorAll(".reel-wrap");
-                const prev = currentReelIndex;
-                if (reelArmed[prev]) reelArmed[prev] = false;
-                if (videos[prev]) videos[prev].pause();
-                wraps[prev].classList.remove("active");
-                currentReelIndex = (currentReelIndex + 1) % REEL_COUNT;
-                wraps[currentReelIndex].classList.add("active");
-                scheduleReel(currentReelIndex);
-            }
-
-            for (let i = 0; i < REEL_COUNT; i++) wireReel(i);
-
-            window.addEventListener("resize", () => {
-                if (!started) return;
-                applyReelLayout();
-            });
-
-            async function beginExperience() {
-                if (started) return;
-                errMsg.textContent = "";
-                try {
-                    await waitForTrackDuration(audioEl);
-                } catch {
-                    errMsg.textContent =
-                        "No se pudo leer la duración del audio. Comprueba public/audio/track.mp3.";
-                }
-                const dur = audioEl.duration;
-                if (Number.isFinite(dur) && dur > 0) {
-                    audioEl.currentTime = Math.random() * dur;
-                }
-                void audioEl.play().catch(() => {});
-
-                started = true;
-                stopClips = false;
-                applyReelLayout();
-                if (VIDEO_CLIPS.length > 0) {
-                    if (isDesktop()) {
-                        const batch = pickDistinctClips(REEL_COUNT);
-                        for (let i = 0; i < REEL_COUNT; i++) {
-                            const c = batch[i] ?? pickRandomClip();
-                            const t = Math.floor(Math.random() * 500);
-                            window.setTimeout(() => {
-                                if (!started || stopClips) return;
-                                scheduleReel(i, c);
-                            }, t);
-                        }
-                    } else {
-                        // Carousel: un reel a la vez; el intervalo rota .active
-                        currentReelIndex = 0;
-                        scheduleReel(0);
-                        document
-                            .querySelectorAll(".reel-wrap")
-                            .forEach((w, idx) => {
-                                w.classList.toggle("active", idx === 0);
-                            });
-                        if (reelInterval) clearInterval(reelInterval);
-                        reelInterval = setInterval(
-                            showNextReel,
-                            3500 + Math.floor(Math.random() * 2000),
-                        );
-                    }
-                    startBouncers();
-                }
-            }
-
-            if (document.readyState === "loading") {
-                document.addEventListener(
-                    "DOMContentLoaded",
-                    () => void beginExperience(),
-                    { once: true },
-                );
-            } else {
-                void beginExperience();
-            }
-        </script>
-    </body>
+        btn.addEventListener("click", () => {
+          if (!soundEnabled) {
+            soundEnabled = true;
+            audio.muted = false;
+            update();
+            audio.play().catch(() => {});
+          } else {
+            soundEnabled = false;
+            audio.muted = true;
+            update();
+          }
+        });
+      })();
+    </script>
+  </body>
 </html>

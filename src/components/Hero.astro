@@ -1,0 +1,150 @@
+---
+export interface Props {
+  videoUrl: string;
+  title: string;
+}
+
+const { videoUrl, title } = Astro.props;
+---
+
+<section class="hero" id="hero-root" data-video-url={videoUrl} aria-label="Hero">
+  <div class="hero__placeholder" id="hero-placeholder"></div>
+  <video
+    id="hero-video"
+    class="hero__video"
+    muted
+    loop
+    playsinline
+    disablepictureinpicture
+    preload="none"
+  ></video>
+  <div class="hero__overlay"></div>
+  <div class="hero__content">
+    <h1 class="hero__title">{title}</h1>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const root = document.getElementById("hero-root");
+    const video = document.getElementById("hero-video") as HTMLVideoElement | null;
+    const placeholder = document.getElementById("hero-placeholder");
+    if (!root || !video || !placeholder) return;
+
+    const videoUrl = root.getAttribute("data-video-url");
+    if (!videoUrl) return;
+
+    let loaded = false;
+
+    function onVideoReady(blobUrl: string) {
+      video.src = blobUrl;
+      video.style.opacity = "1";
+      placeholder.style.opacity = "0";
+      void video.play().catch(() => {});
+    }
+
+    function loadVideo() {
+      if (loaded) return;
+      loaded = true;
+
+      fetch(videoUrl)
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.blob();
+        })
+        .then((blob) => {
+          const blobUrl = URL.createObjectURL(blob);
+          onVideoReady(blobUrl);
+        })
+        .catch((err) => {
+          console.error("[Hero] Video load failed:", err);
+          placeholder.style.opacity = "1";
+        });
+    }
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              loadVideo();
+              observer.disconnect();
+            }
+          });
+        },
+        { rootMargin: "0px", threshold: 0.01 }
+      );
+      observer.observe(root);
+    } else {
+      loadVideo();
+    }
+  })();
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #000000;
+  }
+
+  .hero__placeholder {
+    position: absolute;
+    inset: 0;
+    background: #000000;
+    z-index: 1;
+    transition: opacity 0.5s ease;
+  }
+
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    z-index: 2;
+  }
+
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at center,
+      rgba(0, 0, 0, 0.2) 0%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 1rem;
+    pointer-events: none;
+  }
+
+  .hero__title {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+    color: #ffffff;
+    font-size: clamp(3.2rem, 12vw, 12rem);
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+    text-align: center;
+    text-shadow: 0 6px 40px rgba(0, 0, 0, 0.95);
+    margin: 0;
+    word-break: break-word;
+    hyphens: auto;
+  }
+</style>
