@@ -138,14 +138,27 @@ const { videoUrl, title } = Astro.props;
     font-style: italic;
     text-transform: uppercase;
     color: #ffffff;
-    font-size: clamp(1.4rem, 5.5vmin, 3.6rem);
+    font-size: clamp(1.1rem, 5.2vw, 3.4rem);
     line-height: 0.95;
     letter-spacing: -0.02em;
     text-align: center;
     text-shadow: 0 6px 40px rgba(0, 0, 0, 0.95);
     margin: 0 auto;
-    max-width: min(80vw, 900px);
-    word-break: break-word;
-    hyphens: auto;
+    width: 80vw;
+    max-width: 80vw;
+    white-space: nowrap;
+    overflow: visible;
+    animation: hero-glow 6s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes hero-glow {
+    0%   { transform: scale(1) translate(0, 0); }
+    18%  { transform: scale(1.18) translate(-12%, 8%); }
+    36%  { transform: scale(1.3) translate(16%, -12%); }
+    54%  { transform: scale(1.22) translate(-8%, 14%); }
+    72%  { transform: scale(1.28) translate(12%, -10%); }
+    90%  { transform: scale(1.1) translate(-4%, 6%); }
+    100% { transform: scale(1) translate(0, 0); }
   }
 </style>
