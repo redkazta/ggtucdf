@@ -79,12 +79,17 @@ const { videoUrl, title } = Astro.props;
                 loadVideo();
               }
 
-              // Random pulse for title (desktop only)
+              // Random pulse for title (desktop: 0.7-1.5x, mobile: 0.9-1.1x)
               const titleEl = document.querySelector(".hero__title") as HTMLElement | null;
-              if (titleEl && window.innerWidth > 767) {
+              if (titleEl) {
+                const isMobile = window.innerWidth <= 767;
                 function randomTitlePulse() {
-                  const scale = 0.7 + Math.random() * 0.8;
-                  const duration = 600 + Math.random() * 1200;
+                  const scale = isMobile
+                    ? 0.9 + Math.random() * 0.2
+                    : 0.7 + Math.random() * 0.8;
+                  const duration = isMobile
+                    ? 800 + Math.random() * 1000
+                    : 600 + Math.random() * 1200;
                   titleEl.style.transition = `transform ${duration}ms ease-in-out`;
                   titleEl.style.transform = `scale(${scale})`;
                   setTimeout(randomTitlePulse, duration);
@@ -173,7 +178,8 @@ const { videoUrl, title } = Astro.props;
     line-height: 0.95;
     letter-spacing: -0.02em;
     text-align: center;
-    -webkit-text-stroke: 1.5px #990000;
+    -webkit-text-stroke-width: 0.6px;
+    -webkit-text-stroke-color: #990000;
     text-shadow:
       0 0 8px rgba(255, 0, 0, 0.45),
       0 0 24px rgba(200, 0, 0, 0.25),
@@ -181,7 +187,8 @@ const { videoUrl, title } = Astro.props;
       0 6px 40px rgba(0, 0, 0, 0.95);
     margin: 0 auto;
     width: 80vw;
-    max-width: 80vw;
+    min-width: 40vw;
+    max-width: 90vw;
     white-space: nowrap;
     overflow: visible;
     will-change: transform;
@@ -189,11 +196,13 @@ const { videoUrl, title } = Astro.props;
 
   @media (max-width: 767px) {
     .hero__title {
-      font-size: clamp(0.38rem, 2.2vw, 0.78rem);
+      font-size: clamp(0.32rem, 2.6vw, 0.72rem);
       white-space: nowrap;
-      width: 90vw;
+      width: 80vw;
+      min-width: 40vw;
       max-width: 90vw;
       overflow: visible;
+      -webkit-text-stroke-width: 0.35px;
     }
   }
 
