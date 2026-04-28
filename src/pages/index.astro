@@ -1,4 +1,5 @@
 ---
+import Analytics from "@vercel/analytics/astro";
 import Hero from "../components/Hero.astro";
 import RegisterSW from "../components/RegisterSW.astro";
 import {
@@ -169,6 +170,7 @@ import {
   </head>
 
   <body>
+    <Analytics />
     <RegisterSW />
     <Hero videoUrl={HERO_VIDEO_URL} title={SITE_TITLE} />
 
