@@ -1,0 +1,23 @@
+{
+  "name": "Garguttieneunchingodeferia",
+  "short_name": "Gargut",
+  "description": "Escucha 'YO TE KIERO SOLO' ya disponible en Spotify y YouTube.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
