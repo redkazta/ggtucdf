@@ -1,5 +1,6 @@
 ---
 import ArtistLayout from "../layouts/ArtistLayout.astro";
+import PageFooter from "../components/PageFooter.astro";
 import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
 ---
 
@@ -45,6 +46,8 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
       </div>
     </div>
   </section>
+
+  <PageFooter />
 </ArtistLayout>
 
 <style>
@@ -55,14 +58,14 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
   }
 
   .page-title {
-    font-family: "Archivo Black", sans-serif;
-    font-style: italic;
+    font-family: "Bebas Neue", sans-serif;
     text-transform: uppercase;
     font-size: clamp(1.2rem, 3vw, 1.8rem);
     color: #ffffff;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.04em;
     margin-bottom: 1.5rem;
     line-height: 1;
+    text-shadow: 0 0 18px rgba(255, 50, 50, 0.4);
   }
 
   .videos-empty {
@@ -81,8 +84,7 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
   }
 
   .videos-empty__title {
-    font-family: "Archivo Black", sans-serif;
-    font-style: italic;
+    font-family: "Bebas Neue", sans-serif;f;
     text-transform: uppercase;
     font-size: 1.1rem;
     color: rgba(255, 255, 255, 0.5);
@@ -101,8 +103,7 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
   }
 
   .embed-block__title {
-    font-family: "Archivo Black", sans-serif;
-    font-style: italic;
+    font-family: "Bebas Neue", sans-serif;f;
     text-transform: uppercase;
     font-size: clamp(0.85rem, 2vw, 1.1rem);
     color: rgba(255, 255, 255, 0.5);

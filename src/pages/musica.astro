@@ -1,5 +1,6 @@
 ---
 import ArtistLayout from "../layouts/ArtistLayout.astro";
+import PageFooter from "../components/PageFooter.astro";
 import { DISCOGRAPHY, SPOTIFY_ARTIST_URL, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
 
 const sorted = [...DISCOGRAPHY].sort((a, b) => {
@@ -92,6 +93,8 @@ function formatStreams(n?: number) {
       </a>
     </div>
   </section>
+
+  <PageFooter />
 </ArtistLayout>
 
 <style>
@@ -102,14 +105,14 @@ function formatStreams(n?: number) {
   }
 
   .page-title {
-    font-family: "Archivo Black", sans-serif;
-    font-style: italic;
+    font-family: "Bebas Neue", sans-serif;
     text-transform: uppercase;
     font-size: clamp(1.2rem, 3vw, 1.8rem);
     color: #ffffff;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.04em;
     margin-bottom: 1.5rem;
     line-height: 1;
+    text-shadow: 0 0 18px rgba(255, 50, 50, 0.4);
   }
 
   .featured-embed {
@@ -122,8 +125,7 @@ function formatStreams(n?: number) {
   }
 
   .section-subtitle {
-    font-family: "Archivo Black", sans-serif;
-    font-style: italic;
+    font-family: "Bebas Neue", sans-serif;
     text-transform: uppercase;
     font-size: clamp(0.85rem, 2vw, 1.1rem);
     color: rgba(255, 255, 255, 0.5);
@@ -180,8 +182,7 @@ function formatStreams(n?: number) {
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
   .track-card__cover-fallback span {
-    font-family: "Archivo Black", sans-serif;
-    font-style: italic;
+    font-family: "Bebas Neue", sans-serif;
     font-size: 3rem;
     color: rgba(255, 255, 255, 0.15);
     text-transform: uppercase;
@@ -213,8 +214,7 @@ function formatStreams(n?: number) {
   }
 
   .track-card__title {
-    font-family: "Archivo Black", sans-serif;
-    font-style: italic;
+    font-family: "Bebas Neue", sans-serif;
     font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.9);
     line-height: 1.2;
@@ -275,8 +275,7 @@ function formatStreams(n?: number) {
     justify-content: center;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
-    font-family: "Archivo Black", sans-serif;
-    font-style: italic;
+    font-family: "Bebas Neue", sans-serif;
     text-transform: uppercase;
     font-size: 0.8rem;
     letter-spacing: 0.04em;

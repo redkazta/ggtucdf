@@ -1,0 +1,82 @@
+---
+import { SPOTIFY_ARTIST_URL, YOUTUBE_URL } from "../data/siteConfig";
+---
+
+<footer class="page-footer">
+  <div class="page-footer__divider" aria-hidden="true"></div>
+  <div class="page-footer__links">
+    <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="footer-link footer-link--spotify">
+      <span class="footer-link__icon" aria-hidden="true">&#9836;</span>
+      <span class="footer-link__text">Spotify</span>
+    </a>
+    <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="footer-link footer-link--youtube">
+      <span class="footer-link__icon" aria-hidden="true">&#9654;</span>
+      <span class="footer-link__text">YouTube</span>
+    </a>
+  </div>
+  <p class="page-footer__copy">Gargut &mdash; Guadalajara, México</p>
+</footer>
+
+<style>
+  .page-footer {
+    padding: 2.5rem 1.25rem 2rem;
+    text-align: center;
+  }
+
+  .page-footer__divider {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,50,50,0.6), transparent);
+    margin: 0 auto 1.5rem;
+    border-radius: 2px;
+  }
+
+  .page-footer__links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: transform 0.15s ease, box-shadow 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .footer-link:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.08);
+  }
+  .footer-link:active { transform: scale(0.97); }
+
+  .footer-link--spotify { color: #1db954; border-color: rgba(29, 185, 84, 0.25); }
+  .footer-link--spotify:hover { box-shadow: 0 0 16px rgba(29, 185, 84, 0.2); border-color: rgba(29, 185, 84, 0.5); }
+
+  .footer-link--youtube { color: #ff3333; border-color: rgba(255, 50, 50, 0.25); }
+  .footer-link--youtube:hover { box-shadow: 0 0 16px rgba(255, 50, 50, 0.2); border-color: rgba(255, 50, 50, 0.5); }
+
+  .footer-link__icon { font-size: 0.75rem; line-height: 1; }
+
+  .page-footer__copy {
+    font-family: "Inter", sans-serif;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.25);
+    letter-spacing: 0.04em;
+  }
+
+  @media (min-width: 768px) {
+    .page-footer { padding: 3rem 2.5rem 2rem; }
+    .footer-link { font-size: 0.95rem; padding: 0.55rem 1.2rem; }
+  }
+</style>
