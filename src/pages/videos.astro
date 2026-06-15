@@ -1,0 +1,71 @@
+---
+import ArtistLayout from "../layouts/ArtistLayout.astro";
+---
+
+<ArtistLayout title="Videos" description="Videos de Garguttieneunchingodeferia — próximamente.">
+  <section class="videos-page" aria-label="Videos">
+    <h1 class="page-title">Videos</h1>
+
+    <div class="videos-empty">
+      <div class="videos-empty__icon" aria-hidden="true">▶</div>
+      <h2 class="videos-empty__title">Próximamente</h2>
+      <p class="videos-empty__text">
+        Los videos oficiales aparecerán aquí en cuanto estén disponibles.
+      </p>
+    </div>
+  </section>
+</ArtistLayout>
+
+<style>
+  .videos-page {
+    padding: 1.5rem 1rem 3rem;
+    max-width: 800px;
+    margin: 0 auto;
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-title {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    margin-bottom: 2rem;
+    line-height: 1;
+  }
+
+  .videos-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .videos-empty__icon {
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.12);
+    line-height: 1;
+  }
+
+  .videos-empty__title {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.02em;
+  }
+
+  .videos-empty__text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.35);
+    max-width: 320px;
+    line-height: 1.55;
+  }
+</style>

@@ -164,6 +164,49 @@ import {
         .cta-ig__logo { height: 36px; }
       }
 
+      .cta-enter {
+        position: fixed;
+        left: 50%;
+        bottom: max(0.4rem, env(safe-area-inset-bottom, 0px));
+        z-index: 100;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        text-decoration: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transition: opacity 0.2s, transform 0.15s ease;
+        opacity: 0.55;
+      }
+      .cta-enter:hover { opacity: 0.9; transform: translateX(-50%) scale(1.03); }
+      .cta-enter:active { transform: translateX(-50%) scale(0.98); }
+      .cta-enter__text {
+        font-family: "Archivo Black", sans-serif;
+        font-style: italic;
+        text-transform: uppercase;
+        font-size: clamp(0.55rem, 1.5vmin, 0.78rem);
+        color: rgba(255, 255, 255, 0.65);
+        letter-spacing: 0.06em;
+        line-height: 1;
+        white-space: nowrap;
+        user-select: none;
+      }
+      .cta-enter__arrow {
+        font-size: clamp(0.5rem, 1.3vmin, 0.7rem);
+        color: rgba(255, 255, 255, 0.4);
+        line-height: 1;
+        animation: enter-bounce 1.6s ease-in-out infinite;
+      }
+      .cta-enter__arrow:nth-child(3) { animation-delay: 0.3s; }
+      @keyframes enter-bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(3px); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .cta-enter__arrow { animation: none; }
+      }
+
       .sound-cluster {
         position: fixed;
         top: max(0.5rem, env(safe-area-inset-top, 0px));
@@ -256,6 +299,12 @@ import {
         <span class="cta-arrows">&#8593;&#8593;</span> VER VISUALIZER <span class="cta-arrows">&#8593;&#8593;</span>
       </div>
     </div>
+
+    <a href="/artista" class="cta-enter" aria-label="Conoce la feria de Gargut">
+      <span class="cta-enter__arrow">&#9660;</span>
+      <span class="cta-enter__text">CONOCE LA FERIA DE GARGUT</span>
+      <span class="cta-enter__arrow">&#9660;</span>
+    </a>
 
     <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
       <span class="cta-ig__eyebrow">Hecho por:</span>

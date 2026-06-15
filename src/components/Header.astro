@@ -1,0 +1,109 @@
+---
+import { SITE_TITLE } from "../data/siteConfig";
+
+const navItems = [
+  { label: "Artista", href: "/artista" },
+  { label: "Música", href: "/musica" },
+  { label: "Videos", href: "/videos" },
+];
+---
+
+<header class="site-header">
+  <a href="/" class="site-header__logo" aria-label="Inicio">
+    {SITE_TITLE}
+  </a>
+
+  <nav class="site-header__nav" aria-label="Navegación principal">
+    {navItems.map((item) => (
+      <a href={item.href} class="site-header__link">{item.label}</a>
+    ))}
+  </nav>
+
+  <button
+    class="site-header__menu-btn"
+    id="menuToggle"
+    type="button"
+    aria-label="Abrir menú"
+    aria-expanded="false"
+    aria-controls="mobileDrawer"
+  >
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor">
+      <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+    </svg>
+  </button>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 1rem;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .site-header__logo {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50vw;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s;
+  }
+  .site-header__logo:hover { opacity: 0.8; }
+
+  .site-header__nav {
+    display: none;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .site-header__link {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .site-header__link:hover { color: #ffffff; }
+
+  .site-header__menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; height: 40px;
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s;
+  }
+  .site-header__menu-btn:hover { opacity: 0.7; }
+
+  @media (min-width: 768px) {
+    .site-header { height: 64px; padding: 0 2rem; }
+    .site-header__logo { font-size: 1rem; max-width: none; }
+    .site-header__nav { display: flex; }
+    .site-header__menu-btn { display: none; }
+  }
+</style>

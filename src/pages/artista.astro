@@ -1,0 +1,307 @@
+---
+import ArtistLayout from "../layouts/ArtistLayout.astro";
+import {
+  SITE_TITLE,
+  ARTIST_ORIGIN,
+  ARTIST_MONTHLY_LISTENERS,
+  ARTIST_FOLLOWERS,
+  DISCOGRAPHY,
+  SCENE,
+  SPOTIFY_ARTIST_URL,
+} from "../data/siteConfig";
+
+const soloCount = DISCOGRAPHY.filter((t) => t.type === "solo").length;
+const colabCount = DISCOGRAPHY.filter((t) => t.type === "colab").length;
+const totalStreams = DISCOGRAPHY.reduce((sum, t) => sum + (t.streams || 0), 0);
+
+// Use the most popular track cover as artist image placeholder
+const featuredCover = DISCOGRAPHY.find((t) => t.title === "Yo te kiero solo")?.coverUrl || "";
+---
+
+<ArtistLayout title="Artista" description={`${SITE_TITLE} — Artista independiente de Guadalajara, México.`}>
+  <section class="artist-hero" aria-label="Perfil del artista">
+    <div class="artist-hero__visual">
+      {featuredCover ? (
+        <img
+          src={featuredCover}
+          alt=""
+          class="artist-hero__cover"
+          width="300"
+          height="300"
+          decoding="async"
+        />
+      ) : (
+        <div class="artist-hero__cover-placeholder" aria-hidden="true"></div>
+      )}
+    </div>
+
+    <div class="artist-hero__content">
+      <h1 class="artist-hero__name">{SITE_TITLE}</h1>
+      <p class="artist-hero__origin">{ARTIST_ORIGIN}</p>
+
+      <div class="artist-hero__stats">
+        <div class="stat">
+          <span class="stat__value">{ARTIST_MONTHLY_LISTENERS}</span>
+          <span class="stat__label">oyentes mensuales</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{ARTIST_FOLLOWERS}</span>
+          <span class="stat__label">seguidores</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{DISCOGRAPHY.length}</span>
+          <span class="stat__label">singles</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{totalStreams.toLocaleString("es-MX")}</span>
+          <span class="stat__label">streams totales</span>
+        </div>
+      </div>
+
+      <p class="artist-hero__bio">
+        Artista independiente de Guadalajara, México. Su música navega entre el rap
+        y el trap experimental, acumulando más de {ARTIST_MONTHLY_LISTENERS} oyentes
+        mensuales en Spotify. Con una discografía de {DISCOGRAPHY.length} singles
+        autopublicados entre 2025 y 2026, ha colaborado frecuentemente con
+        artistas de la escena underground mexicana.
+      </p>
+
+      <div class="artist-hero__actions">
+        <a
+          href={SPOTIFY_ARTIST_URL}
+          target="_blank"
+          rel="noopener"
+          class="btn btn--primary"
+        >
+          Escuchar en Spotify
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene-section" aria-label="Escena">
+    <h2 class="section-title">Escena</h2>
+    <p class="scene-section__intro">
+      Artistas con los que ha compartido track.
+    </p>
+    <div class="scene-grid">
+      {SCENE.filter((s) => s.url).map((artist) => (
+        <a
+          href={artist.url}
+          target="_blank"
+          rel="noopener"
+          class="scene-card"
+        >
+          <span class="scene-card__name">{artist.name}</span>
+          <span class="scene-card__hint">Spotify &#187;</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</ArtistLayout>
+
+<style>
+  .artist-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1.25rem 2rem;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .artist-hero__visual {
+    flex-shrink: 0;
+  }
+
+  .artist-hero__cover {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  }
+
+  .artist-hero__cover-placeholder {
+    width: 220px;
+    height: 220px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .artist-hero__name {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    color: #ffffff;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+  }
+
+  .artist-hero__origin {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.25rem;
+  }
+
+  .artist-hero__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    max-width: 420px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .stat {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 0.75rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .stat__value {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .stat__label {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .artist-hero__bio {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.65;
+    max-width: 520px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .artist-hero__actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s ease, opacity 0.2s;
+  }
+  .btn:hover { transform: scale(1.04); opacity: 0.9; }
+  .btn:active { transform: scale(0.97); }
+
+  .btn--primary {
+    background: #1db954;
+    color: #000000;
+    border: none;
+  }
+
+  .scene-section {
+    padding: 0 1.25rem 3rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.4rem;
+    text-align: center;
+  }
+
+  .scene-section__intro {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .scene-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .scene-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .scene-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .scene-card__name {
+    font-family: "Archivo Black", sans-serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .scene-card__hint {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  @media (min-width: 768px) {
+    .artist-hero {
+      flex-direction: row;
+      text-align: left;
+      padding: 4rem 2.5rem 3rem;
+      gap: 2.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .artist-hero__content {
+      flex: 1;
+    }
+    .artist-hero__stats {
+      margin: 0 0 1.5rem;
+      max-width: none;
+    }
+    .artist-hero__bio {
+      margin: 0 0 1.5rem;
+    }
+    .artist-hero__actions {
+      justify-content: flex-start;
+    }
+  }
+</style>
