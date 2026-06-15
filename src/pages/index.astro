@@ -165,46 +165,72 @@ import {
       }
 
       .cta-enter {
-        position: fixed;
-        left: 50%;
-        bottom: max(0.4rem, env(safe-area-inset-bottom, 0px));
-        z-index: 100;
-        transform: translateX(-50%);
-        display: flex;
+        position: relative;
+        display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
+        justify-content: center;
+        gap: 0.5rem;
         text-decoration: none;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
-        transition: opacity 0.2s, transform 0.15s ease;
-        opacity: 0.55;
+        margin-top: 0.6rem;
+        padding: 0.65rem 1.4rem;
+        border: 1.5px solid rgba(255, 255, 255, 0.55);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(4px);
+        transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+        overflow: hidden;
       }
-      .cta-enter:hover { opacity: 0.9; transform: translateX(-50%) scale(1.03); }
-      .cta-enter:active { transform: translateX(-50%) scale(0.98); }
+      .cta-enter:hover {
+        background: rgba(255, 255, 255, 0.14);
+        border-color: rgba(255, 255, 255, 0.85);
+        transform: scale(1.05);
+      }
+      .cta-enter:active { transform: scale(0.97); }
       .cta-enter__text {
+        position: relative;
+        z-index: 2;
         font-family: "Archivo Black", sans-serif;
         font-style: italic;
         text-transform: uppercase;
-        font-size: clamp(0.55rem, 1.5vmin, 0.78rem);
-        color: rgba(255, 255, 255, 0.65);
-        letter-spacing: 0.06em;
+        font-size: clamp(0.62rem, 1.8vmin, 0.9rem);
+        color: rgba(255, 255, 255, 0.9);
+        letter-spacing: 0.08em;
         line-height: 1;
         white-space: nowrap;
         user-select: none;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
       }
       .cta-enter__arrow {
-        font-size: clamp(0.5rem, 1.3vmin, 0.7rem);
-        color: rgba(255, 255, 255, 0.4);
+        position: relative;
+        z-index: 2;
+        font-size: clamp(0.55rem, 1.4vmin, 0.75rem);
+        color: rgba(255, 255, 255, 0.65);
         line-height: 1;
-        animation: enter-bounce 1.6s ease-in-out infinite;
+        animation: enter-bounce 1.4s ease-in-out infinite;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
       }
-      .cta-enter__arrow:nth-child(3) { animation-delay: 0.3s; }
+      .cta-enter__glow {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: radial-gradient(circle at 50% 120%, rgba(255,50,50,0.15), transparent 60%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+      }
+      .cta-enter:hover .cta-enter__glow { opacity: 1; }
       @keyframes enter-bounce {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(3px); }
       }
       @media (prefers-reduced-motion: reduce) {
         .cta-enter__arrow { animation: none; }
+      }
+      @media (max-width: 767px) {
+        .cta-enter { padding: 0.75rem 1.6rem; margin-top: 0.8rem; }
+        .cta-enter__text { font-size: clamp(0.72rem, 2.2vmin, 0.95rem); letter-spacing: 0.06em; }
       }
 
       .sound-cluster {
@@ -298,13 +324,13 @@ import {
       <div class="cta-label cta-label--small">
         <span class="cta-arrows">&#8593;&#8593;</span> VER VISUALIZER <span class="cta-arrows">&#8593;&#8593;</span>
       </div>
-    </div>
 
-    <a href="/artista" class="cta-enter" aria-label="Conoce la feria de Gargut">
-      <span class="cta-enter__arrow">&#9660;</span>
-      <span class="cta-enter__text">CONOCE LA FERIA DE GARGUT</span>
-      <span class="cta-enter__arrow">&#9660;</span>
-    </a>
+      <a href="/artista" class="cta-enter" aria-label="Conoce la feria de Gargut">
+        <span class="cta-enter__glow" aria-hidden="true"></span>
+        <span class="cta-enter__text">CONOCE LA FERIA DE GARGUT</span>
+        <span class="cta-enter__arrow" aria-hidden="true">&#9660;</span>
+      </a>
+    </div>
 
     <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
       <span class="cta-ig__eyebrow">Hecho por:</span>

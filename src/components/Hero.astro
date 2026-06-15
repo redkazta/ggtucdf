@@ -13,14 +13,15 @@ const { videoUrl, title } = Astro.props;
     <video
       id="hero-video"
       class="hero__video"
-      src={videoUrl}
       muted
       loop
       playsinline
       autoplay
       disablepictureinpicture
       preload="auto"
-    ></video>
+    >
+      <source src={videoUrl} type="video/mp4" />
+    </video>
   </div>
   <div class="hero__overlay"></div>
   <div class="hero__content">
@@ -34,27 +35,54 @@ const { videoUrl, title } = Astro.props;
     const placeholder = document.getElementById("hero-placeholder");
     if (!video || !placeholder) return;
 
-    function showVideo() {
+    let revealed = false;
+
+    function reveal() {
+      if (revealed) return;
+      revealed = true;
       video.style.opacity = "1";
       placeholder.style.opacity = "0";
     }
 
-    function handleError() {
-      console.error("[Hero] Video failed to load");
-      placeholder.style.opacity = "1";
+    function attemptPlay() {
+      if (video.paused) {
+        video.play().catch(function() {});
+      }
     }
 
-    // If video is already ready (cached)
-    if (video.readyState >= 2) {
-      showVideo();
-    } else {
-      video.addEventListener("loadeddata", showVideo, { once: true });
-      video.addEventListener("error", handleError, { once: true });
-      // Fallback: if neither fires after 8s, show placeholder
-      setTimeout(() => {
-        if (video.readyState < 2) handleError();
-      }, 8000);
+    // Immediate reveal if any data is available
+    if (video.readyState >= 1) {
+      reveal();
+      attemptPlay();
     }
+
+    // Multiple events that mean "video is ready to show"
+    video.addEventListener("loadedmetadata", function() { reveal(); attemptPlay(); }, { once: true });
+    video.addEventListener("loadeddata", function() { reveal(); attemptPlay(); }, { once: true });
+    video.addEventListener("canplay", function() { reveal(); attemptPlay(); }, { once: true });
+    video.addEventListener("canplaythrough", function() { reveal(); attemptPlay(); }, { once: true });
+
+    // Periodic readyState check
+    var checkInterval = setInterval(function() {
+      if (video.readyState >= 1 || video.currentTime > 0) {
+        reveal();
+        attemptPlay();
+        clearInterval(checkInterval);
+      }
+    }, 300);
+
+    // Force reveal after 2s even if not fully loaded (show blurry/first frame)
+    setTimeout(function() {
+      reveal();
+      attemptPlay();
+      clearInterval(checkInterval);
+    }, 2000);
+
+    // Error handling
+    video.addEventListener("error", function() {
+      console.error("[Hero] Video error", video.error);
+      clearInterval(checkInterval);
+    }, { once: true });
 
     // Probabilistic pulse on title
     const titleEl = document.querySelector(".hero__title") as HTMLElement | null;
