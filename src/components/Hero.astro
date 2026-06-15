@@ -7,17 +7,19 @@ export interface Props {
 const { videoUrl, title } = Astro.props;
 ---
 
-<section class="hero" id="hero-root" data-video-url={videoUrl} aria-label="Hero">
+<section class="hero" id="hero-root" aria-label="Hero">
   <div class="hero__placeholder" id="hero-placeholder"></div>
   <div class="hero__video-wrapper">
     <video
       id="hero-video"
       class="hero__video"
+      src={videoUrl}
       muted
       loop
       playsinline
+      autoplay
       disablepictureinpicture
-      preload="none"
+      preload="auto"
     ></video>
   </div>
   <div class="hero__overlay"></div>
@@ -28,104 +30,69 @@ const { videoUrl, title } = Astro.props;
 
 <script>
   (function () {
-    const root = document.getElementById("hero-root");
     const video = document.getElementById("hero-video") as HTMLVideoElement | null;
     const placeholder = document.getElementById("hero-placeholder");
-    if (!root || !video || !placeholder) return;
+    if (!video || !placeholder) return;
 
-    const videoUrl = root.getAttribute("data-video-url");
-    if (!videoUrl) return;
-
-    let loaded = false;
-
-    function onVideoReady(blobUrl: string) {
-      video.src = blobUrl;
+    function showVideo() {
       video.style.opacity = "1";
       placeholder.style.opacity = "0";
-      void video.play().catch(() => {});
     }
 
-    function loadVideo() {
-      if (loaded) return;
-      loaded = true;
-
-      fetch(videoUrl)
-        .then((res) => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.blob();
-        })
-        .then((blob) => {
-          const blobUrl = URL.createObjectURL(blob);
-          onVideoReady(blobUrl);
-        })
-        .catch((err) => {
-          console.error("[Hero] Video load failed:", err);
-          placeholder.style.opacity = "1";
-        });
+    function handleError() {
+      console.error("[Hero] Video failed to load");
+      placeholder.style.opacity = "1";
     }
 
-    if ("IntersectionObserver" in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              if (document.readyState === "loading") {
-                document.addEventListener(
-                  "DOMContentLoaded",
-                  () => void loadVideo(),
-                  { once: true }
-                );
-              } else {
-                loadVideo();
-              }
-
-              // Probabilistic pulse: mobile starts 80%, favors 90%, rare 40% spikes
-              const titleEl = document.querySelector(".hero__title") as HTMLElement | null;
-              if (titleEl) {
-                const isMobile = window.innerWidth <= 767;
-                function probPulse() {
-                  const r = Math.random();
-                  let targetScale: number;
-                  let durBase: number;
-                  if (isMobile) {
-                    durBase = 200 + Math.random() * 400; // 200-600ms, triple fast
-                    if (r < 0.55) {
-                      targetScale = 1.0 + Math.random() * 0.125; // 80% -> 90%, high probability
-                    } else if (r < 0.82) {
-                      targetScale = 0.9 + Math.random() * 0.1; // 72% -> 80%
-                    } else if (r < 0.94) {
-                      targetScale = 0.75 + Math.random() * 0.1; // 60% -> 68%
-                    } else {
-                      targetScale = 0.45 + Math.random() * 0.15; // 36% -> 48%, aggressive rare
-                    }
-                  } else {
-                    durBase = 180 + Math.random() * 380; // 180-560ms, triple fast
-                    if (r < 0.40) {
-                      targetScale = 1.25 + Math.random() * 0.25; // 1.25-1.50x
-                    } else if (r < 0.70) {
-                      targetScale = 0.85 + Math.random() * 0.20; // 0.85-1.05x
-                    } else if (r < 0.88) {
-                      targetScale = 0.55 + Math.random() * 0.20; // 0.55-0.75x
-                    } else {
-                      targetScale = 1.05 + Math.random() * 0.35; // 1.05-1.40x
-                    }
-                  }
-                  const duration = durBase;
-                  titleEl.style.transition = `transform ${duration}ms cubic-bezier(0.45, 0, 0.55, 1)`;
-                  titleEl.style.transform = `scale(${targetScale})`;
-                  setTimeout(probPulse, duration);
-                }
-                probPulse();
-              }
-              observer.disconnect();
-            }
-          });
-        },
-        { rootMargin: "0px", threshold: 0.01 }
-      );
-      observer.observe(root);
+    // If video is already ready (cached)
+    if (video.readyState >= 2) {
+      showVideo();
     } else {
-      loadVideo();
+      video.addEventListener("loadeddata", showVideo, { once: true });
+      video.addEventListener("error", handleError, { once: true });
+      // Fallback: if neither fires after 8s, show placeholder
+      setTimeout(() => {
+        if (video.readyState < 2) handleError();
+      }, 8000);
+    }
+
+    // Probabilistic pulse on title
+    const titleEl = document.querySelector(".hero__title") as HTMLElement | null;
+    if (titleEl) {
+      const isMobile = window.innerWidth <= 767;
+      function probPulse() {
+        const r = Math.random();
+        let targetScale: number;
+        let durBase: number;
+        if (isMobile) {
+          durBase = 200 + Math.random() * 400;
+          if (r < 0.55) {
+            targetScale = 1.0 + Math.random() * 0.125;
+          } else if (r < 0.82) {
+            targetScale = 0.9 + Math.random() * 0.1;
+          } else if (r < 0.94) {
+            targetScale = 0.75 + Math.random() * 0.1;
+          } else {
+            targetScale = 0.45 + Math.random() * 0.15;
+          }
+        } else {
+          durBase = 180 + Math.random() * 380;
+          if (r < 0.40) {
+            targetScale = 1.25 + Math.random() * 0.25;
+          } else if (r < 0.70) {
+            targetScale = 0.85 + Math.random() * 0.20;
+          } else if (r < 0.88) {
+            targetScale = 0.55 + Math.random() * 0.20;
+          } else {
+            targetScale = 1.05 + Math.random() * 0.35;
+          }
+        }
+        const duration = durBase;
+        titleEl.style.transition = `transform ${duration}ms cubic-bezier(0.45, 0, 0.55, 1)`;
+        titleEl.style.transform = `scale(${targetScale})`;
+        setTimeout(probPulse, duration);
+      }
+      probPulse();
     }
   })();
 </script>
