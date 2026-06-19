@@ -1,0 +1,311 @@
+---
+import ArtistLayout from "../layouts/ArtistLayout.astro";
+import PageFooter from "../components/PageFooter.astro";
+
+const featured = [
+  {
+    title: "FENTATRIP",
+    type: "youtube",
+    id: "txWFWxLmix0",
+    tag: "La Rola Main",
+  },
+  {
+    title: "¿Qué es el FENTATRIP?",
+    type: "instagram",
+    id: "DZByY6CRlAX",
+    tag: "El Contexto",
+  },
+];
+
+const youtubeVideos = [
+  { title: "Gargut - Experiencia Espiritual X @zacklyvibes", id: "NdQbpB4QggQ" },
+  { title: "Gargut - Yo te kiero solo X @buzk09", id: "lVGN_fBoaOU" },
+  { title: "Gargut - El Primer Artista", id: "IpWeeG1wiBE" },
+  { title: "Gargut - Soy Artista o Eso Parece ft @zacklyvibes & @skydemongoat", id: "n0C4dFKB-Ks" },
+  { title: "Artesania", id: "C5DVwAUr2Go" },
+];
+
+const instagramReels = [
+  { title: "Primera experiencia espiritual", id: "DYfkaP8SFNK" },
+  { title: "Fentatrip llega a Tijuana", id: "DZdTgeEyP-O" },
+  { title: "", id: "DWuDsQukspP" },
+  { title: "", id: "DZvgoINyut4" },
+  { title: "", id: "DZdAZEUqNRb" },
+  { title: "", id: "DZaiV0GKylR" },
+];
+
+const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
+const igEmbed = (id: string) => `https://www.instagram.com/p/${id}/embed/`;
+---
+
+<ArtistLayout title="Videos" description="Videos oficiales de Garguttieneunchingodeferia — YouTube, Instagram y TikTok.">
+  <div class="videos-page">
+    <h1 class="page-title">Videos</h1>
+
+    <!-- DESTACADOS -->
+    <section class="featured-section" aria-label="Destacados">
+      <span class="section-eyebrow">01 / Destacados</span>
+      <div class="featured-grid">
+        {featured.map((item) => (
+          <div class={`featured-card ${item.type === "youtube" ? "featured-card--youtube" : "featured-card--ig"}`}>
+            <div class="featured-card__tag">{item.tag}</div>
+            <div class="featured-card__embed-wrap">
+              <iframe
+                class="featured-card__iframe"
+                src={item.type === "youtube" ? youtubeEmbed(item.id) : igEmbed(item.id)}
+                title={item.title}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              />
+            </div>
+            <h2 class="featured-card__title">{item.title}</h2>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- YOUTUBE -->
+    <section class="video-section" aria-label="YouTube">
+      <span class="section-eyebrow">02 / YouTube</span>
+      <h2 class="section-headline">Videos Oficiales</h2>
+      <div class="video-grid">
+        {youtubeVideos.map((v) => (
+          <div class="video-card">
+            <div class="video-card__embed-wrap">
+              <iframe
+                class="video-card__iframe"
+                src={youtubeEmbed(v.id)}
+                title={v.title}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              />
+            </div>
+            <h3 class="video-card__title">{v.title}</h3>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- INSTAGRAM -->
+    <section class="video-section" aria-label="Instagram Reels">
+      <span class="section-eyebrow">03 / Instagram</span>
+      <h2 class="section-headline">Reels</h2>
+      <div class="reel-grid">
+        {instagramReels.map((r) => (
+          <div class="reel-card">
+            <div class="reel-card__embed-wrap">
+              <iframe
+                class="reel-card__iframe"
+                src={igEmbed(r.id)}
+                title={r.title || "Instagram Reel"}
+                loading="lazy"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"
+              />
+            </div>
+            {r.title && <h3 class="reel-card__title">{r.title}</h3>}
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <PageFooter />
+
+  <style>
+    .videos-page {
+      padding: 1.5rem 1rem 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-family: "Bebas Neue", sans-serif;
+      text-transform: uppercase;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      margin-bottom: 2rem;
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(255, 50, 50, 0.4);
+    }
+
+    .section-eyebrow {
+      display: block;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      color: rgba(255, 50, 50, 0.7);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-headline {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
+      color: rgba(255, 255, 255, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 1.25rem;
+      line-height: 1;
+    }
+
+    .featured-section { margin-bottom: 3rem; }
+    .featured-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    .featured-card {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.02);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+    .featured-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    }
+    .featured-card--youtube { border-color: rgba(255, 50, 50, 0.3); }
+    .featured-card--ig { border-color: rgba(225, 48, 108, 0.3); }
+    .featured-card__tag {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 2;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      background: rgba(255, 50, 50, 0.85);
+      color: #000;
+      backdrop-filter: blur(4px);
+    }
+    .featured-card__embed-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      background: #0a0a0a;
+    }
+    .featured-card__iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .featured-card__title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 0.9rem 1rem 0.6rem;
+      line-height: 1.2;
+    }
+
+    .video-section { margin-bottom: 3rem; }
+    .video-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .video-card {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+      transition: transform 0.15s ease;
+    }
+    .video-card:hover { transform: translateY(-3px); }
+    .video-card__embed-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      background: #0a0a0a;
+    }
+    .video-card__iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .video-card__title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 0.6rem 0.75rem 0.5rem;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .reel-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    .reel-card {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+      transition: transform 0.15s ease;
+    }
+    .reel-card:hover { transform: translateY(-3px); }
+    .reel-card__embed-wrap {
+      position: relative;
+      padding-bottom: 125%;
+      background: #0a0a0a;
+    }
+    .reel-card__iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .reel-card__title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.75);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 0.5rem 0.6rem 0.4rem;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (min-width: 768px) {
+      .videos-page { padding: 2rem 1.5rem 4rem; }
+      .featured-grid { grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+      .video-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+      .reel-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+      .video-card__title { font-size: 0.82rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .video-grid { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+      .reel-grid { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+      .featured-card__title { padding: 1rem 1.25rem 0.75rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .featured-card:hover,
+      .video-card:hover,
+      .reel-card:hover { transform: none; }
+    }
+  </style>
+</ArtistLayout>
