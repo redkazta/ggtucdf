@@ -58,7 +58,6 @@ const sections = [
 
         <div class="perfil-content">
           <h1 class="perfil-name">{SITE_TITLE}</h1>
-          <p class="perfil-origin">{ARTIST_ORIGIN}</p>
 
           <div class="perfil-stats">
             <div class="stat">
@@ -422,13 +421,6 @@ const sections = [
       line-height: 0.95;
       text-shadow: 0 0 24px rgba(255, 50, 50, 0.45);
     }
-    .perfil-origin {
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.4);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin: 0.4rem 0 1rem;
-    }
     .perfil-bio {
       font-size: 0.88rem;
       color: rgba(255, 255, 255, 0.6);
@@ -632,40 +624,6 @@ const sections = [
     .badge[data-type="solo"] {
       background: rgba(29, 185, 84, 0.12);
       color: rgba(29, 185, 84, 0.7);
-    }
-
-    .scene-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .scene-card {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 0.9rem;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      text-decoration: none;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.2s, border-color 0.2s, transform 0.15s ease;
-    }
-    .scene-card:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.15);
-      transform: scale(1.03);
-    }
-    .scene-card__name {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.85);
-    }
-    .scene-card__hint {
-      font-size: 0.65rem;
-      color: rgba(255, 255, 255, 0.35);
     }
 
     .embed-wrap {
