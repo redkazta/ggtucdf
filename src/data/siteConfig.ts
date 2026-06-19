@@ -34,8 +34,7 @@ export const SITE_KEYWORDS = [
 ];
 export const SITE_AUTHOR = "Gargut";
 export const SITE_THEME_COLOR = "#000000";
-export const OG_IMAGE_URL =
-  "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02e7dd3698ba2b17ceb4ceda9f";
+export const OG_IMAGE_URL = KAZTA_IG_LOGO;
 
 export const ARTIST_ORIGIN = "Guadalajara, México";
 export const ARTIST_MONTHLY_LISTENERS = "1.7K";

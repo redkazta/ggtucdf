@@ -5,6 +5,7 @@ import RegisterSW from "../components/RegisterSW.astro";
 import {
   HERO_VIDEO_URL,
   TRACK_SRC,
+  KAZTA_IG_LOGO,
   KAZTA_INSTAGRAM_URL,
   YOUTUBE_URL,
   SPOTIFY_URL,
@@ -214,7 +215,15 @@ import {
         overflow: hidden;
         border: 1px solid rgba(0,0,0,0.1);
       }
+      .cta-ig__logo {
+        display: block;
+        width: 100% !important;
+        height: 48px !important;
+        object-fit: contain !important;
+        object-position: center !important;
+      }
       .cta-ig__logo-text {
+        display: none;
         font-family: "Bebas Neue", sans-serif;
         font-size: 1.05rem;
         color: #000000;
@@ -225,6 +234,7 @@ import {
       @media (min-width: 768px) {
         .cta-ig { bottom: max(6.5rem, env(safe-area-inset-bottom, 0px)); width: 150px !important; padding: 0.4rem 0.6rem; }
         .cta-ig__logo-wrap { height: 60px !important; }
+        .cta-ig__logo { height: 60px !important; }
         .cta-ig__logo-text { font-size: 1.3rem; }
         .cta-ig__eyebrow { font-size: 0.7rem; }
       }
@@ -422,7 +432,8 @@ import {
     <a href={KAZTA_INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
       <span class="cta-ig__eyebrow">Hecho por:</span>
       <div class="cta-ig__logo-wrap">
-        <span class="cta-ig__logo-text">young_kazta</span>
+        <img class="cta-ig__logo" src={KAZTA_IG_LOGO} alt="young_kazta logo" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+        <span class="cta-ig__logo-text" style="display:none;">young_kazta</span>
       </div>
     </a>
 
