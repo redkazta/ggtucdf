@@ -209,11 +209,12 @@ import {
         justify-content: center;
         width: 100% !important;
         height: 48px !important;
-        background: rgba(255,255,255,0.15);
+        background: #ffffff !important;
         border-radius: 4px;
         overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.1);
       }
-      .cta-ig__logo { display: block; width: 100% !important; height: 48px !important; object-fit: contain !important; object-position: center !important; filter: brightness(1.3) contrast(1.2); }
+      .cta-ig__logo { display: block; width: 100% !important; height: 48px !important; object-fit: contain !important; object-position: center !important; }
       @media (min-width: 768px) {
         .cta-ig { bottom: max(6.5rem, env(safe-area-inset-bottom, 0px)); width: 150px !important; padding: 0.4rem 0.6rem; }
         .cta-ig__logo-wrap { height: 60px !important; }
@@ -414,7 +415,7 @@ import {
     <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
       <span class="cta-ig__eyebrow">Hecho por:</span>
       <div class="cta-ig__logo-wrap">
-        <img class="cta-ig__logo" src={KAZTA_IG_LOGO} alt="dev_kazta logo" decoding="async" onerror="this.style.display='none'; this.parentElement.style.background='rgba(255,50,50,0.3)'; this.parentElement.innerHTML+='<span style=font-family:Bebas Neue,sans-serif;font-size:0.8rem;color:#fff;>young_kazta</span>';" />
+        <img class="cta-ig__logo" src={`${KAZTA_IG_LOGO}?v=2`} alt="dev_kazta logo" decoding="async" onerror="this.style.display='none'; this.parentElement.style.background='#ff3333'; this.parentElement.innerHTML+='<span style=font-family:Bebas+Neue,sans-serif;font-size:0.8rem;color:#fff;>young_kazta</span>';" />
       </div>
     </a>
 
