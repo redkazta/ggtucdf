@@ -3,8 +3,7 @@ export const HERO_VIDEO_URL =
 
 export const TRACK_SRC = "/audio/track.mp3";
 
-export const KAZTA_IG_LOGO =
-  "https://coilzxaisyuvcsdbywrk.supabase.co/storage/v1/object/public/videos/WhatsApp%20Image%202026-04-23%20at%203.48.28%20PM.jpeg";
+export const KAZTA_IG_LOGO = "/brand/kazta-logo.png";
 
 export const YOUTUBE_URL = "https://www.youtube.com/@Garguttt";
 export const SPOTIFY_URL =
