@@ -186,20 +186,24 @@ import {
       .cta-ig {
         position: fixed;
         right: max(0.6rem, env(safe-area-inset-right, 0px));
-        bottom: max(5.5rem, env(safe-area-inset-bottom, 0px));
+        bottom: max(8.5rem, env(safe-area-inset-bottom, 0px));
         z-index: 110; display: block; width: max-content;
         max-width: min(200px, 40vw); text-decoration: none;
         color: rgba(240,240,240,0.88); cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         filter: drop-shadow(0 2px 10px rgba(0,0,0,0.55));
         transition: transform 0.15s ease, filter 0.2s;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 0.35rem 0.5rem;
       }
-      .cta-ig:hover { filter: drop-shadow(0 3px 14px rgba(0,0,0,0.7)); transform: scale(1.03); }
+      .cta-ig:hover { filter: drop-shadow(0 3px 14px rgba(0,0,0,0.7)); transform: scale(1.03); background: rgba(255,255,255,0.1); }
       .cta-ig:active { transform: scale(0.98); }
-      .cta-ig__eyebrow { display: block; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.04em; line-height: 1.1; margin-bottom: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.5); }
-      .cta-ig__logo { display: block; height: 40px; width: auto; max-width: 100%; object-fit: contain; object-position: left center; }
+      .cta-ig__eyebrow { display: block; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.04em; line-height: 1.1; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.6); }
+      .cta-ig__logo { display: block; height: 40px; width: auto; max-width: 100%; object-fit: contain; object-position: left center; filter: brightness(1.15); }
       @media (min-width: 768px) {
-        .cta-ig { bottom: max(0.75rem, env(safe-area-inset-bottom, 0px)); max-width: min(260px, 40vw); }
+        .cta-ig { bottom: max(6.5rem, env(safe-area-inset-bottom, 0px)); max-width: min(260px, 40vw); padding: 0.4rem 0.6rem; }
         .cta-ig__logo { height: 52px; }
         .cta-ig__eyebrow { font-size: 0.7rem; }
       }
@@ -396,7 +400,8 @@ import {
 
     <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
       <span class="cta-ig__eyebrow">Hecho por:</span>
-      <img class="cta-ig__logo" src={KAZTA_IG_LOGO} alt="dev_kazta logo" decoding="async" />
+      <img class="cta-ig__logo" src={KAZTA_IG_LOGO} alt="dev_kazta logo" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
+      <span class="cta-ig__fallback" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;color:#fff;letter-spacing:0.05em;">young_kazta</span>
     </a>
 
     <audio id="track" preload="none" loop playsinline muted data-src={TRACK_SRC}></audio>

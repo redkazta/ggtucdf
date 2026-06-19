@@ -4,14 +4,11 @@ import PageFooter from "../components/PageFooter.astro";
 import Skeleton from "../components/Skeleton.astro";
 import {
   SITE_TITLE,
-  ARTIST_ORIGIN,
   ARTIST_MONTHLY_LISTENERS,
   ARTIST_FOLLOWERS,
   DISCOGRAPHY,
-  SCENE,
   SPOTIFY_ARTIST_URL,
   SPOTIFY_EMBED_ARTIST,
-  YOUTUBE_URL,
   INSTAGRAM_URL,
 } from "../data/siteConfig";
 
@@ -24,7 +21,6 @@ const topTracks = [...DISCOGRAPHY]
 
 const sections = [
   { id: "perfil", label: "Perfil" },
-  { id: "historia", label: "Historia" },
   { id: "musica", label: "Música" },
   { id: "escena", label: "Escena" },
   { id: "conecta", label: "Conecta" },
@@ -83,13 +79,6 @@ const sections = [
             </div>
           </div>
 
-          <p class="perfil-bio">
-            Artista independiente de Guadalajara, México. Su música navega entre
-            el rap y el trap experimental, acumulando más de {
-              ARTIST_MONTHLY_LISTENERS
-            } oyentes mensuales en Spotify.
-          </p>
-
           <a
             href={SPOTIFY_ARTIST_URL}
             target="_blank"
@@ -107,39 +96,10 @@ const sections = [
       </div>
     </section>
 
-    <!-- SECCIÓN 2: HISTORIA -->
-    <section class="artist-section" id="sec-historia" data-index="1" aria-label="Historia">
-      <div class="section-inner section-inner--narrow">
-        <span class="section-eyebrow">01 / Historia</span>
-        <h2 class="section-headline">Origen</h2>
-        <div class="story-body">
-          <p>
-            Desde las calles de Guadalajara, la música fue siempre un escape y
-            una forma de expresar lo que las palabras no podian capturar. Empezo
-            grabando en casa, mezclando influencias del rap clasico con el trap
-            experimental que resonaba en la escena underground mexicana.
-          </p>
-          <p>
-            Cada track es un fragmento de experiencia vivida: amor, desamor,
-            fiestas, caidas y reencuentros. Con una discografia de {
-              DISCOGRAPHY.length
-            } singles autopublicados entre 2025 y 2026, ha construido una
-            identidad sonora unica que no se deja encasillar.
-          </p>
-          <p>
-            Las colaboraciones con artistas como zacklyvibes, Buzk, ESSENZY y
-            YESH! han ampliado su alcance, consolidando una comunidad de
-            oyentes que supera los {ARTIST_MONTHLY_LISTENERS} mensuales en
-            Spotify.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECCIÓN 3: MÚSICA -->
-    <section class="artist-section" id="sec-musica" data-index="2" aria-label="Música">
+    <!-- SECCIÓN 2: MÚSICA -->
+    <section class="artist-section" id="sec-musica" data-index="1" aria-label="Música">
       <div class="section-inner section-inner--wide">
-        <span class="section-eyebrow">02 / Música</span>
+        <span class="section-eyebrow">Música</span>
         <h2 class="section-headline">Discografia</h2>
         <div class="music-grid">
           {topTracks.map((track) => (
@@ -191,28 +151,11 @@ const sections = [
       </div>
     </section>
 
-    <!-- SECCIÓN 4: ESCENA -->
-    <section class="artist-section" id="sec-escena" data-index="3" aria-label="Escena">
+    <!-- SECCIÓN 3: ESCENA -->
+    <section class="artist-section" id="sec-escena" data-index="2" aria-label="Escena">
       <div class="section-inner section-inner--wide">
-        <span class="section-eyebrow">03 / Escena</span>
-        <h2 class="section-headline">La Banda</h2>
-        <p class="section-lead">
-          Artistas con los que ha compartido track, escenario y jaripeo.
-        </p>
-
-        <div class="scene-grid">
-          {SCENE.filter((s) => s.url).map((artist) => (
-            <a
-              href={artist.url}
-              target="_blank"
-              rel="noopener"
-              class="scene-card"
-            >
-              <span class="scene-card__name">{artist.name}</span>
-              <span class="scene-card__hint">Spotify &#187;</span>
-            </a>
-          ))}
-        </div>
+        <span class="section-eyebrow">Escena</span>
+        <h2 class="section-headline">Spotify</h2>
 
         <div class="embed-wrap">
           <div class="embed-skeleton" data-embed-skeleton aria-hidden="true">
@@ -233,24 +176,13 @@ const sections = [
       </div>
     </section>
 
-    <!-- SECCIÓN 5: CONECTA -->
-    <section class="artist-section" id="sec-conecta" data-index="4" aria-label="Conecta">
+    <!-- SECCIÓN 4: CONECTA -->
+    <section class="artist-section" id="sec-conecta" data-index="3" aria-label="Conecta">
       <div class="section-inner section-inner--center">
-        <span class="section-eyebrow">04 / Conecta</span>
-        <h2 class="section-headline section-headline--big">Sigue el viaje</h2>
-        <p class="section-lead section-lead--center">
-          Nuevas rolas, visuales y lo que se viene. Esto apenas empieza.
-        </p>
+        <span class="section-eyebrow">Conecta</span>
+        <h2 class="section-headline section-headline--big">Enlaces</h2>
 
         <div class="connect-grid">
-          <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="connect-card connect-card--spotify">
-            <span class="connect-card__icon">&#9836;</span>
-            <span class="connect-card__label">Spotify</span>
-          </a>
-          <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="connect-card connect-card--youtube">
-            <span class="connect-card__icon">&#9654;</span>
-            <span class="connect-card__label">YouTube</span>
-          </a>
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="connect-card connect-card--ig">
             <span class="connect-card__icon">&#9670;</span>
             <span class="connect-card__label">Instagram</span>
@@ -323,6 +255,20 @@ const sections = [
 
       sections.forEach((sec) => observer.observe(sec));
 
+      // Entrance animations
+      const entranceObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+            }
+          });
+        },
+        { root: scroller, threshold: 0.15 }
+      );
+
+      sections.forEach((sec) => entranceObserver.observe(sec));
+
       document.addEventListener("keydown", (e) => {
         if (e.key === "ArrowDown" || e.key === "PageDown") {
           e.preventDefault();
@@ -387,6 +333,20 @@ const sections = [
       text-transform: uppercase;
       margin-bottom: 0.5rem;
     }
+
+    .artist-section {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .artist-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .artist-section:nth-child(1) { transition-delay: 0.05s; }
+    .artist-section:nth-child(2) { transition-delay: 0.1s; }
+    .artist-section:nth-child(3) { transition-delay: 0.15s; }
+    .artist-section:nth-child(4) { transition-delay: 0.2s; }
 
     .section-headline {
       font-family: "Bebas Neue", sans-serif;
@@ -879,6 +839,11 @@ const sections = [
     @media (prefers-reduced-motion: reduce) {
       .section-scroller { scroll-behavior: auto; }
       .scroll-hint { animation: none; }
+      .artist-section {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
     }
   </style>
 </ArtistLayout>
