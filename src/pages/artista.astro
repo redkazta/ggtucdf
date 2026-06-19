@@ -11,382 +11,874 @@ import {
   SCENE,
   SPOTIFY_ARTIST_URL,
   SPOTIFY_EMBED_ARTIST,
+  YOUTUBE_URL,
+  INSTAGRAM_URL,
 } from "../data/siteConfig";
 
-const soloCount = DISCOGRAPHY.filter((t) => t.type === "solo").length;
-const colabCount = DISCOGRAPHY.filter((t) => t.type === "colab").length;
 const totalStreams = DISCOGRAPHY.reduce((sum, t) => sum + (t.streams || 0), 0);
+const featuredCover =
+  DISCOGRAPHY.find((t) => t.title === "Yo te kiero solo")?.coverUrl || "";
+const topTracks = [...DISCOGRAPHY]
+  .sort((a, b) => (b.streams || 0) - (a.streams || 0))
+  .slice(0, 6);
 
-// Use the most popular track cover as artist image placeholder
-const featuredCover = DISCOGRAPHY.find((t) => t.title === "Yo te kiero solo")?.coverUrl || "";
+const sections = [
+  { id: "perfil", label: "Perfil" },
+  { id: "historia", label: "Historia" },
+  { id: "musica", label: "Música" },
+  { id: "escena", label: "Escena" },
+  { id: "conecta", label: "Conecta" },
+];
 ---
 
-<ArtistLayout title="Artista" description={`${SITE_TITLE} — Artista independiente de Guadalajara, México.`}>
-  <section class="artist-hero" aria-label="Perfil del artista">
-    <div class="artist-hero__visual">
-      {featuredCover ? (
-        <div class="cover-wrap">
-          <img
-            src={featuredCover}
-            alt=""
-            class="artist-hero__cover"
-            width="300"
-            height="300"
-            decoding="async"
-            onload="this.classList.add('is-loaded'); this.previousElementSibling?.classList.add('is-hidden');"
-          />
-          <div class="cover-skeleton" aria-hidden="true">
-            <Skeleton width="100%" height="100%" borderRadius="8px" />
+<ArtistLayout
+  title="Artista"
+  description={`${SITE_TITLE} — Artista independiente de Guadalajara, México.`}
+>
+  <div class="section-scroller" id="sectionScroller">
+    <!-- SECCIÓN 1: PERFIL -->
+    <section class="artist-section" id="sec-perfil" data-index="0" aria-label="Perfil">
+      <div class="section-inner">
+        <div class="perfil-visual">
+          {featuredCover ? (
+            <div class="cover-wrap">
+              <img
+                src={featuredCover}
+                alt=""
+                class="perfil-cover"
+                width="300"
+                height="300"
+                decoding="async"
+                onload="this.classList.add('is-loaded'); this.nextElementSibling?.classList.add('is-hidden');"
+              />
+              <div class="cover-skeleton" aria-hidden="true">
+                <Skeleton width="100%" height="100%" borderRadius="12px" />
+              </div>
+            </div>
+          ) : (
+            <div class="perfil-cover-placeholder" aria-hidden="true" />
+          )}
+        </div>
+
+        <div class="perfil-content">
+          <h1 class="perfil-name">{SITE_TITLE}</h1>
+          <p class="perfil-origin">{ARTIST_ORIGIN}</p>
+
+          <div class="perfil-stats">
+            <div class="stat">
+              <span class="stat__value">{ARTIST_MONTHLY_LISTENERS}</span>
+              <span class="stat__label">oyentes mensuales</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">{ARTIST_FOLLOWERS}</span>
+              <span class="stat__label">seguidores</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">{DISCOGRAPHY.length}</span>
+              <span class="stat__label">singles</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">{totalStreams.toLocaleString("es-MX")}</span>
+              <span class="stat__label">streams totales</span>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div class="artist-hero__cover-placeholder" aria-hidden="true"></div>
-      )}
-    </div>
 
-    <div class="artist-hero__content">
-      <h1 class="artist-hero__name">{SITE_TITLE}</h1>
-      <p class="artist-hero__origin">{ARTIST_ORIGIN}</p>
+          <p class="perfil-bio">
+            Artista independiente de Guadalajara, México. Su música navega entre
+            el rap y el trap experimental, acumulando más de {
+              ARTIST_MONTHLY_LISTENERS
+            } oyentes mensuales en Spotify.
+          </p>
 
-      <div class="artist-hero__stats">
-        <div class="stat">
-          <span class="stat__value">{ARTIST_MONTHLY_LISTENERS}</span>
-          <span class="stat__label">oyentes mensuales</span>
-        </div>
-        <div class="stat">
-          <span class="stat__value">{ARTIST_FOLLOWERS}</span>
-          <span class="stat__label">seguidores</span>
-        </div>
-        <div class="stat">
-          <span class="stat__value">{DISCOGRAPHY.length}</span>
-          <span class="stat__label">singles</span>
-        </div>
-        <div class="stat">
-          <span class="stat__value">{totalStreams.toLocaleString("es-MX")}</span>
-          <span class="stat__label">streams totales</span>
+          <a
+            href={SPOTIFY_ARTIST_URL}
+            target="_blank"
+            rel="noopener"
+            class="btn btn--primary"
+          >
+            Escuchar en Spotify
+          </a>
         </div>
       </div>
 
-      <p class="artist-hero__bio">
-        Artista independiente de Guadalajara, México. Su música navega entre el rap
-        y el trap experimental, acumulando más de {ARTIST_MONTHLY_LISTENERS} oyentes
-        mensuales en Spotify. Con una discografía de {DISCOGRAPHY.length} singles
-        autopublicados entre 2025 y 2026, ha colaborado frecuentemente con
-        artistas de la escena underground mexicana.
-      </p>
-
-      <div class="artist-hero__actions">
-        <a
-          href={SPOTIFY_ARTIST_URL}
-          target="_blank"
-          rel="noopener"
-          class="btn btn--primary"
-        >
-          Escuchar en Spotify
-        </a>
+      <div class="scroll-hint" aria-hidden="true">
+        <span class="scroll-hint__line" />
+        <span class="scroll-hint__text">Scroll</span>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="embed-section" aria-label="Spotify">
-    <h2 class="section-title">En Spotify</h2>
-    <div class="embed-wrap">
-      <div class="embed-skeleton" data-embed-skeleton aria-hidden="true">
-        <Skeleton width="100%" height="360px" borderRadius="12px" />
+    <!-- SECCIÓN 2: HISTORIA -->
+    <section class="artist-section" id="sec-historia" data-index="1" aria-label="Historia">
+      <div class="section-inner section-inner--narrow">
+        <span class="section-eyebrow">01 / Historia</span>
+        <h2 class="section-headline">Origen</h2>
+        <div class="story-body">
+          <p>
+            Desde las calles de Guadalajara, la música fue siempre un escape y
+            una forma de expresar lo que las palabras no podian capturar. Empezo
+            grabando en casa, mezclando influencias del rap clasico con el trap
+            experimental que resonaba en la escena underground mexicana.
+          </p>
+          <p>
+            Cada track es un fragmento de experiencia vivida: amor, desamor,
+            fiestas, caidas y reencuentros. Con una discografia de {
+              DISCOGRAPHY.length
+            } singles autopublicados entre 2025 y 2026, ha construido una
+            identidad sonora unica que no se deja encasillar.
+          </p>
+          <p>
+            Las colaboraciones con artistas como zacklyvibes, Buzk, ESSENZY y
+            YESH! han ampliado su alcance, consolidando una comunidad de
+            oyentes que supera los {ARTIST_MONTHLY_LISTENERS} mensuales en
+            Spotify.
+          </p>
+        </div>
       </div>
-      <iframe
-        class="embed-iframe"
-        src={SPOTIFY_EMBED_ARTIST}
-        width="100%"
-        height="360"
-        style="border-radius:12px; border:0;"
-        allow="encrypted-media"
-        loading="lazy"
-        title="Gargut en Spotify"
-        onload="this.closest('.embed-wrap').querySelector('[data-embed-skeleton]')?.classList.add('is-hidden'); this.classList.add('is-loaded');"
-      ></iframe>
-    </div>
-  </section>
+    </section>
 
-  <section class="scene-section" aria-label="Escena">
-    <h2 class="section-title">Escena</h2>
-    <p class="scene-section__intro">
-      Artistas con los que ha compartido track.
-    </p>
-    <div class="scene-grid">
-      {SCENE.filter((s) => s.url).map((artist) => (
-        <a
-          href={artist.url}
-          target="_blank"
-          rel="noopener"
-          class="scene-card"
-        >
-          <span class="scene-card__name">{artist.name}</span>
-          <span class="scene-card__hint">Spotify &#187;</span>
-        </a>
-      ))}
-    </div>
-  </section>
+    <!-- SECCIÓN 3: MÚSICA -->
+    <section class="artist-section" id="sec-musica" data-index="2" aria-label="Música">
+      <div class="section-inner section-inner--wide">
+        <span class="section-eyebrow">02 / Música</span>
+        <h2 class="section-headline">Discografia</h2>
+        <div class="music-grid">
+          {topTracks.map((track) => (
+            <a
+              href={track.spotifyUrl}
+              target="_blank"
+              rel="noopener"
+              class="music-card"
+              aria-label={`Escuchar ${track.title}`}
+            >
+              <div class="music-card__cover-wrap">
+                {track.coverUrl ? (
+                  <>
+                    <img
+                      src={track.coverUrl}
+                      alt=""
+                      class="music-card__cover"
+                      width="300"
+                      height="300"
+                      loading="lazy"
+                      decoding="async"
+                      onload="this.classList.add('is-loaded'); this.nextElementSibling?.classList.add('is-hidden');"
+                    />
+                    <div class="music-card__skeleton" aria-hidden="true">
+                      <Skeleton width="100%" height="100%" borderRadius="8px" />
+                    </div>
+                  </>
+                ) : (
+                  <div class="music-card__fallback">
+                    <span>{track.title.charAt(0)}</span>
+                  </div>
+                )}
+                <div class="music-card__overlay">
+                  <span class="music-card__play">&#9654;</span>
+                </div>
+              </div>
+              <div class="music-card__info">
+                <h3 class="music-card__title">{track.title}</h3>
+                <div class="music-card__meta">
+                  <span>{track.year}</span>
+                  <span class="badge" data-type={track.type}>
+                    {track.type === "solo" ? "Solo" : "Colab"}
+                  </span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
 
-  <PageFooter />
+    <!-- SECCIÓN 4: ESCENA -->
+    <section class="artist-section" id="sec-escena" data-index="3" aria-label="Escena">
+      <div class="section-inner section-inner--wide">
+        <span class="section-eyebrow">03 / Escena</span>
+        <h2 class="section-headline">La Banda</h2>
+        <p class="section-lead">
+          Artistas con los que ha compartido track, escenario y jaripeo.
+        </p>
+
+        <div class="scene-grid">
+          {SCENE.filter((s) => s.url).map((artist) => (
+            <a
+              href={artist.url}
+              target="_blank"
+              rel="noopener"
+              class="scene-card"
+            >
+              <span class="scene-card__name">{artist.name}</span>
+              <span class="scene-card__hint">Spotify &#187;</span>
+            </a>
+          ))}
+        </div>
+
+        <div class="embed-wrap">
+          <div class="embed-skeleton" data-embed-skeleton aria-hidden="true">
+            <Skeleton width="100%" height="360px" borderRadius="12px" />
+          </div>
+          <iframe
+            class="embed-iframe"
+            src={SPOTIFY_EMBED_ARTIST}
+            width="100%"
+            height="360"
+            style="border-radius:12px; border:0;"
+            allow="encrypted-media"
+            loading="lazy"
+            title="Gargut en Spotify"
+            onload="this.closest('.embed-wrap').querySelector('[data-embed-skeleton]')?.classList.add('is-hidden'); this.classList.add('is-loaded');"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 5: CONECTA -->
+    <section class="artist-section" id="sec-conecta" data-index="4" aria-label="Conecta">
+      <div class="section-inner section-inner--center">
+        <span class="section-eyebrow">04 / Conecta</span>
+        <h2 class="section-headline section-headline--big">Sigue el viaje</h2>
+        <p class="section-lead section-lead--center">
+          Nuevas rolas, visuales y lo que se viene. Esto apenas empieza.
+        </p>
+
+        <div class="connect-grid">
+          <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="connect-card connect-card--spotify">
+            <span class="connect-card__icon">&#9836;</span>
+            <span class="connect-card__label">Spotify</span>
+          </a>
+          <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="connect-card connect-card--youtube">
+            <span class="connect-card__icon">&#9654;</span>
+            <span class="connect-card__label">YouTube</span>
+          </a>
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="connect-card connect-card--ig">
+            <span class="connect-card__icon">&#9670;</span>
+            <span class="connect-card__label">Instagram</span>
+          </a>
+        </div>
+
+        <PageFooter />
+      </div>
+    </section>
+  </div>
+
+  <!-- Navegacion lateral -->
+  <nav class="section-dots" id="sectionDots" aria-label="Navegacion de secciones">
+    {sections.map((sec, i) => (
+      <button
+        class={`section-dot ${i === 0 ? "is-active" : ""}`}
+        data-index={i}
+        aria-label={sec.label}
+        type="button"
+      >
+        <span class="section-dot__label">{sec.label}</span>
+      </button>
+    ))}
+  </nav>
+
+  <script is:inline>
+    (function () {
+      const scroller = document.getElementById("sectionScroller");
+      const dots = document.querySelectorAll(".section-dot");
+      const sections = document.querySelectorAll(".artist-section");
+      if (!scroller || !dots.length || !sections.length) return;
+
+      let current = 0;
+      let isSnapping = false;
+
+      function activate(index) {
+        current = index;
+        dots.forEach((d, i) => {
+          d.classList.toggle("is-active", i === index);
+        });
+      }
+
+      function scrollToSection(index) {
+        if (index < 0 || index >= sections.length) return;
+        isSnapping = true;
+        sections[index].scrollIntoView({ behavior: "smooth", block: "start" });
+        activate(index);
+        setTimeout(() => { isSnapping = false; }, 600);
+      }
+
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const idx = parseInt(dot.dataset.index || "0", 10);
+          scrollToSection(idx);
+        });
+      });
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (isSnapping) return;
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const idx = parseInt((entry.target).dataset.index || "0", 10);
+              activate(idx);
+            }
+          });
+        },
+        { root: scroller, threshold: 0.55 }
+      );
+
+      sections.forEach((sec) => observer.observe(sec));
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown" || e.key === "PageDown") {
+          e.preventDefault();
+          scrollToSection(current + 1);
+        } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+          e.preventDefault();
+          scrollToSection(current - 1);
+        }
+      });
+
+      let touchStartY = 0;
+      scroller.addEventListener("touchstart", (e) => {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      scroller.addEventListener("touchend", (e) => {
+        const diff = touchStartY - e.changedTouches[0].clientY;
+        if (Math.abs(diff) > 50) {
+          if (diff > 0) scrollToSection(current + 1);
+          else scrollToSection(current - 1);
+        }
+      }, { passive: true });
+    })();
+  </script>
+
+  <style>
+    .section-scroller {
+      height: calc(100dvh - 56px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+    .section-scroller::-webkit-scrollbar { display: none; }
+
+    .artist-section {
+      min-height: calc(100dvh - 56px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      position: relative;
+      padding: 1.5rem 1.25rem;
+    }
+
+    .section-inner {
+      width: 100%;
+      max-width: 520px;
+    }
+    .section-inner--wide { max-width: 720px; }
+    .section-inner--narrow { max-width: 560px; }
+    .section-inner--center { text-align: center; }
+
+    .section-eyebrow {
+      display: block;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: rgba(255, 50, 50, 0.7);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-headline {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(1.6rem, 5vw, 2.6rem);
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 1.25rem;
+      text-shadow: 0 0 20px rgba(255, 50, 50, 0.35);
+    }
+    .section-headline--big {
+      font-size: clamp(1.8rem, 6vw, 3rem);
+    }
+
+    .section-lead {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+    .section-lead--center {
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .perfil-visual {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .cover-wrap {
+      position: relative;
+      width: 180px;
+      height: 180px;
+    }
+    .cover-skeleton {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      transition: opacity 0.4s ease;
+    }
+    .cover-skeleton.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .perfil-cover {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 50, 50, 0.15);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .perfil-cover.is-loaded { opacity: 1; }
+    .perfil-cover-placeholder {
+      width: 180px;
+      height: 180px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .perfil-content { text-align: center; }
+    .perfil-name {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(1.8rem, 6vw, 2.8rem);
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 0.95;
+      text-shadow: 0 0 24px rgba(255, 50, 50, 0.45);
+    }
+    .perfil-origin {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 0.4rem 0 1rem;
+    }
+    .perfil-bio {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.7;
+      max-width: 420px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .perfil-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      max-width: 340px;
+      margin: 0 auto 1.25rem;
+    }
+    .stat {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 0.7rem 0.4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .stat__value {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.15rem;
+      color: #ffffff;
+      line-height: 1;
+    }
+    .stat__label {
+      font-size: 0.6rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.8rem 1.8rem;
+      border-radius: 999px;
+      font-family: "Bebas Neue", sans-serif;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s ease, box-shadow 0.3s ease;
+    }
+    .btn:hover { transform: scale(1.05); }
+    .btn:active { transform: scale(0.96); }
+    .btn--primary {
+      background: linear-gradient(135deg, #1db954, #169c46);
+      color: #000000;
+      border: none;
+      box-shadow: 0 0 20px rgba(29, 185, 84, 0.3);
+    }
+    .btn--primary:hover { box-shadow: 0 0 30px rgba(29, 185, 84, 0.45); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      opacity: 0.35;
+      animation: hint-bob 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .scroll-hint__line {
+      display: block;
+      width: 1px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    .scroll-hint__text {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    @keyframes hint-bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    .story-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .story-body p {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.75;
+    }
+
+    .music-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    .music-card {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s ease;
+    }
+    .music-card:hover { transform: translateY(-3px); }
+    .music-card__cover-wrap {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+      background: #111;
+    }
+    .music-card__cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .music-card__cover.is-loaded { opacity: 1; }
+    .music-card__skeleton {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      transition: opacity 0.4s ease;
+    }
+    .music-card__skeleton.is-hidden { opacity: 0; pointer-events: none; }
+    .music-card__fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a0a0a, #0a0a0a);
+    }
+    .music-card__fallback span {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 2.5rem;
+      color: rgba(255, 255, 255, 0.12);
+    }
+    .music-card__overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .music-card:hover .music-card__overlay { opacity: 1; }
+    .music-card__play {
+      font-size: 1.6rem;
+      color: #ffffff;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+      line-height: 1;
+    }
+    .music-card__info { display: flex; flex-direction: column; gap: 0.15rem; }
+    .music-card__title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .music-card__meta {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.35);
+    }
+    .badge {
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.08rem 0.3rem;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.5);
+      line-height: 1;
+    }
+    .badge[data-type="solo"] {
+      background: rgba(29, 185, 84, 0.12);
+      color: rgba(29, 185, 84, 0.7);
+    }
+
+    .scene-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .scene-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.9rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s ease;
+    }
+    .scene-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: scale(1.03);
+    }
+    .scene-card__name {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .scene-card__hint {
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .embed-wrap {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .embed-skeleton {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      transition: opacity 0.5s ease;
+    }
+    .embed-skeleton.is-hidden { opacity: 0; pointer-events: none; }
+    .embed-iframe {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      display: block;
+    }
+    .embed-iframe.is-loaded { opacity: 1; }
+
+    .connect-grid {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .connect-card {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      width: 90px;
+      height: 90px;
+      border-radius: 16px;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .connect-card:hover { transform: scale(1.08); }
+    .connect-card:active { transform: scale(0.95); }
+    .connect-card__icon {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .connect-card__label {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .connect-card--spotify { color: #1db954; border-color: rgba(29, 185, 84, 0.25); }
+    .connect-card--spotify:hover { box-shadow: 0 0 20px rgba(29, 185, 84, 0.25); }
+    .connect-card--youtube { color: #ff3333; border-color: rgba(255, 50, 50, 0.25); }
+    .connect-card--youtube:hover { box-shadow: 0 0 20px rgba(255, 50, 50, 0.25); }
+    .connect-card--ig { color: #e1306c; border-color: rgba(225, 48, 108, 0.25); }
+    .connect-card--ig:hover { box-shadow: 0 0 20px rgba(225, 48, 108, 0.25); }
+
+    .section-dots {
+      position: fixed;
+      right: 0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-dot {
+      position: relative;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+    }
+    .section-dot.is-active {
+      background: #ff3333;
+      border-color: #ff3333;
+      transform: scale(1.4);
+      box-shadow: 0 0 10px rgba(255, 50, 50, 0.5);
+    }
+    .section-dot__label {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.65);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    .section-dot:hover .section-dot__label {
+      opacity: 1;
+      transform: translateY(-50%) translateX(-4px);
+    }
+
+    @media (min-width: 768px) {
+      .section-scroller { height: calc(100dvh - 64px); }
+      .artist-section {
+        min-height: calc(100dvh - 64px);
+        padding: 2rem 2.5rem;
+      }
+      .section-inner { max-width: 640px; }
+      .section-inner--wide { max-width: 860px; }
+      .section-inner--narrow { max-width: 620px; }
+
+      .perfil-visual { margin-bottom: 2rem; }
+      .cover-wrap { width: 220px; height: 220px; }
+      .perfil-cover { width: 220px; height: 220px; }
+      .perfil-cover-placeholder { width: 220px; height: 220px; }
+      .perfil-stats { grid-template-columns: repeat(4, 1fr); max-width: 480px; }
+      .perfil-bio { font-size: 0.95rem; max-width: 480px; }
+
+      .music-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+      .connect-grid { gap: 1rem; }
+      .connect-card { width: 110px; height: 110px; }
+
+      .section-dots { right: 1rem; gap: 0.65rem; }
+      .section-dot { width: 10px; height: 10px; }
+      .section-dot__label { font-size: 0.7rem; }
+    }
+
+    @media (min-width: 1024px) {
+      .section-inner { max-width: 720px; }
+      .section-inner--wide { max-width: 980px; }
+      .section-inner--narrow { max-width: 680px; }
+
+      #sec-perfil .section-inner {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        gap: 2rem;
+        max-width: 900px;
+      }
+      .perfil-visual { margin-bottom: 0; margin-right: 3rem; }
+      .perfil-content { text-align: left; }
+      .perfil-stats { margin: 0 0 1.25rem; }
+      .perfil-bio { margin: 0 0 1.5rem; }
+      .btn { justify-content: flex-start; }
+
+      .music-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+      .music-card__title { font-size: 0.9rem; }
+
+      .connect-grid { gap: 1.25rem; }
+      .connect-card { width: 120px; height: 120px; }
+      .connect-card__icon { font-size: 1.6rem; }
+      .connect-card__label { font-size: 0.75rem; }
+
+      .section-dots { right: 1.5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .section-scroller { scroll-behavior: auto; }
+      .scroll-hint { animation: none; }
+    }
+  </style>
 </ArtistLayout>
-
-<style>
-  .artist-hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2.5rem 1.25rem 2rem;
-    gap: 1.5rem;
-    text-align: center;
-  }
-
-  .artist-hero__visual {
-    flex-shrink: 0;
-  }
-
-  .cover-wrap {
-    position: relative;
-    width: 220px;
-    height: 220px;
-  }
-  .cover-skeleton {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    transition: opacity 0.4s ease;
-  }
-  .cover-skeleton.is-hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .artist-hero__cover {
-    position: relative;
-    z-index: 1;
-    width: 220px;
-    height: 220px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-  .artist-hero__cover.is-loaded {
-    opacity: 1;
-  }
-
-  .artist-hero__cover-placeholder {
-    width: 220px;
-    height: 220px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .artist-hero__name {
-    font-family: "Bebas Neue", sans-serif;
-    text-transform: uppercase;
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
-    color: #ffffff;
-    line-height: 0.95;
-    letter-spacing: 0.04em;
-    margin-bottom: 0.35rem;
-    text-shadow: 0 0 20px rgba(255, 50, 50, 0.45), 0 0 40px rgba(255, 50, 50, 0.15);
-  }
-
-  .artist-hero__origin {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.45);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 1.25rem;
-  }
-
-  .artist-hero__stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    max-width: 420px;
-    margin: 0 auto 1.5rem;
-  }
-
-  .stat {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 0.75rem 0.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-  }
-
-  .stat__value {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 1.1rem;
-    color: #ffffff;
-    line-height: 1;
-  }
-
-  .stat__label {
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .artist-hero__bio {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.65);
-    line-height: 1.65;
-    max-width: 520px;
-    margin: 0 auto 1.5rem;
-  }
-
-  .artist-hero__actions {
-    display: flex;
-    justify-content: center;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-family: "Bebas Neue", sans-serif;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 0.04em;
-    text-decoration: none;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s ease, opacity 0.2s;
-  }
-  .btn:hover { transform: scale(1.04); opacity: 0.9; }
-  .btn:active { transform: scale(0.97); }
-
-  .btn--primary {
-    background: #1db954;
-    color: #000000;
-    border: none;
-  }
-
-  .scene-section {
-    padding: 0 1.25rem 3rem;
-    max-width: 720px;
-    margin: 0 auto;
-  }
-
-  .section-title {
-    font-family: "Bebas Neue", sans-serif;
-    text-transform: uppercase;
-    font-size: clamp(1rem, 2.5vw, 1.4rem);
-    color: #ffffff;
-    letter-spacing: 0.04em;
-    margin-bottom: 0.4rem;
-    text-align: center;
-    text-shadow: 0 0 14px rgba(255, 50, 50, 0.35);
-  }
-
-  .scene-section__intro {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.4);
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-
-  .scene-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .scene-card {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 0.85rem;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 6px;
-    text-decoration: none;
-    -webkit-tap-highlight-color: transparent;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .scene-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.15);
-  }
-
-  .scene-card__name {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 0.78rem;
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  .scene-card__hint {
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.35);
-  }
-
-  .embed-section {
-    padding: 0 1.25rem 3rem;
-    max-width: 720px;
-    margin: 0 auto;
-  }
-
-  .embed-wrap {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.02);
-  }
-  .embed-skeleton {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    transition: opacity 0.5s ease;
-  }
-  .embed-skeleton.is-hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .embed-iframe {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    display: block;
-  }
-  .embed-iframe.is-loaded {
-    opacity: 1;
-  }
-
-  @media (min-width: 768px) {
-    .artist-hero {
-      flex-direction: row;
-      text-align: left;
-      padding: 4rem 2.5rem 3rem;
-      gap: 2.5rem;
-      max-width: 960px;
-      margin: 0 auto;
-    }
-    .artist-hero__content {
-      flex: 1;
-    }
-    .artist-hero__stats {
-      margin: 0 0 1.5rem;
-      max-width: none;
-    }
-    .artist-hero__bio {
-      margin: 0 0 1.5rem;
-    }
-    .artist-hero__actions {
-      justify-content: flex-start;
-    }
-    .embed-section {
-      padding: 0 2.5rem 3rem;
-    }
-  }
-</style>
