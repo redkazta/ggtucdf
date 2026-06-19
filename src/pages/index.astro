@@ -1,13 +1,10 @@
 ---
-import { readFileSync } from "fs";
-import { join } from "path";
 import Analytics from "@vercel/analytics/astro";
 import Hero from "../components/Hero.astro";
 import RegisterSW from "../components/RegisterSW.astro";
 import {
   HERO_VIDEO_URL,
   TRACK_SRC,
-  KAZTA_IG_LOGO,
   KAZTA_INSTAGRAM_URL,
   YOUTUBE_URL,
   SPOTIFY_URL,
@@ -20,10 +17,6 @@ import {
   SITE_THEME_COLOR,
   OG_IMAGE_URL,
 } from "../data/siteConfig";
-
-const logoPath = join(process.cwd(), "public", "brand", "kazta-logo.png");
-const logoBase64 = readFileSync(logoPath).toString("base64");
-const logoDataUri = `data:image/png;base64,${logoBase64}`;
 ---
 
 <html lang="es">
@@ -221,11 +214,18 @@ const logoDataUri = `data:image/png;base64,${logoBase64}`;
         overflow: hidden;
         border: 1px solid rgba(0,0,0,0.1);
       }
-      .cta-ig__logo { display: block; width: 100% !important; height: 48px !important; object-fit: contain !important; object-position: center !important; }
+      .cta-ig__logo-text {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.05rem;
+        color: #000000;
+        letter-spacing: 0.06em;
+        line-height: 1;
+        text-transform: lowercase;
+      }
       @media (min-width: 768px) {
         .cta-ig { bottom: max(6.5rem, env(safe-area-inset-bottom, 0px)); width: 150px !important; padding: 0.4rem 0.6rem; }
         .cta-ig__logo-wrap { height: 60px !important; }
-        .cta-ig__logo { height: 60px !important; }
+        .cta-ig__logo-text { font-size: 1.3rem; }
         .cta-ig__eyebrow { font-size: 0.7rem; }
       }
 
@@ -422,8 +422,7 @@ const logoDataUri = `data:image/png;base64,${logoBase64}`;
     <a href={KAZTA_INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
       <span class="cta-ig__eyebrow">Hecho por:</span>
       <div class="cta-ig__logo-wrap">
-        <img class="cta-ig__logo" src={logoDataUri} alt="dev_kazta logo" decoding="async" onload="this.nextElementSibling.style.display='none';" />
-        <span class="logo-fallback" style="font-family:Bebas Neue,sans-serif;font-size:0.8rem;color:#000;font-weight:700;">young_kazta</span>
+        <span class="cta-ig__logo-text">young_kazta</span>
       </div>
     </a>
 
