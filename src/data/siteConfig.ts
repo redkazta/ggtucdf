@@ -4,6 +4,7 @@ export const HERO_VIDEO_URL =
 export const TRACK_SRC = "/audio/track.mp3";
 
 export const KAZTA_IG_LOGO = "/brand/kazta-logo.png";
+export const KAZTA_INSTAGRAM_URL = "https://www.instagram.com/young_kazta/";
 
 export const YOUTUBE_URL = "https://www.youtube.com/@Garguttt";
 export const YOUTUBE_CHANNEL_ID = "@Garguttt";
