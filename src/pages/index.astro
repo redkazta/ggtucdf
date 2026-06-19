@@ -74,6 +74,7 @@ import {
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
     />
+    <link rel="prefetch" href="/artista" as="document" />
 
     <style is:global>
       * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -83,6 +84,20 @@ import {
         font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         overflow-x: hidden;
         min-height: 100dvh;
+      }
+      .scanlines {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.03;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.15) 2px,
+          rgba(0, 0, 0, 0.15) 4px
+        );
       }
     </style>
 
@@ -110,10 +125,22 @@ import {
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         filter: drop-shadow(0 3px 12px rgba(0,0,0,0.55));
-        transition: transform 0.15s ease, filter 0.2s;
+        transition: transform 0.2s ease, filter 0.3s ease;
+        position: relative;
       }
-      .cta-icon:hover { filter: drop-shadow(0 4px 16px rgba(0,0,0,0.65)); transform: scale(1.06); }
-      .cta-icon:active { transform: scale(0.96); }
+      .cta-icon::after {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+      .cta-icon:hover { filter: drop-shadow(0 4px 20px rgba(0,0,0,0.7)) brightness(1.15); transform: scale(1.12); }
+      .cta-icon:hover::after { opacity: 1; }
+      .cta-icon:active { transform: scale(0.94); }
       .cta-icon__logo { display: block; width: 88px; height: 88px; object-fit: contain; }
       @media (max-width: 767px) { .cta-icon__logo { width: 76px; height: 76px; } }
       @media (min-width: 1200px) { .cta-icon__logo { width: 96px; height: 96px; } }
@@ -126,7 +153,7 @@ import {
         text-align: center;
         line-height: 1.05;
         letter-spacing: 0.04em;
-        text-shadow: 0 4px 18px rgba(0,0,0,0.9);
+        text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 20px rgba(255,50,50,0.15);
         pointer-events: none;
         user-select: none;
       }
@@ -141,6 +168,19 @@ import {
         font-size: clamp(1rem, 2.6vmin, 1.4rem);
         letter-spacing: -0.1em;
         line-height: 1;
+        animation: arrow-drift 2s ease-in-out infinite;
+      }
+      @keyframes arrow-drift {
+        0%, 100% { opacity: 0.7; transform: translateX(0); }
+        50% { opacity: 1; transform: translateX(2px); }
+      }
+      .cta-label--outnow {
+        color: #ff3333;
+        animation: outnow-glow 2s ease-in-out infinite;
+      }
+      @keyframes outnow-glow {
+        0%, 100% { text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 10px rgba(255,50,50,0.3); }
+        50% { text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 30px rgba(255,50,50,0.6); }
       }
 
       .cta-ig {
@@ -169,68 +209,76 @@ import {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.6rem;
         text-decoration: none;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
-        margin-top: 0.6rem;
-        padding: 0.65rem 1.4rem;
-        border: 1.5px solid rgba(255, 255, 255, 0.55);
+        margin-top: 0.8rem;
+        padding: 0.85rem 2.2rem;
+        border: 2px solid rgba(255, 50, 50, 0.6);
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.06);
-        backdrop-filter: blur(4px);
-        transition: background 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+        background: linear-gradient(135deg, rgba(255, 50, 50, 0.15), rgba(150, 0, 0, 0.25));
+        backdrop-filter: blur(8px);
+        box-shadow: 0 0 20px rgba(255, 50, 50, 0.25), 0 4px 24px rgba(0,0,0,0.4);
+        transition: background 0.3s ease, border-color 0.3s ease, transform 0.15s ease, box-shadow 0.3s ease;
         overflow: hidden;
+        animation: cta-pulse 2.5s ease-in-out infinite;
       }
       .cta-enter:hover {
-        background: rgba(255, 255, 255, 0.14);
-        border-color: rgba(255, 255, 255, 0.85);
-        transform: scale(1.05);
+        background: linear-gradient(135deg, rgba(255, 50, 50, 0.3), rgba(180, 0, 0, 0.4));
+        border-color: rgba(255, 80, 80, 0.9);
+        transform: scale(1.08);
+        box-shadow: 0 0 35px rgba(255, 50, 50, 0.5), 0 6px 30px rgba(0,0,0,0.5);
       }
-      .cta-enter:active { transform: scale(0.97); }
+      .cta-enter:active { transform: scale(0.95); }
       .cta-enter__text {
         position: relative;
         z-index: 2;
         font-family: "Archivo Black", sans-serif;
         font-style: italic;
         text-transform: uppercase;
-        font-size: clamp(0.62rem, 1.8vmin, 0.9rem);
-        color: rgba(255, 255, 255, 0.9);
-        letter-spacing: 0.08em;
+        font-size: clamp(0.72rem, 2.2vmin, 1.05rem);
+        color: #ffffff;
+        letter-spacing: 0.1em;
         line-height: 1;
         white-space: nowrap;
         user-select: none;
-        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 0 10px rgba(255,50,50,0.4);
       }
       .cta-enter__arrow {
         position: relative;
         z-index: 2;
-        font-size: clamp(0.55rem, 1.4vmin, 0.75rem);
-        color: rgba(255, 255, 255, 0.65);
+        font-size: clamp(0.65rem, 1.6vmin, 0.9rem);
+        color: rgba(255, 200, 200, 0.9);
         line-height: 1;
-        animation: enter-bounce 1.4s ease-in-out infinite;
+        animation: enter-bounce 1.2s ease-in-out infinite;
         text-shadow: 0 2px 8px rgba(0,0,0,0.5);
       }
       .cta-enter__glow {
         position: absolute;
         inset: 0;
         border-radius: 999px;
-        background: radial-gradient(circle at 50% 120%, rgba(255,50,50,0.15), transparent 60%);
-        opacity: 0;
+        background: radial-gradient(circle at 50% 120%, rgba(255,80,80,0.35), transparent 60%);
+        opacity: 0.6;
         transition: opacity 0.4s ease;
         pointer-events: none;
       }
       .cta-enter:hover .cta-enter__glow { opacity: 1; }
       @keyframes enter-bounce {
         0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(3px); }
+        50% { transform: translateY(4px); }
+      }
+      @keyframes cta-pulse {
+        0%, 100% { box-shadow: 0 0 20px rgba(255, 50, 50, 0.25), 0 4px 24px rgba(0,0,0,0.4); }
+        50% { box-shadow: 0 0 32px rgba(255, 50, 50, 0.45), 0 4px 24px rgba(0,0,0,0.4); }
       }
       @media (prefers-reduced-motion: reduce) {
         .cta-enter__arrow { animation: none; }
+        .cta-enter { animation: none; }
       }
       @media (max-width: 767px) {
-        .cta-enter { padding: 0.75rem 1.6rem; margin-top: 0.8rem; }
-        .cta-enter__text { font-size: clamp(0.72rem, 2.2vmin, 0.95rem); letter-spacing: 0.06em; }
+        .cta-enter { padding: 0.9rem 1.8rem; margin-top: 1rem; }
+        .cta-enter__text { font-size: clamp(0.78rem, 2.6vmin, 1rem); letter-spacing: 0.08em; }
       }
 
       .sound-cluster {
@@ -279,6 +327,7 @@ import {
   </head>
 
   <body>
+    <div class="scanlines" aria-hidden="true"></div>
     <Analytics />
     <RegisterSW />
     <Hero videoUrl={HERO_VIDEO_URL} title={SITE_TITLE} />
@@ -315,7 +364,7 @@ import {
       <div class="cta-label cta-label--big">
         <span class="cta-arrows">&#171;&#171;</span> YO TE KIERO SOLO <span class="cta-arrows">&#187;&#187;</span>
       </div>
-      <div class="cta-label cta-label--big" style="color:#ff3333;">OUT NOW</div>
+      <div class="cta-label cta-label--big cta-label--outnow">OUT NOW</div>
 
       <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="cta-icon" aria-label="Gargut en YouTube">
         <img class="cta-icon__logo" src="/brand/youtube.svg" width="88" height="88" alt="" decoding="async" />
@@ -325,9 +374,9 @@ import {
         <span class="cta-arrows">&#8593;&#8593;</span> VER VISUALIZER <span class="cta-arrows">&#8593;&#8593;</span>
       </div>
 
-      <a href="/artista" class="cta-enter" aria-label="Conoce la feria de Gargut">
+      <a href="/artista" class="cta-enter" aria-label="Entrar a Experiencia Espiritual">
         <span class="cta-enter__glow" aria-hidden="true"></span>
-        <span class="cta-enter__text">CONOCE LA FERIA DE GARGUT</span>
+        <span class="cta-enter__text">EXPERIENCIA ESPIRITUAL</span>
         <span class="cta-enter__arrow" aria-hidden="true">&#9660;</span>
       </a>
     </div>
@@ -337,7 +386,7 @@ import {
       <img class="cta-ig__logo" src={KAZTA_IG_LOGO} width="400" height="120" alt="" decoding="async" />
     </a>
 
-    <audio id="track" preload="auto" loop playsinline autoplay muted src={TRACK_SRC}></audio>
+    <audio id="track" preload="none" loop playsinline muted data-src={TRACK_SRC}></audio>
 
     <script>
       (function() {
@@ -355,6 +404,10 @@ import {
 
         btn.addEventListener("click", () => {
           if (!soundEnabled) {
+            if (!audio.src) {
+              audio.src = (audio.dataset.src as string) || "";
+              audio.load();
+            }
             soundEnabled = true;
             audio.muted = false;
             update();

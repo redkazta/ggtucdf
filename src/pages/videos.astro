@@ -1,6 +1,7 @@
 ---
 import ArtistLayout from "../layouts/ArtistLayout.astro";
 import PageFooter from "../components/PageFooter.astro";
+import Skeleton from "../components/Skeleton.astro";
 import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
 ---
 
@@ -19,7 +20,11 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
     <div class="embed-block">
       <h2 class="embed-block__title">Escucha ahora</h2>
       <div class="embed-wrap">
+        <div class="embed-skeleton" data-embed-skeleton aria-hidden="true">
+          <Skeleton width="100%" height="152px" borderRadius="12px" />
+        </div>
         <iframe
+          class="embed-iframe"
           src={SPOTIFY_EMBED_TRACK}
           width="100%"
           height="152"
@@ -27,6 +32,7 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
           allow="encrypted-media"
           loading="lazy"
           title="YO TE KIERO SOLO en Spotify"
+          onload="this.closest('.embed-wrap').querySelector('[data-embed-skeleton]')?.classList.add('is-hidden'); this.classList.add('is-loaded');"
         ></iframe>
       </div>
     </div>
@@ -34,7 +40,11 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
     <div class="embed-block">
       <h2 class="embed-block__title">Más del artista</h2>
       <div class="embed-wrap">
+        <div class="embed-skeleton" data-embed-skeleton aria-hidden="true">
+          <Skeleton width="100%" height="360px" borderRadius="12px" />
+        </div>
         <iframe
+          class="embed-iframe"
           src={SPOTIFY_EMBED_ARTIST}
           width="100%"
           height="360"
@@ -42,6 +52,7 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
           allow="encrypted-media"
           loading="lazy"
           title="Gargut en Spotify"
+          onload="this.closest('.embed-wrap').querySelector('[data-embed-skeleton]')?.classList.add('is-hidden'); this.classList.add('is-loaded');"
         ></iframe>
       </div>
     </div>
@@ -84,7 +95,7 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
   }
 
   .videos-empty__title {
-    font-family: "Bebas Neue", sans-serif;f;
+    font-family: "Bebas Neue", sans-serif;
     text-transform: uppercase;
     font-size: 1.1rem;
     color: rgba(255, 255, 255, 0.5);
@@ -103,7 +114,7 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
   }
 
   .embed-block__title {
-    font-family: "Bebas Neue", sans-serif;f;
+    font-family: "Bebas Neue", sans-serif;
     text-transform: uppercase;
     font-size: clamp(0.85rem, 2vw, 1.1rem);
     color: rgba(255, 255, 255, 0.5);
@@ -113,9 +124,28 @@ import { SPOTIFY_EMBED_ARTIST, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
   }
 
   .embed-wrap {
+    position: relative;
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.02);
+  }
+  .embed-skeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transition: opacity 0.5s ease;
+  }
+  .embed-skeleton.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .embed-iframe {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    display: block;
+  }
+  .embed-iframe.is-loaded {
+    opacity: 1;
   }
 </style>

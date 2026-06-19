@@ -1,6 +1,7 @@
 ---
 import ArtistLayout from "../layouts/ArtistLayout.astro";
 import PageFooter from "../components/PageFooter.astro";
+import Skeleton from "../components/Skeleton.astro";
 import { DISCOGRAPHY, SPOTIFY_ARTIST_URL, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
 
 const sorted = [...DISCOGRAPHY].sort((a, b) => {
@@ -23,7 +24,11 @@ function formatStreams(n?: number) {
     <h1 class="page-title">Música</h1>
 
     <div class="featured-embed">
+      <div class="embed-skeleton" data-embed-skeleton aria-hidden="true">
+        <Skeleton width="100%" height="152px" borderRadius="12px" />
+      </div>
       <iframe
+        class="embed-iframe"
         src={SPOTIFY_EMBED_TRACK}
         width="100%"
         height="152"
@@ -31,6 +36,7 @@ function formatStreams(n?: number) {
         allow="encrypted-media"
         loading="lazy"
         title="YO TE KIERO SOLO en Spotify"
+        onload="this.closest('.featured-embed').querySelector('[data-embed-skeleton]')?.classList.add('is-hidden'); this.classList.add('is-loaded');"
       ></iframe>
     </div>
 
@@ -47,15 +53,21 @@ function formatStreams(n?: number) {
         >
           <div class="track-card__cover-wrap">
             {track.coverUrl ? (
-              <img
-                src={track.coverUrl}
-                alt=""
-                class="track-card__cover"
-                width="300"
-                height="300"
-                loading="lazy"
-                decoding="async"
-              />
+              <>
+                <img
+                  src={track.coverUrl}
+                  alt=""
+                  class="track-card__cover"
+                  width="300"
+                  height="300"
+                  loading="lazy"
+                  decoding="async"
+                  onload="this.classList.add('is-loaded'); this.nextElementSibling?.classList.add('is-hidden');"
+                />
+                <div class="track-card__skeleton" aria-hidden="true">
+                  <Skeleton width="100%" height="100%" borderRadius="6px" />
+                </div>
+              </>
             ) : (
               <div class="track-card__cover-fallback">
                 <span>{track.title.charAt(0)}</span>
@@ -116,12 +128,31 @@ function formatStreams(n?: number) {
   }
 
   .featured-embed {
+    position: relative;
     max-width: 600px;
     margin: 0 auto 1.5rem;
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.02);
+  }
+  .embed-skeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transition: opacity 0.5s ease;
+  }
+  .embed-skeleton.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .embed-iframe {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    display: block;
+  }
+  .embed-iframe.is-loaded {
+    opacity: 1;
   }
 
   .section-subtitle {
@@ -170,6 +201,21 @@ function formatStreams(n?: number) {
     height: 100%;
     object-fit: cover;
     display: block;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .track-card__cover.is-loaded {
+    opacity: 1;
+  }
+  .track-card__skeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transition: opacity 0.4s ease;
+  }
+  .track-card__skeleton.is-hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .track-card__cover-fallback {

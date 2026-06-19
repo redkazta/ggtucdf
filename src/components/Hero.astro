@@ -18,7 +18,7 @@ const { videoUrl, title } = Astro.props;
       playsinline
       autoplay
       disablepictureinpicture
-      preload="auto"
+      preload="metadata"
     >
       <source src={videoUrl} type="video/mp4" />
     </video>
@@ -165,11 +165,17 @@ const { videoUrl, title } = Astro.props;
   .hero__overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      circle at center,
-      rgba(0, 0, 0, 0.2) 0%,
-      rgba(0, 0, 0, 0.8) 100%
-    );
+    background:
+      radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 0.15) 0%,
+        rgba(0, 0, 0, 0.75) 100%
+      ),
+      radial-gradient(
+        ellipse at 50% 100%,
+        rgba(0, 0, 0, 0.9) 0%,
+        transparent 50%
+      );
     z-index: 3;
     pointer-events: none;
   }
