@@ -49,7 +49,7 @@ const igEmbed = (id: string) => `https://www.instagram.com/p/${id}/embed/`;
         {featured.map((item) => (
           <div class={`featured-card ${item.type === "youtube" ? "featured-card--youtube" : "featured-card--ig"}`}>
             <div class="featured-card__tag">{item.tag}</div>
-            <div class="featured-card__embed-wrap">
+            <div class={`featured-card__embed-wrap ${item.type === "instagram" ? "featured-card__embed-wrap--reel" : ""}`}>
               <iframe
                 class="featured-card__iframe"
                 src={item.type === "youtube" ? youtubeEmbed(item.id) : igEmbed(item.id)}
@@ -191,6 +191,7 @@ const igEmbed = (id: string) => `https://www.instagram.com/p/${id}/embed/`;
       padding-bottom: 56.25%;
       background: #0a0a0a;
     }
+    .featured-card__embed-wrap--reel { padding-bottom: 125%; }
     .featured-card__iframe {
       position: absolute;
       inset: 0;
@@ -290,7 +291,7 @@ const igEmbed = (id: string) => `https://www.instagram.com/p/${id}/embed/`;
 
     @media (min-width: 768px) {
       .videos-page { padding: 2rem 1.5rem 4rem; }
-      .featured-grid { grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+      .featured-grid { grid-template-columns: repeat(2, 1fr); align-items: start; gap: 1.5rem; }
       .video-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
       .reel-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
       .video-card__title { font-size: 0.82rem; }
