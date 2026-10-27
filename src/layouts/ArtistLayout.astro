@@ -77,6 +77,13 @@ const pageDesc = description || SITE_DESCRIPTION;
     <main class="artist-main">
       <slot />
     </main>
+
+    <footer class="wildforge-branding" aria-label="WildForgeLabs">
+      <a href="https://wildforge.dev" target="_blank" rel="noopener" class="wildforge-link">
+        <span class="wildforge-text">Desarrollado por</span>
+        <span class="wildforge-name">WildForgeLabs</span>
+      </a>
+    </footer>
   </body>
 </html>
 
@@ -87,5 +94,31 @@ const pageDesc = description || SITE_DESCRIPTION;
   }
   @media (min-width: 768px) {
     .artist-main { padding-top: 64px; }
+  }
+
+  .wildforge-branding {
+    padding: 1rem;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .wildforge-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.4);
+    transition: color 0.2s;
+  }
+  .wildforge-link:hover { color: #ff3333; }
+  .wildforge-text { color: inherit; }
+  .wildforge-name {
+    color: #ff3333;
+    font-weight: 600;
   }
 </style>

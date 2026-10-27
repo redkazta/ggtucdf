@@ -12,6 +12,7 @@ export const SPOTIFY_URL =
   "https://open.spotify.com/intl-es/track/4KvIxXUbDzMicaBr2opF9e?si=ece662d11f1a48c0";
 export const SPOTIFY_ARTIST_URL = "https://open.spotify.com/artist/3IWeUxh0WKXHNXJ6ahJUtX";
 export const SPOTIFY_TRACK_ID = "4KvIxXUbDzMicaBr2opF9e";
+export const SPOTIFY_ARTIST_ID = "3IWeUxh0WKXHNXJ6ahJUtX";
 export const SPOTIFY_EMBED_ARTIST = "https://open.spotify.com/embed/artist/3IWeUxh0WKXHNXJ6ahJUtX";
 export const SPOTIFY_EMBED_TRACK = `https://open.spotify.com/embed/track/${SPOTIFY_TRACK_ID}`;
 export const INSTAGRAM_URL = "https://www.instagram.com/garguttt/";

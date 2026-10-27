@@ -1,0 +1,122 @@
+---
+import AdminTable from '../components/AdminTable.astro';
+import { toast } from '../lib/toast';
+---
+
+<div class="admin-page">
+  <div class="admin-header">
+    <h1>🔐 Panel de Admin</h1>
+    <p class="admin-subtitle">Gestión de fans del Drop Room</p>
+  </div>
+
+  <div class="auth-box">
+    <input
+      type="password"
+      id="adminPassword"
+      placeholder="Contraseña de administrador"
+      class="password-input"
+    />
+    <button id="adminLoginBtn" class="login-btn">Entrar</button>
+    <p id="authError" class="auth-error"></p>
+  </div>
+
+  <div id="adminContent" class="admin-content hidden">
+    <AdminTable />
+  </div>
+</div>
+
+<script client:load>
+  const passwordInput = document.getElementById('adminPassword');
+  const loginBtn = document.getElementById('adminLoginBtn');
+  const authError = document.getElementById('authError');
+  const adminContent = document.getElementById('adminContent');
+
+  // Contraseña simple para MVP (en producción usar Supabase Auth)
+  const VALID_PASSWORD = import.meta.env.PRIVATE_ADMIN_TOKEN || 'gargut123';
+
+  function checkAuth() {
+    if (passwordInput.value === VALID_PASSWORD) {
+      authError.textContent = '';
+      adminContent.classList.remove('hidden');
+      toast('Acceso concedido');
+    } else {
+      authError.textContent = 'Contraseña incorrecta.';
+      authError.className = 'auth-error';
+    }
+  }
+
+  loginBtn.addEventListener('click', checkAuth);
+  passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') checkAuth();
+  });
+</script>
+
+<style>
+  .admin-page {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .admin-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .admin-header h1 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+  .admin-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+  }
+  .auth-box {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .password-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+  .password-input:focus { outline: none; border-color: #ff3333; }
+  .login-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    background: #ff3333;
+    color: #fff;
+    font-family: "Bebas Neue", sans-serif;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .login-btn:hover { background: #e02a2a; }
+  .auth-error {
+    color: #ff3333;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+  }
+  .admin-content { animation: fadeIn 0.3s ease; }
+  .hidden { display: none; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 640px) {
+    .admin-page { padding: 0.5rem; }
+    .auth-box { padding: 1.5rem; }
+  }
+</style>

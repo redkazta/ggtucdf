@@ -1,0 +1,162 @@
+---
+import { toast } from '../lib/toast';
+
+let fans: any[] = [];
+let loading = true;
+let errorMsg = '';
+
+async function loadFans() {
+  try {
+    const res = await fetch('/api/fans');
+    if (!res.ok) throw new Error('Failed to fetch fans');
+    const { fans: data } = await res.json();
+    fans = data;
+  } catch (err) {
+    errorMsg = 'No se pudieron cargar los fans.';
+    toast(errorMsg, 'error');
+  } finally {
+    loading = false;
+  }
+}
+
+loadFans();
+
+async function copyToClipboard(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Número copiado al portapapeles');
+  } catch (e) {
+    toast('No se pudo copiar', 'error');
+  }
+}
+
+function copyAll() {
+  const numbers = fans.map(f => f.whatsapp).join(', ');
+  navigator.clipboard.writeText(numbers).then(() => toast('Todos los números copiados'));
+}
+---
+
+<div class="admin-table-container">
+  {#if loading}
+    <div class="loading">Cargando fans...</div>
+  {:else if errorMsg}
+    <div class="error">{errorMsg}</div>
+  {:else if fans.length === 0}
+    <div class="empty">No hay fans registrados todavía.</div>
+  {:else}
+    <table class="fans-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>WhatsApp</th>
+          <th>Fecha</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {fans.map(fan => (
+          <tr>
+            <td>{fan.nombre}</td>
+            <td>{fan.email}</td>
+            <td>{fan.whatsapp}</td>
+            <td>{new Date(fan.created_at).toLocaleString('es-MX')}</td>
+            <td>
+              <button class="copy-btn" on:click={() => copyToClipboard(fan.whatsapp)}>
+                Copiar
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <div class="admin-actions">
+      <button class="copy-all-btn" on:click={copyAll}>
+        Copiar todos los números (coma-separados)
+      </button>
+    </div>
+  {/if}
+</div>
+
+<style>
+  .admin-table-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  .loading, .error, .empty {
+    text-align: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .error { color: #ff3333; }
+  .fans-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .fans-table th {
+    background: rgba(255, 50, 50, 0.15);
+    color: #fff;
+    text-align: left;
+    padding: 0.75rem;
+    font-family: "Bebas Neue", sans-serif;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+  }
+  .fans-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+  }
+  .fans-table tr:last-child td { border-bottom: none; }
+  .fans-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+  .copy-btn {
+    background: rgba(255, 50, 50, 0.15);
+    color: #ff3333;
+    border: 1px solid rgba(255, 50, 50, 0.3);
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover {
+    background: rgba(255, 50, 50, 0.3);
+    color: #fff;
+  }
+  .admin-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  .copy-all-btn {
+    background: rgba(29, 185, 84, 0.15);
+    color: #1db954;
+    border: 1px solid rgba(29, 185, 84, 0.3);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-all-btn:hover {
+    background: rgba(29, 185, 84, 0.3);
+    color: #fff;
+  }
+
+  @media (max-width: 640px) {
+    .admin-table-container { padding: 0.5rem; }
+    .fans-table th, .fans-table td { padding: 0.5rem; font-size: 0.75rem; }
+  }
+</style>

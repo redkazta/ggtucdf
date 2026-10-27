@@ -2,7 +2,9 @@
 import ArtistLayout from "../layouts/ArtistLayout.astro";
 import PageFooter from "../components/PageFooter.astro";
 import Skeleton from "../components/Skeleton.astro";
-import { DISCOGRAPHY, SPOTIFY_ARTIST_URL, SPOTIFY_EMBED_TRACK } from "../data/siteConfig";
+import SpotifyLatestPlayer from "../components/SpotifyLatestPlayer.astro";
+import DropCountdown from "../components/DropCountdown.astro";
+import { DISCOGRAPHY, SPOTIFY_ARTIST_URL } from "../data/siteConfig";
 
 const sorted = [...DISCOGRAPHY].sort((a, b) => {
   if (b.year !== a.year) return b.year - a.year;
@@ -23,21 +25,10 @@ function formatStreams(n?: number) {
   <section class="music-page" aria-label="Discografía">
     <h1 class="page-title">Música</h1>
 
+    <DropCountdown />
+
     <div class="featured-embed">
-      <div class="embed-skeleton" data-embed-skeleton aria-hidden="true">
-        <Skeleton width="100%" height="152px" borderRadius="12px" />
-      </div>
-      <iframe
-        class="embed-iframe"
-        src={SPOTIFY_EMBED_TRACK}
-        width="100%"
-        height="152"
-        style="border-radius:12px; border:0;"
-        allow="encrypted-media"
-        loading="lazy"
-        title="YO TE KIERO SOLO en Spotify"
-        onload="this.closest('.featured-embed').querySelector('[data-embed-skeleton]')?.classList.add('is-hidden'); this.classList.add('is-loaded');"
-      ></iframe>
+      <SpotifyLatestPlayer />
     </div>
 
     <h2 class="section-subtitle">Discografía</h2>

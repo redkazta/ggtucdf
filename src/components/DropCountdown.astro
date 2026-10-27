@@ -1,0 +1,168 @@
+---
+import { dropConfig } from '../data/dropConfig';
+---
+
+<div class="drop-countdown" id="dropCountdown" data-show={dropConfig.showCountdown}>
+  {#if dropConfig.showCountdown}
+    <div class="countdown-header">
+      <span class="countdown-label">PRÓXIMO DROP</span>
+      <h2 class="countdown-title">{dropConfig.nextDropName}</h2>
+    </div>
+    <div class="countdown-timer" id="countdownTimer">
+      <div class="countdown-unit">
+        <span class="countdown-value" id="days">00</span>
+        <span class="countdown-unit-label">DÍAS</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="hours">00</span>
+        <span class="countdown-unit-label">HRS</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="minutes">00</span>
+        <span class="countdown-unit-label">MIN</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="seconds">00</span>
+        <span class="countdown-unit-label">SEG</span>
+      </div>
+    </div>
+  {:else}
+    <div class="latest-drop">
+      <span class="countdown-label">ÚLTIMO DROP</span>
+      <a href={dropConfig.latestReleaseUrl} target="_blank" rel="noopener" class="latest-drop-link">
+        {dropConfig.latestReleaseName}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+      </a>
+    </div>
+  {/if}
+</div>
+
+<script client:load>
+  const timerEl = document.getElementById('countdownTimer');
+  const countdownEl = document.getElementById('dropCountdown');
+  const showCountdown = countdownEl?.dataset.show === 'true';
+
+  if (!showCountdown || !timerEl) return;
+
+  const target = new Date(dropConfig.nextDropDate);
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minutesEl = document.getElementById('minutes');
+  const secondsEl = document.getElementById('seconds');
+
+  function update() {
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      clearInterval(interval);
+      // Recargar para mostrar "Último Drop"
+      window.location.reload();
+      return;
+    }
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((diff / (1000 * 60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+    if (daysEl) daysEl.textContent = String(d).padStart(2, '0');
+    if (hoursEl) hoursEl.textContent = String(h).padStart(2, '0');
+    if (minutesEl) minutesEl.textContent = String(m).padStart(2, '0');
+    if (secondsEl) secondsEl.textContent = String(s).padStart(2, '0');
+  }
+
+  const interval = setInterval(update, 1000);
+  update(); // primera ejecución inmediata
+</script>
+
+<style>
+  .drop-countdown {
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255, 50, 50, 0.1) 0%, rgba(255, 50, 50, 0.02) 100%);
+    border: 1px solid rgba(255, 50, 50, 0.2);
+    text-align: center;
+  }
+  .countdown-header {
+    margin-bottom: 1rem;
+  }
+  .countdown-label {
+    display: block;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: rgba(255, 50, 50, 0.8);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+  .countdown-title {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .countdown-timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
+  .countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+  }
+  .countdown-value {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: #fff;
+    line-height: 1;
+  }
+  .countdown-unit-label {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+  }
+  .countdown-separator {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: rgba(255, 50, 50, 0.6);
+    line-height: 1;
+  }
+  .latest-drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .latest-drop-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .latest-drop-link:hover { color: #ff3333; }
+  .latest-drop-link svg { flex-shrink: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-bar { animation: none; }
+  }
+</style>
