@@ -15,10 +15,11 @@ const dropSettings = authenticated ? await loadDropSettings() : null;
 
 <ArtistLayout title="Admin" noindex>
   <div class="admin-page">
-    <div class="admin-header">
+    <header class="admin-header">
+      <span class="eyebrow">Privado</span>
       <h1>Panel de Admin</h1>
       <p class="admin-subtitle">Gestión de fans del Drop Room</p>
-    </div>
+    </header>
 
     {!configured ? (
       <div class="auth-box" role="alert">
@@ -29,6 +30,7 @@ const dropSettings = authenticated ? await loadDropSettings() : null;
       </div>
     ) : !authenticated ? (
       <form class="auth-box" method="POST" action="/api/admin-login">
+        <span class="auth-box__label">Acceso restringido</span>
         <label class="sr-only" for="adminPassword">Contraseña de administrador</label>
         <input
           type="password"
@@ -40,7 +42,7 @@ const dropSettings = authenticated ? await loadDropSettings() : null;
           required
           autofocus
         />
-        <button type="submit" class="login-btn">Entrar</button>
+        <button type="submit" class="login-btn btn btn--primary">Entrar</button>
         {loginFailed ? (
           <p class="auth-error" role="alert">Contraseña incorrecta.</p>
         ) : null}
@@ -48,8 +50,12 @@ const dropSettings = authenticated ? await loadDropSettings() : null;
     ) : (
       <div class="admin-content">
         <div class="admin-toolbar">
+          <span class="admin-toolbar__status">
+            <span class="admin-toolbar__dot" aria-hidden="true"></span>
+            Sesión activa
+          </span>
           <form method="POST" action="/api/admin-logout">
-            <button type="submit" class="logout-btn">Salir</button>
+            <button type="submit" class="logout-btn btn btn--outline">Salir</button>
           </form>
         </div>
         {dropSettings ? (
@@ -67,104 +73,172 @@ const dropSettings = authenticated ? await loadDropSettings() : null;
 
 <style>
   .admin-page {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 3rem;
   }
+
   .admin-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.25rem;
   }
+
+  .eyebrow {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--accent-bright);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    opacity: 0.85;
+  }
+
   .admin-header h1 {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    color: #fff;
+    position: relative;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 3.1rem);
+    color: var(--text);
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    margin-bottom: 0.5rem;
+    line-height: 0.95;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.6rem;
+    text-shadow: 0 0 32px rgba(225, 29, 46, 0.25);
   }
+  .admin-header h1::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 64px;
+    height: 2px;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
   .admin-subtitle {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-size: 0.88rem;
   }
+
   .auth-box {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 2rem;
+    gap: 0.9rem;
+    max-width: 420px;
+    margin: 0 auto 2rem;
+    padding: 2rem 1.75rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background:
+      radial-gradient(420px 200px at 50% 0%, rgba(225, 29, 46, 0.1), transparent 70%),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.012) 100%);
+    box-shadow: var(--shadow-deep);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     text-align: center;
+    overflow: hidden;
   }
+  .auth-box::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 18%;
+    right: 18%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-line), transparent);
+  }
+
+  .auth-box__label {
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
   .password-input {
     width: 100%;
-    max-width: 300px;
-    padding: 0.75rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
-    margin-bottom: 1rem;
-    font-size: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
   }
+  .password-input::placeholder { color: var(--text-dim); }
+  .password-input:hover:not(:focus) { border-color: var(--border-strong); }
   .password-input:focus {
     outline: none;
-    border-color: #ff3333;
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow:
+      0 0 0 3px var(--accent-soft),
+      0 0 24px -6px var(--accent-glow);
   }
+
   .login-btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    border: none;
-    background: #ff3333;
-    color: #fff;
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: background 0.2s;
+    width: 100%;
   }
-  .login-btn:hover {
-    background: #e02a2a;
-  }
+
   .auth-error {
-    color: #ff3333;
-    margin-top: 0.75rem;
-    font-size: 0.85rem;
-    line-height: 1.5;
+    color: #ff6b76;
+    margin-top: 0.15rem;
+    font-size: 0.82rem;
+    line-height: 1.6;
   }
   .auth-error code {
     background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 0.1rem 0.3rem;
+    padding: 0.1rem 0.35rem;
+    color: var(--text-soft);
   }
+
   .admin-toolbar {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
   }
-  .logout-btn {
-    padding: 0.4rem 0.9rem;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: transparent;
-    color: rgba(255, 255, 255, 0.65);
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 0.8rem;
+
+  .admin-toolbar__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
+    color: var(--text-dim);
   }
-  .logout-btn:hover {
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.35);
+  .admin-toolbar__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-bright);
+    box-shadow: 0 0 10px var(--accent-glow);
   }
+
+  .logout-btn {
+    padding: 0.55rem 1.15rem;
+    font-size: 0.78rem;
+  }
+
   .admin-content {
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.35s ease;
   }
+
   .sr-only {
     position: absolute;
     width: 1px;
@@ -176,23 +250,18 @@ const dropSettings = authenticated ? await loadDropSettings() : null;
     white-space: nowrap;
     border: 0;
   }
+
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  @media (max-width: 640px) {
-    .admin-page {
-      padding: 0.5rem;
-    }
-    .auth-box {
-      padding: 1.5rem;
-    }
+  @media (min-width: 768px) {
+    .admin-page { padding: 3.5rem 1.5rem 4rem; }
+    .auth-box { padding: 2.25rem 2rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .admin-content { animation: none; }
   }
 </style>

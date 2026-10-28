@@ -61,27 +61,46 @@ import { SPOTIFY_TRACK_ID } from "../data/siteConfig";
 
 <style>
   .spotify-player {
-    width: 100%;
-    height: 80px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     position: relative;
+    width: 100%;
+    padding: 10px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background:
+      radial-gradient(420px 120px at 50% 0%, rgba(29, 185, 84, 0.09), transparent 70%),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.012) 100%);
+    box-shadow:
+      var(--shadow-deep),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .spotify-player::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(29, 185, 84, 0.4), transparent);
+    pointer-events: none;
   }
   .spotify-iframe {
     width: 100%;
-    height: 100%;
+    height: 80px;
     border: none;
+    border-radius: 10px;
     display: block;
+    background: #0a0a0c;
   }
   .spotify-skeleton {
     position: absolute;
-    inset: 0;
+    inset: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 0.5rem;
-    padding: 1rem;
+    padding: 0.75rem;
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.02);
   }
   .skeleton-bar {

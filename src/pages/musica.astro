@@ -23,11 +23,15 @@ function formatStreams(n?: number) {
 
 <ArtistLayout title="Música" description="Discografía completa de Garguttieneunchingodeferia — singles 2025-2026.">
   <section class="music-page" aria-label="Discografía">
-    <h1 class="page-title">Música</h1>
+    <header class="page-head">
+      <span class="eyebrow">Gargut / Catálogo</span>
+      <h1 class="page-title">Música</h1>
+    </header>
 
     <DropCountdown />
 
     <div class="featured-embed">
+      <span class="embed-label">Escucha el último lanzamiento</span>
       <SpotifyLatestPlayer />
     </div>
 
@@ -61,7 +65,7 @@ function formatStreams(n?: number) {
                   onload="this.classList.add('is-loaded'); this.nextElementSibling?.classList.add('is-hidden');"
                 />
                 <div class="track-card__skeleton" aria-hidden="true">
-                  <Skeleton width="100%" height="100%" borderRadius="6px" />
+                  <Skeleton width="100%" height="100%" borderRadius="10px" />
                 </div>
               </>
             ) : (
@@ -107,108 +111,157 @@ function formatStreams(n?: number) {
 
 <style>
   .music-page {
-    padding: 1.5rem 1rem 3rem;
+    padding: 2.5rem 1rem 3rem;
     max-width: 1100px;
     margin: 0 auto;
   }
 
-  .page-title {
-    font-family: "Bebas Neue", sans-serif;
+  .page-head {
+    margin-bottom: 1.75rem;
+  }
+
+  .eyebrow {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--accent-bright);
     text-transform: uppercase;
-    font-size: clamp(1.2rem, 3vw, 1.8rem);
-    color: #ffffff;
+    margin-bottom: 0.45rem;
+    opacity: 0.85;
+  }
+
+  .page-title {
+    position: relative;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: var(--text);
     letter-spacing: 0.04em;
-    margin-bottom: 1.5rem;
-    line-height: 1;
-    text-shadow: 0 0 18px rgba(255, 50, 50, 0.4);
+    line-height: 0.95;
+    padding-bottom: 0.65rem;
+    text-shadow: 0 0 32px rgba(225, 29, 46, 0.25);
+  }
+  .page-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 64px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
+    box-shadow: 0 0 12px var(--accent-glow);
   }
 
   .featured-embed {
-    position: relative;
-    max-width: 600px;
-    margin: 0 auto 1.5rem;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.02);
+    max-width: 620px;
+    margin: 0 auto 1.75rem;
   }
-  .embed-skeleton {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    transition: opacity 0.5s ease;
-  }
-  .embed-skeleton.is-hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .embed-iframe {
-    opacity: 0;
-    transition: opacity 0.5s ease;
+  .embed-label {
     display: block;
-  }
-  .embed-iframe.is-loaded {
-    opacity: 1;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 0.6rem;
   }
 
   .droproom-cta {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.85rem;
     text-align: center;
-    margin: 0 auto 2rem;
-    padding: 1.25rem;
-    max-width: 600px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, rgba(255, 50, 50, 0.12), rgba(255, 50, 50, 0.03));
-    border: 1px solid rgba(255, 50, 50, 0.2);
+    margin: 0 auto 2.5rem;
+    padding: 1.5rem 1.25rem;
+    max-width: 620px;
+    border-radius: var(--radius);
+    background:
+      radial-gradient(420px 180px at 50% 0%, rgba(225, 29, 46, 0.14), transparent 70%),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-deep);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    overflow: hidden;
+  }
+  .droproom-cta::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-line), transparent);
   }
   .droproom-cta p {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-size: 0.88rem;
     line-height: 1.5;
   }
 
   .section-subtitle {
-    font-family: "Bebas Neue", sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-display);
     text-transform: uppercase;
-    font-size: clamp(0.85rem, 2vw, 1.1rem);
-    color: rgba(255, 255, 255, 0.5);
-    letter-spacing: 0.02em;
-    margin-bottom: 1rem;
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    color: var(--text-soft);
+    letter-spacing: 0.08em;
+    margin-bottom: 1.25rem;
     line-height: 1;
+  }
+  .section-subtitle::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
   }
 
   .discography-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
+    gap: 0.9rem;
   }
 
   @media (min-width: 640px) {
     .discography-grid {
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1.25rem;
+      gap: 1.1rem;
     }
   }
 
   .track-card {
     display: flex;
     flex-direction: column;
+    padding: 0.65rem;
+    border-radius: var(--radius);
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s ease;
+    border: 1px solid var(--border);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.048) 0%, rgba(255, 255, 255, 0.012) 100%);
+    box-shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.9);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.3s ease;
   }
-  .track-card:hover { transform: translateY(-4px); }
+  .track-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-line);
+    box-shadow:
+      0 26px 50px -28px rgba(0, 0, 0, 0.95),
+      0 0 30px -12px var(--accent-glow);
+  }
 
   .track-card__cover-wrap {
     position: relative;
     aspect-ratio: 1;
-    border-radius: 6px;
+    border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 0.6rem;
-    background: #111;
+    margin-bottom: 0.7rem;
+    background: #0d0d10;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   }
 
   .track-card__cover {
@@ -217,11 +270,11 @@ function formatStreams(n?: number) {
     object-fit: cover;
     display: block;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.5s ease;
   }
-  .track-card__cover.is-loaded {
-    opacity: 1;
-  }
+  .track-card:hover .track-card__cover { transform: scale(1.045); }
+  .track-card__cover.is-loaded { opacity: 1; }
+
   .track-card__skeleton {
     position: absolute;
     inset: 0;
@@ -239,13 +292,14 @@ function formatStreams(n?: number) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #1a0a0a 0%, #0a0a0a 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background:
+      radial-gradient(120% 100% at 50% 0%, rgba(225, 29, 46, 0.18), transparent 60%),
+      linear-gradient(135deg, #1a0d10 0%, #0a0a0c 100%);
   }
   .track-card__cover-fallback span {
-    font-family: "Bebas Neue", sans-serif;
+    font-family: var(--font-display);
     font-size: 3rem;
-    color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.18);
     text-transform: uppercase;
   }
 
@@ -255,30 +309,43 @@ function formatStreams(n?: number) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.45);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.6));
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.25s ease;
   }
   .track-card:hover .track-card__overlay { opacity: 1; }
 
   .track-card__play {
-    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    padding-left: 3px;
+    border-radius: 50%;
+    font-size: 1rem;
     color: #ffffff;
-    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+    background: rgba(225, 29, 46, 0.9);
+    box-shadow: 0 0 28px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     line-height: 1;
+    transform: scale(0.85);
+    transition: transform 0.25s ease;
   }
+  .track-card:hover .track-card__play { transform: scale(1); }
 
   .track-card__info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.3rem;
+    padding: 0 0.15rem 0.15rem;
   }
 
   .track-card__title {
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.2;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    line-height: 1.15;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -292,33 +359,36 @@ function formatStreams(n?: number) {
   }
 
   .track-card__year {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
   }
 
   .track-card__badge {
-    font-size: 0.6rem;
+    font-size: 0.58rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.08em;
+    padding: 0.14rem 0.4rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: var(--text-muted);
     line-height: 1;
   }
   .track-card__badge[data-type="solo"] {
-    background: rgba(29, 185, 84, 0.12);
-    color: rgba(29, 185, 84, 0.7);
+    background: var(--accent-soft);
+    border-color: var(--accent-line);
+    color: #ff8b95;
   }
 
   .track-card__streams {
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.62rem;
+    color: var(--text-dim);
   }
 
   .track-card__collabs {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.68rem;
+    color: var(--text-dim);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -327,44 +397,18 @@ function formatStreams(n?: number) {
   .music-footer {
     display: flex;
     justify-content: center;
-    margin-top: 2.5rem;
+    margin-top: 2.75rem;
   }
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-family: "Bebas Neue", sans-serif;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 0.04em;
-    text-decoration: none;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s ease, opacity 0.2s;
-  }
-  .btn:hover { transform: scale(1.04); opacity: 0.9; }
-  .btn:active { transform: scale(0.97); }
-
-  .btn--outline {
-    background: transparent;
-    color: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-  }
-  .btn--outline:hover {
-    border-color: rgba(255, 255, 255, 0.3);
-    color: #ffffff;
+  @media (min-width: 768px) {
+    .music-page { padding: 3rem 1.5rem 4rem; }
+    .track-card { padding: 0.75rem; }
+    .track-card__title { font-size: 1rem; }
   }
 
-  .btn--primary {
-    background: #ff3333;
-    color: #ffffff;
-    border: 1px solid #ff3333;
-  }
-  .btn--primary:hover {
-    background: #e02a2a;
-    border-color: #e02a2a;
+  @media (prefers-reduced-motion: reduce) {
+    .track-card, .track-card__cover, .track-card__play { transition: none; }
+    .track-card:hover { transform: none; }
+    .track-card:hover .track-card__cover { transform: none; }
   }
 </style>

@@ -184,97 +184,131 @@
 
 <style>
   .admin-table-container {
-    max-width: 800px;
+    max-width: 860px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 0;
   }
+
   .loading,
   .error,
   .empty {
     text-align: center;
-    padding: 2rem;
-    color: rgba(255, 255, 255, 0.6);
+    padding: 2.25rem 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
   }
-  .error {
-    color: #ff3333;
-  }
+  .error { color: #ff6b76; border-color: rgba(225, 29, 46, 0.28); }
+
   .fans-table {
     width: 100%;
-    border-collapse: collapse;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius);
     overflow: hidden;
+    border: 1px solid var(--border);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+    box-shadow: 0 22px 50px -34px rgba(0, 0, 0, 0.95);
+    font-size: 0.82rem;
   }
   .fans-table th {
-    background: rgba(255, 50, 50, 0.15);
-    color: #fff;
+    background: rgba(225, 29, 46, 0.09);
+    color: var(--text);
     text-align: left;
-    padding: 0.75rem;
-    font-family: "Bebas Neue", sans-serif;
+    padding: 0.8rem 0.85rem;
+    font-family: var(--font-display);
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.06em;
+    font-size: 0.68rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--accent-line);
+    white-space: nowrap;
   }
   .fans-table td {
-    padding: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.85rem;
+    padding: 0.8rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-soft);
+    font-size: 0.82rem;
     overflow-wrap: anywhere;
   }
-  .fans-table tr:last-child td {
-    border-bottom: none;
+  .fans-table tr:last-child td { border-bottom: none; }
+  .fans-table tbody tr {
+    transition: background 0.2s ease;
   }
-  .fans-table tr:hover {
-    background: rgba(255, 255, 255, 0.05);
+  .fans-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.035);
   }
+
   .copy-btn {
-    background: rgba(255, 50, 50, 0.15);
-    color: #ff3333;
-    border: 1px solid rgba(255, 50, 50, 0.3);
-    padding: 0.35rem 0.75rem;
-    border-radius: 4px;
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-bright);
+    border: 1px solid var(--accent-line);
+    font-family: var(--font-display);
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.2s;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s, box-shadow 0.25s, border-color 0.2s;
   }
   .copy-btn:hover {
-    background: rgba(255, 50, 50, 0.3);
+    background: rgba(225, 29, 46, 0.22);
     color: #fff;
+    box-shadow: 0 0 20px -6px var(--accent-glow);
   }
+  .copy-btn:active { transform: scale(0.96); }
+
   .admin-actions {
     margin-top: 1.5rem;
     display: flex;
     justify-content: center;
   }
   .copy-all-btn {
-    background: rgba(29, 185, 84, 0.15);
-    color: #1db954;
-    border: 1px solid rgba(29, 185, 84, 0.3);
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 0.8rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-soft);
+    border: 1px solid var(--border-strong);
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.3s;
   }
   .copy-all-btn:hover {
-    background: rgba(29, 185, 84, 0.3);
-    color: #fff;
+    background: var(--accent-soft);
+    border-color: var(--accent-line);
+    color: var(--text);
+    box-shadow: 0 0 26px -8px var(--accent-glow);
   }
+  .copy-all-btn:active { transform: scale(0.985); }
 
   @media (max-width: 640px) {
     .admin-table-container {
-      padding: 0.5rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .fans-table {
+      min-width: 620px;
     }
     .fans-table th,
     .fans-table td {
-      padding: 0.5rem;
-      font-size: 0.75rem;
+      padding: 0.65rem 0.6rem;
+      font-size: 0.74rem;
     }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fans-table tbody tr,
+    .copy-btn,
+    .copy-all-btn { transition: none; }
   }
 </style>
