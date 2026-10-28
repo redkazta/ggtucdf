@@ -1,0 +1,331 @@
+---
+import { toDatetimeLocalValue, type DropSettings } from "../lib/dropSettings";
+
+interface Props {
+  settings: DropSettings;
+  configured: boolean;
+  error?: string;
+}
+
+const { settings, configured, error } = Astro.props;
+const nextDropValue = toDatetimeLocalValue(settings.nextDropDate);
+const updatedAtLabel =
+  settings.updatedAt && !Number.isNaN(Date.parse(settings.updatedAt))
+    ? new Date(settings.updatedAt).toLocaleString("es-MX", {
+        dateStyle: "short",
+        timeStyle: "short",
+        timeZone: "America/Mexico_City",
+      })
+    : null;
+---
+
+<section class="drop-settings" id="drop-settings" aria-labelledby="dropSettingsTitle">
+  <div class="drop-settings-header">
+    <div>
+      <h2 id="dropSettingsTitle">Drop / ERP</h2>
+      <p class="drop-settings-subtitle">
+        Controla el último drop y el contador de <a href="/musica" target="_blank" rel="noopener">/musica</a>
+        sin volver a desplegar.
+      </p>
+    </div>
+    {updatedAtLabel ? <span class="drop-settings-updated">Actualizado: {updatedAtLabel}</span> : null}
+  </div>
+
+  {!configured ? (
+    <p class="drop-settings-warning" role="alert">
+      Supabase no está configurado. Agrega <code>PUBLIC_SUPABASE_URL</code> y
+      <code>PRIVATE_SUPABASE_SERVICE_ROLE_KEY</code> para guardar estos ajustes.
+    </p>
+  ) : error ? (
+    <p class="drop-settings-warning" role="alert">{error}</p>
+  ) : null}
+
+  <form id="dropSettingsForm" class="drop-settings-form" novalidate>
+    <div class="drop-settings-grid">
+      <label>
+        <span>Último drop (nombre)</span>
+        <input
+          name="latestReleaseName"
+          type="text"
+          maxlength="120"
+          required
+          value={settings.latestReleaseName}
+          disabled={!configured}
+        />
+      </label>
+
+      <label>
+        <span>Último drop (URL)</span>
+        <input
+          name="latestReleaseUrl"
+          type="url"
+          maxlength="500"
+          required
+          value={settings.latestReleaseUrl}
+          disabled={!configured}
+        />
+      </label>
+
+      <label>
+        <span>Próximo drop (nombre)</span>
+        <input
+          name="nextDropName"
+          type="text"
+          maxlength="120"
+          value={settings.nextDropName}
+          disabled={!configured}
+        />
+      </label>
+
+      <label>
+        <span>Fecha del próximo drop</span>
+        <input
+          name="nextDropDate"
+          type="datetime-local"
+          value={nextDropValue}
+          disabled={!configured}
+        />
+        <small>Hora de Guadalajara (UTC-6).</small>
+      </label>
+    </div>
+
+    <label class="drop-settings-check">
+      <input
+        name="showCountdown"
+        type="checkbox"
+        checked={settings.showCountdown}
+        disabled={!configured}
+      />
+      <span>
+        Mostrar contador regresivo. Si está desactivado, /musica muestra el último drop.
+      </span>
+    </label>
+
+    <div class="drop-settings-actions">
+      <button type="submit" disabled={!configured}>Guardar ajustes</button>
+      <a href="/musica" target="_blank" rel="noopener">Ver /musica</a>
+    </div>
+
+    <p id="dropSettingsMessage" class="drop-settings-message" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<script>
+  const form = document.getElementById("dropSettingsForm");
+  const message = document.getElementById("dropSettingsMessage");
+
+  if (form && message) {
+    const submitButton = form.querySelector('button[type="submit"]');
+    const defaultText = submitButton?.textContent ?? "Guardar ajustes";
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!submitButton || submitButton.disabled) return;
+
+      const data = new FormData(form);
+      const payload = {
+        latestReleaseName: String(data.get("latestReleaseName") ?? "").trim(),
+        latestReleaseUrl: String(data.get("latestReleaseUrl") ?? "").trim(),
+        nextDropName: String(data.get("nextDropName") ?? "").trim(),
+        nextDropDate: String(data.get("nextDropDate") ?? "").trim() || null,
+        showCountdown: data.get("showCountdown") === "on",
+      };
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Guardando...";
+      message.textContent = "";
+      message.className = "drop-settings-message";
+
+      try {
+        const response = await fetch("/api/drop-settings", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          message.textContent =
+            "Ajustes guardados. /musica se actualizará en menos de un minuto.";
+          message.className = "drop-settings-message success";
+        } else {
+          message.textContent =
+            result?.error ?? "No se pudieron guardar los ajustes.";
+          message.className = "drop-settings-message error";
+        }
+      } catch (error) {
+        console.error("[DropSettingsForm] Save failed:", error);
+        message.textContent = "No se pudo conectar al servidor.";
+        message.className = "drop-settings-message error";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = defaultText;
+      }
+    });
+  }
+</script>
+
+<style>
+  .drop-settings {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .drop-settings-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .drop-settings h2 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 1.5rem;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+  .drop-settings-subtitle {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .drop-settings-subtitle a {
+    color: #ff6b6b;
+    text-underline-offset: 2px;
+  }
+  .drop-settings-updated {
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+  .drop-settings-warning {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 180, 0, 0.25);
+    background: rgba(255, 180, 0, 0.08);
+    color: #ffd479;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .drop-settings-warning code {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 0.1rem 0.3rem;
+  }
+  .drop-settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .drop-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+  .drop-settings label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.75rem;
+  }
+  .drop-settings input[type="text"],
+  .drop-settings input[type="url"],
+  .drop-settings input[type="datetime-local"] {
+    width: 100%;
+    padding: 0.65rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.85rem;
+  }
+  .drop-settings input:focus {
+    outline: none;
+    border-color: #ff3333;
+  }
+  .drop-settings input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .drop-settings small {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.65rem;
+  }
+  .drop-settings-check {
+    flex-direction: row !important;
+    align-items: flex-start;
+    gap: 0.5rem !important;
+    line-height: 1.5;
+  }
+  .drop-settings-check input {
+    width: auto;
+    margin-top: 0.15rem;
+    accent-color: #ff3333;
+  }
+  .drop-settings-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .drop-settings-actions button {
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    background: #ff3333;
+    color: #fff;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+  }
+  .drop-settings-actions button:hover:not(:disabled) {
+    background: #e02a2a;
+  }
+  .drop-settings-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .drop-settings-actions a {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    text-underline-offset: 2px;
+  }
+  .drop-settings-actions a:hover {
+    color: #fff;
+  }
+  .drop-settings-message {
+    min-height: 1.2rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+  .drop-settings-message.success {
+    color: #1db954;
+  }
+  .drop-settings-message.error {
+    color: #ff3333;
+  }
+  @media (max-width: 640px) {
+    .drop-settings-header {
+      flex-direction: column;
+    }
+    .drop-settings-updated {
+      white-space: normal;
+    }
+  }
+</style>

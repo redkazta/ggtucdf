@@ -1,3 +1,5 @@
+> Documentación del proyecto GARGUT: [README_MVP.md](./README_MVP.md)
+
 # Astro Starter Kit: Minimal
 
 ```sh

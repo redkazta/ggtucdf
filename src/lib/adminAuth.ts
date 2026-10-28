@@ -14,6 +14,15 @@ function getAdminToken(): string | undefined {
   return token && token.length >= 8 ? token : undefined;
 }
 
+function getErpApiToken(): string | undefined {
+  const token = getServerEnv("PRIVATE_ERP_API_TOKEN", import.meta.env.PRIVATE_ERP_API_TOKEN);
+
+  if (token && token.length >= 8) return token;
+
+  // Fallback for small deployments: reuse the admin token as the ERP token.
+  return getAdminToken();
+}
+
 export function isAdminConfigured(): boolean {
   return getAdminToken() !== undefined;
 }
@@ -43,6 +52,21 @@ export function isValidSession(cookies: AstroCookies): boolean {
   const provided = cookies.get(ADMIN_COOKIE_NAME)?.value;
 
   return Boolean(expected && provided && safeEqual(provided, expected));
+}
+
+/**
+ * Allows a server-side ERP to call admin APIs without a browser session.
+ * Uses PRIVATE_ERP_API_TOKEN when set; otherwise falls back to PRIVATE_ADMIN_TOKEN.
+ */
+export function isValidBearerToken(request: Request): boolean {
+  const token = getErpApiToken();
+  if (!token) return false;
+
+  const header = request.headers.get("authorization");
+  if (!header) return false;
+
+  const match = /^Bearer\s+(.+)$/i.exec(header);
+  return match ? safeEqual(match[1].trim(), token) : false;
 }
 
 export function setSessionCookie(cookies: AstroCookies): boolean {

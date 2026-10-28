@@ -2,12 +2,15 @@
 export const prerender = false;
 
 import AdminTable from "../components/AdminTable.astro";
+import DropSettingsForm from "../components/DropSettingsForm.astro";
 import ArtistLayout from "../layouts/ArtistLayout.astro";
 import { isAdminConfigured, isValidSession } from "../lib/adminAuth";
+import { loadDropSettings } from "../lib/dropSettings";
 
 const configured = isAdminConfigured();
 const authenticated = configured && isValidSession(Astro.cookies);
 const loginFailed = Astro.url.searchParams.get("error") === "1";
+const dropSettings = authenticated ? await loadDropSettings() : null;
 ---
 
 <ArtistLayout title="Admin" noindex>
@@ -49,6 +52,13 @@ const loginFailed = Astro.url.searchParams.get("error") === "1";
             <button type="submit" class="logout-btn">Salir</button>
           </form>
         </div>
+        {dropSettings ? (
+          <DropSettingsForm
+            settings={dropSettings.settings}
+            configured={dropSettings.configured}
+            error={dropSettings.error}
+          />
+        ) : null}
         <AdminTable />
       </div>
     )}
