@@ -1,83 +1,98 @@
 ---
 import { toast } from '../lib/toast';
-
-let fans: any[] = [];
-let loading = true;
-let errorMsg = '';
-
-async function loadFans() {
-  try {
-    const res = await fetch('/api/fans');
-    if (!res.ok) throw new Error('Failed to fetch fans');
-    const { fans: data } = await res.json();
-    fans = data;
-  } catch (err) {
-    errorMsg = 'No se pudieron cargar los fans.';
-    toast(errorMsg, 'error');
-  } finally {
-    loading = false;
-  }
-}
-
-loadFans();
-
-async function copyToClipboard(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    toast('Número copiado al portapapeles');
-  } catch (e) {
-    toast('No se pudo copiar', 'error');
-  }
-}
-
-function copyAll() {
-  const numbers = fans.map(f => f.whatsapp).join(', ');
-  navigator.clipboard.writeText(numbers).then(() => toast('Todos los números copiados'));
-}
 ---
 
-<div class="admin-table-container">
-  {#if loading}
-    <div class="loading">Cargando fans...</div>
-  {:else if errorMsg}
-    <div class="error">{errorMsg}</div>
-  {:else if fans.length === 0}
-    <div class="empty">No hay fans registrados todavía.</div>
-  {:else}
-    <table class="fans-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Email</th>
-          <th>WhatsApp</th>
-          <th>Fecha</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        {fans.map(fan => (
-          <tr>
-            <td>{fan.nombre}</td>
-            <td>{fan.email}</td>
-            <td>{fan.whatsapp}</td>
-            <td>{new Date(fan.created_at).toLocaleString('es-MX')}</td>
-            <td>
-              <button class="copy-btn" on:click={() => copyToClipboard(fan.whatsapp)}>
-                Copiar
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-
-    <div class="admin-actions">
-      <button class="copy-all-btn" on:click={copyAll}>
-        Copiar todos los números (coma-separados)
-      </button>
-    </div>
-  {/if}
+<div class="admin-table-container" id="adminTable">
+  <div class="loading" id="loading">Cargando fans...</div>
+  <div class="error" id="error" style="display:none"></div>
+  <div class="empty" id="empty" style="display:none">No hay fans registrados todavía.</div>
+  <table class="fans-table" id="fansTable" style="display:none">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>WhatsApp</th>
+        <th>Fecha</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody id="fansBody"></tbody>
+  </table>
+  <div class="admin-actions" id="adminActions" style="display:none">
+    <button class="copy-all-btn" id="copyAllBtn">Copiar todos los números (coma-separados)</button>
+  </div>
 </div>
+
+<script client:load>
+  const loadingEl = document.getElementById('loading');
+  const errorEl = document.getElementById('error');
+  const emptyEl = document.getElementById('empty');
+  const tableEl = document.getElementById('fansTable');
+  const bodyEl = document.getElementById('fansBody');
+  const actionsEl = document.getElementById('adminActions');
+  const copyAllBtn = document.getElementById('copyAllBtn');
+
+  let fans = [];
+
+  async function loadFans() {
+    try {
+      const res = await fetch('/api/fans');
+      if (!res.ok) throw new Error('Failed to fetch fans');
+      const { fans: data } = await res.json();
+      fans = data;
+      render();
+    } catch (err) {
+      errorEl.textContent = 'No se pudieron cargar los fans.';
+      errorEl.style.display = 'block';
+      loadingEl.style.display = 'none';
+    }
+  }
+
+  function render() {
+    loadingEl.style.display = 'none';
+    if (fans.length === 0) {
+      emptyEl.style.display = 'block';
+      return;
+    }
+    tableEl.style.display = 'table';
+    actionsEl.style.display = 'flex';
+
+    bodyEl.innerHTML = fans.map(fan => `
+      <tr>
+        <td>${fan.nombre}</td>
+        <td>${fan.email}</td>
+        <td>${fan.whatsapp}</td>
+        <td>${new Date(fan.created_at).toLocaleString('es-MX')}</td>
+        <td>
+          <button class="copy-btn" data-whatsapp="${fan.whatsapp}">Copiar</button>
+        </td>
+      </tr>
+    `).join('');
+
+    // Attach copy buttons
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyToClipboard(btn.dataset.whatsapp);
+      });
+    });
+  }
+
+  async function copyToClipboard(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Número copiado al portapapeles');
+    } catch (e) {
+      toast('No se pudo copiar', 'error');
+    }
+  }
+
+  copyAllBtn.addEventListener('click', () => {
+    const numbers = fans.map(f => f.whatsapp).join(', ');
+    navigator.clipboard.writeText(numbers).then(() => toast('Todos los números copiados'));
+  });
+
+  loadFans();
+</script>
 
 <style>
   .admin-table-container {
