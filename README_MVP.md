@@ -1,56 +1,132 @@
-# MVP GARGUT — Resumen de implementación
+# MVP GARGUT — Estado y despliegue
 
-## ✅ Lo que se hizo
+## Estado actual
 
-1. **Base de datos** (`supabase/fans_gargut.sql`) — Tabla `fans_gargut` creada.
-2. **Configuración** (`src/data/dropConfig.ts`) — Configuración del drop y contador.
-3. **Supabase Client** (`src/lib/supabase.ts`) — Cliente server-side con service_role.
-4. **Toast** (`src/lib/toast.ts`) — Notificaciones simples.
-5. **Drop Room** (`src/components/DropRoomForm.astro`) — Formulario con validación y envío a `/api/register-fan`.
-6. **API Register** (`src/pages/api/register-fan.ts`) — Inserta en Supabase + envía email con Resend.
-7. **API Fans** (`src/pages/api/fans.ts`) — Lista todos los fans para el admin.
-8. **Admin** (`src/pages/admin.astro` + `AdminTable.astro`) — Panel protegido con contraseña simple, tabla responsive, botón "Copiar WhatsApp" y "Copiar todos".
-9. **Spotify Dinámico** (`src/pages/api/latest-spotify.ts` + `SpotifyLatestPlayer.astro`) — Consulta la API de Spotify (Client Credentials) y genera el iframe dinámicamente.
-10. **Contador** (`src/components/DropCountdown.astro`) — Muestra el último drop o el contador regresivo según `dropConfig`.
-11. **Branding** (`ArtistLayout.astro`) — Enlace a WildForgeLabs en el footer de todas las páginas.
-12. **Site Config** (`siteConfig.ts`) — Añadido `SPOTIFY_ARTIST_ID`.
-13. **Música** (`musica.astro`) — Reemplazado el iframe estático por `SpotifyLatestPlayer` y `DropCountdown`.
-14. **Variables de entorno** (`.env.example`) — Ejemplo completo.
+- Astro 6 con `@astrojs/vercel` v10.
+- `output: "static"` y adapter de Vercel: las páginas públicas se prerenderizan y las rutas de API/admin se ejecutan como función serverless.
+- El build de producción pasa en Vercel.
+- El panel `/admin` usa una sesión firmada con HMAC en cookie `HttpOnly`; ya no hay contraseña por defecto en el código.
+- `/api/fans` requiere sesión de admin.
+- El registro del Drop Room valida los datos en el servidor, evita emails duplicados y escapa el HTML del correo de bienvenida.
+- El reproductor de Spotify consulta el último lanzamiento y usa un track de respaldo si la API no está configurada.
+- El contador se muestra en `/musica` cuando `showCountdown` es `true` en `src/data/dropConfig.ts`.
 
-## ⚠️ Lo que DEBES hacer tú (porque no puedo ejecutar en este entorno)
+## Rutas
 
-1. **Instalar dependencias:**
-   ```bash
-   npm install @supabase/supabase-js resend
-   ```
+| Ruta | Tipo | Descripción |
+| --- | --- | --- |
+| `/` | Estática | Home |
+| `/artista` | Estática | Biografía |
+| `/musica` | Estática | Discografía, último drop y reproductor |
+| `/videos` | Estática | Videos |
+| `/drop-room` | Estática | Formulario de registro de fans |
+| `/privacidad` | Estática | Aviso de privacidad |
+| `/admin` | SSR | Panel de fans (requiere `PRIVATE_ADMIN_TOKEN`) |
+| `/api/register-fan` | SSR | POST de registro |
+| `/api/fans` | SSR | GET de fans (requiere sesión de admin) |
+| `/api/latest-spotify` | SSR | Último lanzamiento de Spotify |
+| `/api/admin-login` | SSR | Login del panel |
+| `/api/admin-logout` | SSR | Logout del panel |
 
-2. **Crear la tabla en Supabase:** Copiar el contenido de `supabase/fans_gargut.sql` y ejecutarlo en el SQL Editor de Supabase.
+## Variables de entorno
 
-3. **Configurar `.env`:** Copiar `.env.example` a `.env` y llenar con tus valores reales.
+Configúralas en **Vercel → Project → Settings → Environment Variables** para
+Production (y Preview si quieres probar ramas). También puedes usar un `.env`
+local para desarrollo.
 
-4. **Crear la cuenta de Resend:** Obtener la API key y configurar el `from` email.
+| Variable | Obligatoria | Uso |
+| --- | --- | --- |
+| `PUBLIC_SUPABASE_URL` | Sí | URL del proyecto de Supabase (`https://xxxx.supabase.co`) |
+| `PRIVATE_SUPABASE_SERVICE_ROLE_KEY` | Sí | Service role key; solo se usa en el servidor |
+| `PRIVATE_ADMIN_TOKEN` | Sí | Contraseña/token del panel; mínimo 8 caracteres, ideal 32+ |
+| `SPOTIFY_CLIENT_ID` | Para Spotify dinámico | Client ID de la app de Spotify |
+| `SPOTIFY_CLIENT_SECRET` | Para Spotify dinámico | Client Secret de Spotify |
+| `SPOTIFY_ARTIST_ID` | No | Si se omite, se usa el artista de `src/data/siteConfig.ts` |
+| `PRIVATE_RESEND_API_KEY` | No | API key de Resend para el correo de bienvenida |
+| `PRIVATE_RESEND_FROM_EMAIL` | No | Remitente verificado en Resend |
 
-5. **Configurar Spotify:** Crear una app en Spotify Developer, obtener Client ID y Secret.
+Genera el token del admin con Node:
 
-6. **Probar localmente:**
-   ```bash
-   npm run dev
-   ```
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-7. **Desplegar en Vercel:**
-   ```bash
-   vercel --prod
-   ```
+Si falta `PRIVATE_ADMIN_TOKEN`, `/admin` muestra un aviso y no permite entrar.
+Si faltan las variables de Supabase, el registro responde `503`. Si faltan las
+de Spotify, `/api/latest-spotify` responde `503` y el reproductor usa el track
+de respaldo. Si faltan las de Resend, el registro funciona pero no envía correo.
 
-## 🔗 Rutas nuevas
+## Base de datos (Supabase)
 
-- `/api/register-fan` — POST (registro de fans)
-- `/api/fans` — GET (lista fans para admin)
-- `/api/latest-spotify` — GET (último lanzamiento)
-- `/admin` — Panel de administración
+Ejecuta el contenido de `supabase/fans_gargut.sql` en el **SQL Editor** de
+Supabase. El script:
 
-## 📝 Notas importantes
+- Crea la tabla `fans_gargut`.
+- Usa `CITEXT` y un índice único por `lower(email)` para evitar duplicados.
+- Activa RLS. Las API routes usan la service role key, que omite RLS.
 
-- El admin usa una contraseña simple (`gargut123` por defecto, o la que pongas en `.env`). En producción, reemplazar por Supabase Auth.
-- El reproductor de Spotify consulta la API en cada carga de página (client-side fetch a tu propio endpoint). Esto mantiene el iframe actualizado sin romper la estética.
-- El contador (`DropCountdown`) se activa cambiando `showCountdown: true` en `src/data/dropConfig.ts`.
+Si la tabla ya existía con `email TEXT`, aplica manualmente:
+
+```sql
+ALTER TABLE fans_gargut ALTER COLUMN email TYPE CITEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_fans_gargut_email_lower
+  ON fans_gargut(lower(email));
+```
+
+## Spotify
+
+1. Crea una app en <https://developer.spotify.com/dashboard>.
+2. Copia el Client ID y el Client Secret a Vercel.
+3. El endpoint usa el flujo Client Credentials y busca el lanzamiento más
+   reciente del artista configurado.
+
+## Resend (opcional)
+
+1. Crea una cuenta en <https://resend.com>.
+2. Verifica el dominio remitente.
+3. Agrega `PRIVATE_RESEND_API_KEY` y `PRIVATE_RESEND_FROM_EMAIL`.
+
+El correo de bienvenida es opcional: si Resend falla, el registro se conserva.
+
+## Despliegue
+
+1. Agrega las variables en Vercel.
+2. Haz commit y push a `main`.
+3. Vercel compila con `npm run build` y publica `.vercel/output`.
+4. Verifica:
+
+```bash
+# Debe devolver 200 con el formulario
+curl -I https://www.garguttieneunchingodeferia.com/drop-room
+
+# Sin sesión debe devolver 401
+curl -i https://www.garguttieneunchingodeferia.com/api/fans
+
+# Con Spotify configurado debe devolver 200 y un trackId
+curl -i https://www.garguttieneunchingodeferia.com/api/latest-spotify
+
+# Con el token configurado debe mostrar el formulario de login
+curl -s https://www.garguttieneunchingodeferia.com/admin | grep -o 'name="password"'
+```
+
+## Pruebas locales
+
+```bash
+cp .env.example .env
+# Completa .env con tus valores
+npm install
+npm run dev
+```
+
+- `/admin` debe mostrar el login si `PRIVATE_ADMIN_TOKEN` está definido.
+- Sin sesión, `/api/fans` debe responder `401`.
+- Con Supabase configurado, un POST válido a `/api/register-fan` debe responder
+  `201`; un email repetido debe responder `409`.
+
+## Notas de seguridad
+
+- No publiques `PRIVATE_SUPABASE_SERVICE_ROLE_KEY`, `PRIVATE_ADMIN_TOKEN`,
+  `SPOTIFY_CLIENT_SECRET` ni `PRIVATE_RESEND_API_KEY`.
+- La service role key solo se usa en rutas server-side.
+- La cookie del admin es `HttpOnly`, `SameSite=Strict` y `Secure` en producción.
+- `/admin` está excluido del sitemap y lleva `X-Robots-Tag: noindex`.

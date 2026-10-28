@@ -18,7 +18,7 @@ export const SPOTIFY_EMBED_TRACK = `https://open.spotify.com/embed/track/${SPOTI
 export const INSTAGRAM_URL = "https://www.instagram.com/garguttt/";
 export const TIKTOK_URL = "https://www.tiktok.com/@gargutttt";
 
-export const SITE_URL = "https://garguttieneunchingodeferia.com";
+export const SITE_URL = "https://www.garguttieneunchingodeferia.com";
 export const SITE_TITLE = "Garguttieneunchingodeferia";
 export const SITE_DESCRIPTION =
   "Garguttieneunchingodeferia — Escucha 'YO TE KIERO SOLO' ya disponible. Música urbana desde Guadalajara, México.";
