@@ -16,55 +16,60 @@ const hasCountdown =
   data-target={nextDropDate ?? ""}
 >
   <div class="latest-drop" data-latest hidden={hasCountdown}>
-    <span class="countdown-label">ÚLTIMO DROP</span>
-    <a
-      href={latestReleaseUrl}
-      target="_blank"
-      rel="noopener"
-      class="latest-drop-link"
-      data-latest-link
-    >
-      <span data-latest-name>{latestReleaseName}</span>
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        aria-hidden="true"
+    <div class="latest-drop__text">
+      <span class="countdown-label">Último drop</span>
+      <a
+        href={latestReleaseUrl}
+        target="_blank"
+        rel="noopener"
+        class="latest-drop-link"
+        data-latest-link
       >
-        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-        <polyline points="15 3 21 3 21 9"></polyline>
-        <line x1="10" y1="14" x2="21" y2="3"></line>
-      </svg>
-    </a>
+        <span data-latest-name>{latestReleaseName}</span>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          aria-hidden="true"
+        >
+          <path d="M7 17 17 7"></path>
+          <path d="M8 7h9v9"></path>
+        </svg>
+      </a>
+    </div>
+    <span class="latest-drop__meta">Disponible ahora / Spotify</span>
   </div>
 
   <div class="countdown-content" data-countdown hidden={!hasCountdown}>
     <div class="countdown-header">
-      <span class="countdown-label">PRÓXIMO DROP</span>
-      <h2 class="countdown-title" data-next-name>{nextDropName}</h2>
+      <div>
+        <span class="countdown-label">Próximo drop</span>
+        <h2 class="countdown-title" data-next-name>{nextDropName}</h2>
+      </div>
+      <span class="countdown-zone">Guadalajara / UTC-6</span>
     </div>
     <div class="countdown-timer" id="countdownTimer" role="timer">
       <div class="countdown-unit">
         <span class="countdown-value" id="days">00</span>
-        <span class="countdown-unit-label">DÍAS</span>
+        <span class="countdown-unit-label">Días</span>
       </div>
-      <span class="countdown-separator">:</span>
+      <span class="countdown-separator" aria-hidden="true">:</span>
       <div class="countdown-unit">
         <span class="countdown-value" id="hours">00</span>
-        <span class="countdown-unit-label">HRS</span>
+        <span class="countdown-unit-label">Hrs</span>
       </div>
-      <span class="countdown-separator">:</span>
+      <span class="countdown-separator" aria-hidden="true">:</span>
       <div class="countdown-unit">
         <span class="countdown-value" id="minutes">00</span>
-        <span class="countdown-unit-label">MIN</span>
+        <span class="countdown-unit-label">Min</span>
       </div>
-      <span class="countdown-separator">:</span>
+      <span class="countdown-separator" aria-hidden="true">:</span>
       <div class="countdown-unit">
         <span class="countdown-value" id="seconds">00</span>
-        <span class="countdown-unit-label">SEG</span>
+        <span class="countdown-unit-label">Seg</span>
       </div>
     </div>
   </div>
@@ -200,129 +205,124 @@ const hasCountdown =
 <style>
   .drop-countdown {
     position: relative;
-    max-width: 620px;
-    margin: 0 auto 1.75rem;
-    padding: 1.6rem 1.25rem;
-    border-radius: var(--radius);
-    background:
-      radial-gradient(480px 200px at 50% 0%, rgba(225, 29, 46, 0.14), transparent 72%),
-      linear-gradient(160deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.012) 100%);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-deep);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    text-align: center;
-    overflow: hidden;
+    margin: 0 0 1.25rem;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    background: var(--bg-soft);
   }
-  .drop-countdown::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 16%; right: 16%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent-line), transparent);
-  }
-  .drop-countdown [hidden] {
-    display: none !important;
-  }
+  .drop-countdown [hidden] { display: none !important; }
 
-  .countdown-header {
-    margin-bottom: 1.1rem;
-  }
   .countdown-label {
     display: block;
-    font-family: var(--font-display);
-    font-size: 0.68rem;
-    letter-spacing: 0.22em;
-    color: var(--accent-bright);
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
+    color: var(--accent);
     margin-bottom: 0.35rem;
-    opacity: 0.9;
+  }
+
+  /* Estado: último drop */
+  .latest-drop {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+  }
+  .latest-drop__text { display: flex; flex-direction: column; }
+  .latest-drop-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 7vw, 2.8rem);
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .latest-drop-link:hover { color: var(--accent); }
+  .latest-drop-link svg { flex-shrink: 0; transition: transform 0.2s ease; }
+  .latest-drop-link:hover svg { transform: translate(2px, -2px); }
+  .latest-drop__meta {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* Estado: contador */
+  .countdown-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--line);
   }
   .countdown-title {
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 4vw, 2.2rem);
-    color: var(--text);
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    font-weight: 400;
+    line-height: 0.95;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    line-height: 1;
-    text-shadow: 0 0 26px rgba(225, 29, 46, 0.35);
+    color: var(--ink);
+  }
+  .countdown-zone {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    white-space: nowrap;
   }
 
   .countdown-timer {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 0.35rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid var(--line);
+    background: var(--bg);
   }
   .countdown-unit {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 58px;
-    padding: 0.5rem 0.35rem;
-    border-radius: var(--radius-sm);
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid var(--border);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    gap: 0.15rem;
+    padding: 0.7rem 0.3rem 0.55rem;
+    border-right: 1px solid var(--line);
   }
+  .countdown-unit:last-of-type { border-right: 0; }
   .countdown-value {
     font-family: var(--font-display);
-    font-size: clamp(1.7rem, 5vw, 2.7rem);
-    color: var(--text);
-    line-height: 1;
+    font-size: clamp(1.9rem, 9vw, 3.4rem);
+    line-height: 0.9;
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 0 22px rgba(225, 29, 46, 0.25);
   }
   .countdown-unit-label {
-    font-family: var(--font-display);
-    font-size: 0.55rem;
-    letter-spacing: 0.16em;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--text-dim);
-    text-transform: uppercase;
-    margin-top: 0.3rem;
   }
-  .countdown-separator {
-    font-family: var(--font-display);
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
-    color: var(--accent);
-    line-height: 1;
-    margin-top: 1rem;
-    opacity: 0.8;
-  }
-
-  .latest-drop {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.55rem;
-  }
-  .latest-drop-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    font-family: var(--font-display);
-    font-size: clamp(1.3rem, 3.5vw, 1.9rem);
-    color: var(--text);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    text-decoration: none;
-    transition: color 0.25s ease, text-shadow 0.3s ease;
-  }
-  .latest-drop-link:hover {
-    color: var(--accent-bright);
-    text-shadow: 0 0 26px var(--accent-glow);
-  }
-  .latest-drop-link svg {
-    flex-shrink: 0;
-    transition: transform 0.25s ease;
-  }
-  .latest-drop-link:hover svg { transform: translate(2px, -2px); }
+  .countdown-separator { display: none; }
 
   @media (min-width: 768px) {
-    .drop-countdown { padding: 1.9rem 1.5rem; }
-    .countdown-unit { min-width: 68px; }
+    .drop-countdown { padding: 1.25rem 1.35rem; }
+    .countdown-unit { padding: 0.9rem 0.5rem 0.75rem; }
   }
+
   @media (prefers-reduced-motion: reduce) {
     .latest-drop-link, .latest-drop-link svg { transition: none; }
   }
