@@ -4,34 +4,36 @@ import { dropConfig } from '../data/dropConfig';
 const { showCountdown, nextDropName, nextDropDate, latestReleaseName, latestReleaseUrl } = dropConfig;
 ---
 
-<div class="drop-countdown" id="dropCountdown" data-show={showCountdown}>
-  {#if showCountdown}
-    <div class="countdown-header">
-      <span class="countdown-label">PRÓXIMO DROP</span>
-      <h2 class="countdown-title">{nextDropName}</h2>
-    </div>
-    <div class="countdown-timer" id="countdownTimer">
-      <div class="countdown-unit">
-        <span class="countdown-value" id="days">00</span>
-        <span class="countdown-unit-label">DÍAS</span>
+<div class="drop-countdown" id="dropCountdown" data-show={String(showCountdown)}>
+  {showCountdown ? (
+    <>
+      <div class="countdown-header">
+        <span class="countdown-label">PRÓXIMO DROP</span>
+        <h2 class="countdown-title">{nextDropName}</h2>
       </div>
-      <span class="countdown-separator">:</span>
-      <div class="countdown-unit">
-        <span class="countdown-value" id="hours">00</span>
-        <span class="countdown-unit-label">HRS</span>
+      <div class="countdown-timer" id="countdownTimer">
+        <div class="countdown-unit">
+          <span class="countdown-value" id="days">00</span>
+          <span class="countdown-unit-label">DÍAS</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-unit">
+          <span class="countdown-value" id="hours">00</span>
+          <span class="countdown-unit-label">HRS</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-unit">
+          <span class="countdown-value" id="minutes">00</span>
+          <span class="countdown-unit-label">MIN</span>
+        </div>
+        <span class="countdown-separator">:</span>
+        <div class="countdown-unit">
+          <span class="countdown-value" id="seconds">00</span>
+          <span class="countdown-unit-label">SEG</span>
+        </div>
       </div>
-      <span class="countdown-separator">:</span>
-      <div class="countdown-unit">
-        <span class="countdown-value" id="minutes">00</span>
-        <span class="countdown-unit-label">MIN</span>
-      </div>
-      <span class="countdown-separator">:</span>
-      <div class="countdown-unit">
-        <span class="countdown-value" id="seconds">00</span>
-        <span class="countdown-unit-label">SEG</span>
-      </div>
-    </div>
-  {:else}
+    </>
+  ) : (
     <div class="latest-drop">
       <span class="countdown-label">ÚLTIMO DROP</span>
       <a href={latestReleaseUrl} target="_blank" rel="noopener" class="latest-drop-link">
@@ -43,7 +45,7 @@ const { showCountdown, nextDropName, nextDropDate, latestReleaseName, latestRele
         </svg>
       </a>
     </div>
-  {/if}
+  )}
 </div>
 
 <script client:load>
