@@ -1,74 +1,139 @@
----
-import { SPOTIFY_URL } from '../data/siteConfig';
----
-
-<form id="dropRoomForm" class="drop-room-form">
-  <input type="text" name="nombre" placeholder="Nombre" required />
-  <input type="email" name="email" placeholder="Email" required />
-  <input type="tel" name="whatsapp" placeholder="WhatsApp (+52...)" required />
+<form id="dropRoomForm" class="drop-room-form" novalidate>
+  <input
+    type="text"
+    name="nombre"
+    placeholder="Nombre"
+    required
+    minlength="2"
+    maxlength="80"
+    autocomplete="name"
+  />
+  <input
+    type="email"
+    name="email"
+    placeholder="Email"
+    required
+    maxlength="254"
+    autocomplete="email"
+  />
+  <input
+    type="tel"
+    name="whatsapp"
+    placeholder="WhatsApp (+52...)"
+    required
+    maxlength="20"
+    autocomplete="tel"
+    inputmode="tel"
+  />
   <label class="checkbox-label">
     <input type="checkbox" name="acepto_privacidad" required />
-    <span>Acepto el aviso de privacidad y recibir contenido exclusivo</span>
+    <span>
+      Acepto el
+      <a href="/privacidad" target="_blank" rel="noopener">aviso de privacidad</a>
+      y recibir contenido exclusivo
+    </span>
   </label>
   <button type="submit">Unirme al Drop Room</button>
-  <p id="formError" class="error-message"></p>
+  <p id="formError" class="error-message" role="status" aria-live="polite"></p>
 </form>
 
-<script client:load>
-  const form = document.getElementById('dropRoomForm');
-  const errorEl = document.getElementById('formError');
+<script>
+  const form = document.getElementById("dropRoomForm");
+  const messageEl = document.getElementById("formError");
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData);
+  if (form && messageEl) {
+    const submitButton = form.querySelector('button[type="submit"]');
+    const defaultButtonText = submitButton?.textContent ?? "Unirme al Drop Room";
 
-    // Validación
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const whatsappRegex = /^\+?\d{7,15}$/;
-
-    if (!emailRegex.test(data.email)) {
-      errorEl.textContent = 'Por favor, introduce un email válido.';
-      errorEl.className = 'error-message';
-      return;
-    }
-    if (!whatsappRegex.test(data.whatsapp)) {
-      errorEl.textContent = 'Por favor, introduce un número de WhatsApp válido (ej. +521234567890).';
-      errorEl.className = 'error-message';
-      return;
-    }
-    if (!data.acepto_privacidad) {
-      errorEl.textContent = 'Debes aceptar el aviso de privacidad.';
-      errorEl.className = 'error-message';
-      return;
+    function showMessage(message, type) {
+      messageEl.textContent = message;
+      messageEl.className =
+        type === "success" ? "success-message" : "error-message";
     }
 
-    try {
-      const res = await fetch('/api/register-fan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombre: data.nombre,
-          email: data.email,
-          whatsapp: data.whatsapp,
-          acepto_privacidad: data.acepto_privacidad === 'on',
-        }),
-      });
+    function setSubmitting(isSubmitting) {
+      if (!submitButton) return;
+      submitButton.disabled = isSubmitting;
+      submitButton.textContent = isSubmitting ? "Enviando..." : defaultButtonText;
+    }
 
-      if (res.ok) {
-        form.reset();
-        errorEl.textContent = '¡Te has unido al Drop Room! Revisa tu email.';
-        errorEl.className = 'success-message';
-      } else {
-        const err = await res.json();
-        errorEl.textContent = err.error || 'Hubo un error al registrarte.';
-        errorEl.className = 'error-message';
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const nombre = String(formData.get("nombre") ?? "").trim();
+      const email = String(formData.get("email") ?? "").trim();
+      const rawWhatsapp = String(formData.get("whatsapp") ?? "").trim();
+      const whatsapp = rawWhatsapp.replace(/[\s().-]+/g, "");
+      const accepted = formData.get("acepto_privacidad") === "on";
+
+      if (nombre.length < 2 || nombre.length > 80) {
+        showMessage("Introduce un nombre válido (2-80 caracteres).");
+        return;
       }
-    } catch (err) {
-      errorEl.textContent = 'No se pudo conectar al servidor.';
-      errorEl.className = 'error-message';
-    }
-  });
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        showMessage("Por favor, introduce un email válido.");
+        return;
+      }
+
+      if (!/^\+?\d{7,15}$/.test(whatsapp)) {
+        showMessage(
+          "Por favor, introduce un número de WhatsApp válido (ej. +521234567890)."
+        );
+        return;
+      }
+
+      if (!accepted) {
+        showMessage("Debes aceptar el aviso de privacidad.");
+        return;
+      }
+
+      setSubmitting(true);
+      showMessage("");
+
+      try {
+        const response = await fetch("/api/register-fan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            nombre,
+            email,
+            whatsapp,
+            acepto_privacidad: true,
+          }),
+        });
+
+        if (response.ok) {
+          form.reset();
+          showMessage(
+            "¡Ya estás dentro! Gracias por unirte al Drop Room.",
+            "success"
+          );
+          return;
+        }
+
+        let message = "Hubo un error al registrarte. Inténtalo de nuevo.";
+
+        try {
+          const payload = await response.json();
+          if (typeof payload?.error === "string") message = payload.error;
+        } catch {
+          // Keep the generic message when the server did not return JSON.
+        }
+
+        showMessage(message);
+      } catch (error) {
+        console.error("[DropRoomForm] Registration request failed:", error);
+        showMessage("No se pudo conectar al servidor. Inténtalo de nuevo.");
+      } finally {
+        setSubmitting(false);
+      }
+    });
+  }
 </script>
 
 <style>
@@ -86,6 +151,7 @@ import { SPOTIFY_URL } from '../data/siteConfig';
     background: rgba(255, 255, 255, 0.05);
     color: #fff;
     font-family: inherit;
+    font-size: 1rem;
   }
   input:focus {
     outline: none;
@@ -98,10 +164,17 @@ import { SPOTIFY_URL } from '../data/siteConfig';
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
+    text-align: left;
+    line-height: 1.5;
   }
   .checkbox-label input {
     width: auto;
     margin-top: 0.2rem;
+    accent-color: #ff3333;
+  }
+  .checkbox-label a {
+    color: #ff6b6b;
+    text-underline-offset: 2px;
   }
   button {
     padding: 0.75rem;
@@ -110,18 +183,33 @@ import { SPOTIFY_URL } from '../data/siteConfig';
     background: #ff3333;
     color: #fff;
     font-family: "Bebas Neue", sans-serif;
+    font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
   }
-  button:hover { background: #e02a2a; }
-  button:active { transform: scale(0.98); }
-  .error-message, .success-message {
+  button:hover:not(:disabled) {
+    background: #e02a2a;
+  }
+  button:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  button:disabled {
+    opacity: 0.65;
+    cursor: wait;
+  }
+  .error-message,
+  .success-message {
     font-size: 0.8rem;
     text-align: center;
     min-height: 1.2rem;
+    line-height: 1.5;
   }
-  .error-message { color: #ff3333; }
-  .success-message { color: #1db954; }
+  .error-message {
+    color: #ff3333;
+  }
+  .success-message {
+    color: #1db954;
+  }
 </style>

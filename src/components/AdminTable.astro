@@ -1,7 +1,3 @@
----
-import { toast } from '../lib/toast';
----
-
 <div class="admin-table-container" id="adminTable">
   <div class="loading" id="loading">Cargando fans...</div>
   <div class="error" id="error" style="display:none"></div>
@@ -19,79 +15,171 @@ import { toast } from '../lib/toast';
     <tbody id="fansBody"></tbody>
   </table>
   <div class="admin-actions" id="adminActions" style="display:none">
-    <button class="copy-all-btn" id="copyAllBtn">Copiar todos los números (coma-separados)</button>
+    <button type="button" class="copy-all-btn" id="copyAllBtn">
+      Copiar todos los números (coma-separados)
+    </button>
   </div>
 </div>
 
-<script client:load>
-  const loadingEl = document.getElementById('loading');
-  const errorEl = document.getElementById('error');
-  const emptyEl = document.getElementById('empty');
-  const tableEl = document.getElementById('fansTable');
-  const bodyEl = document.getElementById('fansBody');
-  const actionsEl = document.getElementById('adminActions');
-  const copyAllBtn = document.getElementById('copyAllBtn');
+<script>
+  import { toast } from "../lib/toast";
 
-  let fans = [];
+  const loadingEl = document.getElementById("loading");
+  const errorEl = document.getElementById("error");
+  const emptyEl = document.getElementById("empty");
+  const tableEl = document.getElementById("fansTable");
+  const bodyEl = document.getElementById("fansBody");
+  const actionsEl = document.getElementById("adminActions");
+  const copyAllBtn = document.getElementById("copyAllBtn");
 
-  async function loadFans() {
-    try {
-      const res = await fetch('/api/fans');
-      if (!res.ok) throw new Error('Failed to fetch fans');
-      const { fans: data } = await res.json();
-      fans = data;
-      render();
-    } catch (err) {
-      errorEl.textContent = 'No se pudieron cargar los fans.';
-      errorEl.style.display = 'block';
-      loadingEl.style.display = 'none';
+  if (
+    loadingEl &&
+    errorEl &&
+    emptyEl &&
+    tableEl &&
+    bodyEl &&
+    actionsEl &&
+    copyAllBtn
+  ) {
+    let fans = [];
+
+    function formatDate(value) {
+      const date = new Date(String(value ?? ""));
+      if (Number.isNaN(date.getTime())) return "—";
+
+      return new Intl.DateTimeFormat("es-MX", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(date);
     }
-  }
 
-  function render() {
-    loadingEl.style.display = 'none';
-    if (fans.length === 0) {
-      emptyEl.style.display = 'block';
-      return;
+    async function copyText(text, successMessage) {
+      if (!text) {
+        toast("No hay número para copiar", "error");
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.top = "-9999px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          const copied = document.execCommand("copy");
+          textarea.remove();
+          if (!copied) throw new Error("copy command failed");
+        }
+
+        toast(successMessage);
+      } catch (error) {
+        console.error("[AdminTable] Copy failed:", error);
+        toast("No se pudo copiar", "error");
+      }
     }
-    tableEl.style.display = 'table';
-    actionsEl.style.display = 'flex';
 
-    bodyEl.innerHTML = fans.map(fan => `
-      <tr>
-        <td>${fan.nombre}</td>
-        <td>${fan.email}</td>
-        <td>${fan.whatsapp}</td>
-        <td>${new Date(fan.created_at).toLocaleString('es-MX')}</td>
-        <td>
-          <button class="copy-btn" data-whatsapp="${fan.whatsapp}">Copiar</button>
-        </td>
-      </tr>
-    `).join('');
+    function makeCell(text) {
+      const cell = document.createElement("td");
+      cell.textContent = text;
+      return cell;
+    }
 
-    // Attach copy buttons
-    document.querySelectorAll('.copy-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        copyToClipboard(btn.dataset.whatsapp);
-      });
+    function render() {
+      loadingEl.style.display = "none";
+      errorEl.style.display = "none";
+      bodyEl.replaceChildren();
+
+      if (fans.length === 0) {
+        emptyEl.style.display = "block";
+        tableEl.style.display = "none";
+        actionsEl.style.display = "none";
+        return;
+      }
+
+      emptyEl.style.display = "none";
+      tableEl.style.display = "table";
+      actionsEl.style.display = "flex";
+
+      const fragment = document.createDocumentFragment();
+
+      for (const fan of fans) {
+        const row = document.createElement("tr");
+        const name = String(fan.nombre ?? "");
+        const whatsapp = String(fan.whatsapp ?? "");
+
+        row.append(
+          makeCell(name),
+          makeCell(String(fan.email ?? "")),
+          makeCell(whatsapp),
+          makeCell(formatDate(fan.created_at))
+        );
+
+        const actionCell = document.createElement("td");
+        const copyButton = document.createElement("button");
+        copyButton.type = "button";
+        copyButton.className = "copy-btn";
+        copyButton.textContent = "Copiar";
+        copyButton.setAttribute("aria-label", `Copiar WhatsApp de ${name || "fan"}`);
+        copyButton.addEventListener("click", () => {
+          void copyText(whatsapp, "Número copiado al portapapeles");
+        });
+
+        actionCell.appendChild(copyButton);
+        row.appendChild(actionCell);
+        fragment.appendChild(row);
+      }
+
+      bodyEl.appendChild(fragment);
+    }
+
+    async function loadFans() {
+      try {
+        const response = await fetch("/api/fans", {
+          headers: { Accept: "application/json" },
+        });
+
+        if (response.status === 401) {
+          errorEl.textContent =
+            "Tu sesión ha expirado. Recarga la página para volver a entrar.";
+          errorEl.style.display = "block";
+          loadingEl.style.display = "none";
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const payload = await response.json();
+        fans = Array.isArray(payload?.fans) ? payload.fans : [];
+        render();
+      } catch (error) {
+        console.error("[AdminTable] Could not load fans:", error);
+        errorEl.textContent = "No se pudieron cargar los fans.";
+        errorEl.style.display = "block";
+        loadingEl.style.display = "none";
+      }
+    }
+
+    copyAllBtn.addEventListener("click", () => {
+      const numbers = fans
+        .map((fan) => String(fan.whatsapp ?? ""))
+        .filter(Boolean);
+
+      if (numbers.length === 0) {
+        toast("No hay números para copiar", "error");
+        return;
+      }
+
+      void copyText(numbers.join(", "), "Todos los números copiados");
     });
+
+    void loadFans();
   }
-
-  async function copyToClipboard(text: string) {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast('Número copiado al portapapeles');
-    } catch (e) {
-      toast('No se pudo copiar', 'error');
-    }
-  }
-
-  copyAllBtn.addEventListener('click', () => {
-    const numbers = fans.map(f => f.whatsapp).join(', ');
-    navigator.clipboard.writeText(numbers).then(() => toast('Todos los números copiados'));
-  });
-
-  loadFans();
 </script>
 
 <style>
@@ -100,12 +188,16 @@ import { toast } from '../lib/toast';
     margin: 0 auto;
     padding: 1rem;
   }
-  .loading, .error, .empty {
+  .loading,
+  .error,
+  .empty {
     text-align: center;
     padding: 2rem;
     color: rgba(255, 255, 255, 0.6);
   }
-  .error { color: #ff3333; }
+  .error {
+    color: #ff3333;
+  }
   .fans-table {
     width: 100%;
     border-collapse: collapse;
@@ -128,9 +220,14 @@ import { toast } from '../lib/toast';
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.85rem;
+    overflow-wrap: anywhere;
   }
-  .fans-table tr:last-child td { border-bottom: none; }
-  .fans-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+  .fans-table tr:last-child td {
+    border-bottom: none;
+  }
+  .fans-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
   .copy-btn {
     background: rgba(255, 50, 50, 0.15);
     color: #ff3333;
@@ -171,7 +268,13 @@ import { toast } from '../lib/toast';
   }
 
   @media (max-width: 640px) {
-    .admin-table-container { padding: 0.5rem; }
-    .fans-table th, .fans-table td { padding: 0.5rem; font-size: 0.75rem; }
+    .admin-table-container {
+      padding: 0.5rem;
+    }
+    .fans-table th,
+    .fans-table td {
+      padding: 0.5rem;
+      font-size: 0.75rem;
+    }
   }
 </style>

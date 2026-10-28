@@ -31,6 +31,11 @@ function formatStreams(n?: number) {
       <SpotifyLatestPlayer />
     </div>
 
+    <div class="droproom-cta">
+      <p>¿Quieres enterarte del próximo drop antes que nadie?</p>
+      <a href="/drop-room" class="btn btn--primary">Unirme al Drop Room</a>
+    </div>
+
     <h2 class="section-subtitle">Discografía</h2>
 
     <div class="discography-grid">
@@ -144,6 +149,25 @@ function formatStreams(n?: number) {
   }
   .embed-iframe.is-loaded {
     opacity: 1;
+  }
+
+  .droproom-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    margin: 0 auto 2rem;
+    padding: 1.25rem;
+    max-width: 600px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255, 50, 50, 0.12), rgba(255, 50, 50, 0.03));
+    border: 1px solid rgba(255, 50, 50, 0.2);
+  }
+  .droproom-cta p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    line-height: 1.5;
   }
 
   .section-subtitle {
@@ -332,5 +356,15 @@ function formatStreams(n?: number) {
   .btn--outline:hover {
     border-color: rgba(255, 255, 255, 0.3);
     color: #ffffff;
+  }
+
+  .btn--primary {
+    background: #ff3333;
+    color: #ffffff;
+    border: 1px solid #ff3333;
+  }
+  .btn--primary:hover {
+    background: #e02a2a;
+    border-color: #e02a2a;
   }
 </style>

@@ -1,62 +1,65 @@
 ---
-import AdminTable from '../components/AdminTable.astro';
-import { toast } from '../lib/toast';
+export const prerender = false;
+
+import AdminTable from "../components/AdminTable.astro";
+import ArtistLayout from "../layouts/ArtistLayout.astro";
+import { isAdminConfigured, isValidSession } from "../lib/adminAuth";
+
+const configured = isAdminConfigured();
+const authenticated = configured && isValidSession(Astro.cookies);
+const loginFailed = Astro.url.searchParams.get("error") === "1";
 ---
 
-<div class="admin-page">
-  <div class="admin-header">
-    <h1>🔐 Panel de Admin</h1>
-    <p class="admin-subtitle">Gestión de fans del Drop Room</p>
+<ArtistLayout title="Admin" noindex>
+  <div class="admin-page">
+    <div class="admin-header">
+      <h1>Panel de Admin</h1>
+      <p class="admin-subtitle">Gestión de fans del Drop Room</p>
+    </div>
+
+    {!configured ? (
+      <div class="auth-box" role="alert">
+        <p class="auth-error">
+          El panel no está configurado. Añade <code>PRIVATE_ADMIN_TOKEN</code> en las
+          variables de entorno del servidor y vuelve a desplegar.
+        </p>
+      </div>
+    ) : !authenticated ? (
+      <form class="auth-box" method="POST" action="/api/admin-login">
+        <label class="sr-only" for="adminPassword">Contraseña de administrador</label>
+        <input
+          type="password"
+          id="adminPassword"
+          name="password"
+          placeholder="Contraseña de administrador"
+          class="password-input"
+          autocomplete="current-password"
+          required
+          autofocus
+        />
+        <button type="submit" class="login-btn">Entrar</button>
+        {loginFailed ? (
+          <p class="auth-error" role="alert">Contraseña incorrecta.</p>
+        ) : null}
+      </form>
+    ) : (
+      <div class="admin-content">
+        <div class="admin-toolbar">
+          <form method="POST" action="/api/admin-logout">
+            <button type="submit" class="logout-btn">Salir</button>
+          </form>
+        </div>
+        <AdminTable />
+      </div>
+    )}
   </div>
-
-  <div class="auth-box">
-    <input
-      type="password"
-      id="adminPassword"
-      placeholder="Contraseña de administrador"
-      class="password-input"
-    />
-    <button id="adminLoginBtn" class="login-btn">Entrar</button>
-    <p id="authError" class="auth-error"></p>
-  </div>
-
-  <div id="adminContent" class="admin-content hidden">
-    <AdminTable />
-  </div>
-</div>
-
-<script client:load>
-  const passwordInput = document.getElementById('adminPassword');
-  const loginBtn = document.getElementById('adminLoginBtn');
-  const authError = document.getElementById('authError');
-  const adminContent = document.getElementById('adminContent');
-
-  // Contraseña simple para MVP (en producción usar Supabase Auth)
-  const VALID_PASSWORD = import.meta.env.PRIVATE_ADMIN_TOKEN || 'gargut123';
-
-  function checkAuth() {
-    if (passwordInput.value === VALID_PASSWORD) {
-      authError.textContent = '';
-      adminContent.classList.remove('hidden');
-      toast('Acceso concedido');
-    } else {
-      authError.textContent = 'Contraseña incorrecta.';
-      authError.className = 'auth-error';
-    }
-  }
-
-  loginBtn.addEventListener('click', checkAuth);
-  passwordInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') checkAuth();
-  });
-</script>
+</ArtistLayout>
 
 <style>
   .admin-page {
     max-width: 800px;
     margin: 2rem auto;
     padding: 1rem;
-    font-family: system-ui, -apple-system, sans-serif;
   }
   .admin-header {
     text-align: center;
@@ -75,6 +78,9 @@ import { toast } from '../lib/toast';
     font-size: 0.9rem;
   }
   .auth-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background: rgba(255, 255, 255, 0.03);
     padding: 2rem;
     border-radius: 12px;
@@ -93,7 +99,10 @@ import { toast } from '../lib/toast';
     margin-bottom: 1rem;
     font-size: 1rem;
   }
-  .password-input:focus { outline: none; border-color: #ff3333; }
+  .password-input:focus {
+    outline: none;
+    border-color: #ff3333;
+  }
   .login-btn {
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
@@ -101,22 +110,79 @@ import { toast } from '../lib/toast';
     background: #ff3333;
     color: #fff;
     font-family: "Bebas Neue", sans-serif;
+    font-size: 1rem;
     text-transform: uppercase;
+    letter-spacing: 0.04em;
     cursor: pointer;
     transition: background 0.2s;
   }
-  .login-btn:hover { background: #e02a2a; }
+  .login-btn:hover {
+    background: #e02a2a;
+  }
   .auth-error {
     color: #ff3333;
     margin-top: 0.75rem;
     font-size: 0.85rem;
+    line-height: 1.5;
   }
-  .admin-content { animation: fadeIn 0.3s ease; }
-  .hidden { display: none; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .auth-error code {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 0.1rem 0.3rem;
+  }
+  .admin-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.75rem;
+  }
+  .logout-btn {
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .logout-btn:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+  .admin-content {
+    animation: fadeIn 0.3s ease;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   @media (max-width: 640px) {
-    .admin-page { padding: 0.5rem; }
-    .auth-box { padding: 1.5rem; }
+    .admin-page {
+      padding: 0.5rem;
+    }
+    .auth-box {
+      padding: 1.5rem;
+    }
   }
 </style>

@@ -5,7 +5,12 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  output: "hybrid",
+  output: "static",
   site: "https://garguttieneunchingodeferia.com",
-  integrations: [sitemap(), vercel()],
+  adapter: vercel(),
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/admin'),
+    }),
+  ],
 });
