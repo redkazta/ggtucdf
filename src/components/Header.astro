@@ -6,58 +6,38 @@ const navItems = [
   { label: "Videos", href: "/videos" },
   { label: "Drop Room", href: "/drop-room" },
 ];
-
-const tickerItems = [
-  "NUEVO DROP: YO TE KIERO SOLO",
-  "DROP ROOM ABIERTO",
-  "GUADALAJARA, MÉXICO",
-  "MÚSICA URBANA",
-];
-const ticker = tickerItems.join(" ✦ ") + " ✦ ";
 ---
 
 <header class="site-header">
-  <div class="site-header__bar">
-    <a href="/" class="site-header__logo" aria-label="Inicio">
-      <span class="site-header__mark" aria-hidden="true"></span>
-      GARGUT<span class="site-header__tm" aria-hidden="true">®</span>
-    </a>
+  <a href="/" class="site-header__logo" aria-label="Inicio">
+    <span class="site-header__logo-g">G</span><span class="site-header__logo-rest">ARGUT</span>
+  </a>
 
-    <nav class="site-header__nav" aria-label="Navegación principal">
-      {navItems.map((item, i) => (
-        <a
-          href={item.href}
-          class="site-header__link"
-          data-nav={item.href}
-          aria-current={Astro.url.pathname === item.href ? "page" : undefined}
-        >
-          <span class="site-header__index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-          <span>{item.label}</span>
-        </a>
-      ))}
-    </nav>
+  <nav class="site-header__nav" aria-label="Navegación principal">
+    {navItems.map((item) => (
+      <a
+        href={item.href}
+        class="site-header__link"
+        data-nav={item.href}
+        aria-current={Astro.url.pathname === item.href ? "page" : undefined}
+      >
+        {item.label}
+      </a>
+    ))}
+  </nav>
 
-    <button
-      class="site-header__menu-btn"
-      id="menuToggle"
-      type="button"
-      aria-label="Abrir menú"
-      aria-expanded="false"
-      aria-controls="mobileDrawer"
-    >
-      <span class="site-header__menu-label">Menú</span>
-      <span class="site-header__menu-icon" aria-hidden="true">
-        <span></span><span></span>
-      </span>
-    </button>
-  </div>
-
-  <div class="site-header__ticker" aria-hidden="true">
-    <div class="site-header__ticker-track">
-      <span>{ticker}</span>
-      <span>{ticker}</span>
-    </div>
-  </div>
+  <button
+    class="site-header__menu-btn"
+    id="menuToggle"
+    type="button"
+    aria-label="Abrir menú"
+    aria-expanded="false"
+    aria-controls="mobileDrawer"
+  >
+    <span class="site-header__menu-line" aria-hidden="true"></span>
+    <span class="site-header__menu-line" aria-hidden="true"></span>
+    <span class="site-header__menu-line" aria-hidden="true"></span>
+  </button>
 </header>
 
 <script is:inline>
@@ -77,163 +57,144 @@ const ticker = tickerItems.join(" ✦ ") + " ✦ ";
 <style>
   .site-header {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     z-index: 200;
-    background: var(--bg);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .site-header__bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 52px;
-    padding: 0 1rem;
+    height: 56px;
+    padding: 0 1.25rem;
+    background: linear-gradient(180deg, rgba(7, 7, 9, 0.9) 0%, rgba(7, 7, 9, 0.68) 100%);
+    backdrop-filter: blur(22px) saturate(1.25);
+    -webkit-backdrop-filter: blur(22px) saturate(1.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9);
+  }
+  .site-header::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(225, 29, 46, 0.5) 32%,
+      rgba(225, 29, 46, 0.18) 68%,
+      transparent 100%
+    );
+    pointer-events: none;
   }
 
   .site-header__logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
+    display: flex;
+    align-items: baseline;
     text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s;
+    line-height: 1;
+  }
+  .site-header__logo:hover { opacity: 0.82; }
+
+  .site-header__logo-g {
     font-family: var(--font-display);
     font-size: 1.55rem;
+    background: linear-gradient(180deg, #ff6b76 0%, var(--accent) 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 0.02em;
     line-height: 1;
-    letter-spacing: 0.03em;
-    color: var(--ink);
-    -webkit-tap-highlight-color: transparent;
-    transition: color 0.2s;
+    filter: drop-shadow(0 0 12px rgba(225, 29, 46, 0.5));
   }
-  .site-header__logo:hover { color: var(--accent); }
-
-  .site-header__mark {
-    width: 9px;
-    height: 9px;
-    background: var(--accent);
-    box-shadow: 3px 3px 0 var(--ink);
-  }
-
-  .site-header__tm {
-    align-self: flex-start;
-    margin-top: 0.15rem;
-    font-family: var(--font-mono);
-    font-size: 0.48rem;
-    color: var(--text-dim);
-    letter-spacing: 0;
+  .site-header__logo-rest {
+    font-family: var(--font-display);
+    font-size: 1.28rem;
+    color: var(--text);
+    letter-spacing: 0.14em;
+    line-height: 1;
+    margin-left: 0.04em;
   }
 
   .site-header__nav {
     display: none;
     align-items: center;
-    gap: 1.5rem;
+    gap: 0.15rem;
   }
 
   .site-header__link {
     position: relative;
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    font-family: var(--font-mono);
-    font-size: 0.64rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
+    font-family: var(--font-display);
     text-transform: uppercase;
+    font-size: 0.88rem;
     color: var(--text-muted);
     text-decoration: none;
-    padding: 0.5rem 0 0.45rem;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
+    letter-spacing: 0.1em;
+    padding: 0.42rem 0.78rem;
+    border-radius: 999px;
+    transition: color 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.3s;
     -webkit-tap-highlight-color: transparent;
-  }
-  .site-header__index {
-    font-size: 0.52rem;
-    color: var(--text-dim);
-    letter-spacing: 0.06em;
-    transition: color 0.2s;
+    border: 1px solid transparent;
   }
   .site-header__link:hover {
-    color: var(--ink);
-    border-bottom-color: var(--line-strong);
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.045);
+    border-color: var(--border);
   }
-  .site-header__link:hover .site-header__index { color: var(--accent); }
   .site-header__link.is-active {
-    color: var(--ink);
-    border-bottom-color: var(--accent);
+    color: var(--text);
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 18px -6px rgba(225, 29, 46, 0.5);
   }
-  .site-header__link.is-active .site-header__index { color: var(--accent); }
+  .site-header__link.is-active::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0.12rem;
+    width: 14px;
+    height: 1px;
+    transform: translateX(-50%);
+    background: var(--accent-bright);
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
 
   .site-header__menu-btn {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.35rem 0;
-    background: transparent;
-    border: 0;
-    color: var(--ink);
+    justify-content: center;
+    gap: 5px;
+    width: 42px; height: 42px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0;
   }
-  .site-header__menu-label {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+  .site-header__menu-btn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent-line);
   }
-  .site-header__menu-icon {
-    display: inline-flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 22px;
-  }
-  .site-header__menu-icon span {
+
+  .site-header__menu-line {
     display: block;
+    width: 20px;
     height: 1.5px;
     background: currentColor;
-    transition: transform 0.25s ease;
-  }
-  .site-header__menu-btn:hover .site-header__menu-icon span:first-child { transform: translateX(3px); }
-  .site-header__menu-btn:hover .site-header__menu-icon span:last-child { transform: translateX(-3px); }
-
-  /* Ticker */
-  .site-header__ticker {
-    overflow: hidden;
-    background: var(--accent);
-    border-top: 1px solid var(--accent-deep);
-  }
-  .site-header__ticker-track {
-    display: flex;
-    width: max-content;
-    animation: ticker-run 28s linear infinite;
-  }
-  .site-header__ticker-track span {
-    display: block;
-    padding: 0.34rem 0;
-    font-family: var(--font-mono);
-    font-size: 0.54rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #ffffff;
-    white-space: nowrap;
-  }
-
-  @keyframes ticker-run {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    border-radius: 1px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    transform-origin: center;
   }
 
   @media (min-width: 768px) {
-    .site-header__bar { height: 62px; padding: 0 2.25rem; }
-    .site-header__logo { font-size: 1.9rem; }
+    .site-header { height: 64px; padding: 0 2.5rem; }
+    .site-header__logo-g { font-size: 1.8rem; }
+    .site-header__logo-rest { font-size: 1.5rem; }
     .site-header__nav { display: flex; }
     .site-header__menu-btn { display: none; }
-    .site-header__ticker-track span { font-size: 0.58rem; padding: 0.38rem 0; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .site-header__ticker-track { animation: none; }
+    .site-header__link { font-size: 0.92rem; padding: 0.45rem 0.9rem; }
   }
 </style>
