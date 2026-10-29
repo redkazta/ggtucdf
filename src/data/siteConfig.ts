@@ -15,6 +15,20 @@ export const SPOTIFY_TRACK_ID = "4KvIxXUbDzMicaBr2opF9e";
 export const SPOTIFY_ARTIST_ID = "3IWeUxh0WKXHNXJ6ahJUtX";
 export const SPOTIFY_EMBED_ARTIST = "https://open.spotify.com/embed/artist/3IWeUxh0WKXHNXJ6ahJUtX";
 export const SPOTIFY_EMBED_TRACK = `https://open.spotify.com/embed/track/${SPOTIFY_TRACK_ID}`;
+
+/**
+ * Metadata del lanzamiento más reciente.
+ *
+ * La API Web de Spotify ya no expone el catálogo de un artista (álbumes,
+ * top tracks, búsqueda) a apps nuevas: esos endpoints responden 403. Por eso
+ * el lanzamiento se guarda aquí y se mantiene a mano junto con DISCOGRAPHY.
+ */
+export const LATEST_RELEASE = {
+  id: SPOTIFY_TRACK_ID,
+  name: "Yo te kiero solo",
+  album: "Yo te kiero solo",
+  releaseDate: null as string | null,
+};
 export const INSTAGRAM_URL = "https://www.instagram.com/garguttt/";
 export const TIKTOK_URL = "https://www.tiktok.com/@gargutttt";
 
