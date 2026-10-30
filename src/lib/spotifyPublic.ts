@@ -45,6 +45,7 @@ export interface SpotifyArtistOverview {
   monthlyListeners: number | null;
   followers: number | null;
   topTrack: string | null;
+  topCities: { city: string; country: string; listeners: number }[];
   latestRelease: SpotifyLatestRelease | null;
   fetchedAt: string;
 }
@@ -186,7 +187,13 @@ export async function getSpotifyArtistOverview(): Promise<SpotifyArtistOverview 
     const payload = (await response.json()) as {
       data?: {
         artistUnion?: {
-          stats?: { monthlyListeners?: number; followers?: number };
+          stats?: {
+            monthlyListeners?: number;
+            followers?: number;
+            topCities?: {
+              items?: { city?: string; country?: string; numberOfListeners?: number }[];
+            };
+          };
           discography?: {
             topTracks?: { items?: { track?: { name?: string } }[] };
             latest?: {
@@ -230,6 +237,13 @@ export async function getSpotifyArtistOverview(): Promise<SpotifyArtistOverview 
       monthlyListeners: artist.stats?.monthlyListeners ?? null,
       followers: artist.stats?.followers ?? null,
       topTrack: artist.discography?.topTracks?.items?.[0]?.track?.name ?? null,
+      topCities: (artist.stats?.topCities?.items ?? [])
+        .filter((item) => Boolean(item?.city) && typeof item?.numberOfListeners === "number")
+        .map((item) => ({
+          city: item.city as string,
+          country: item.country ?? "",
+          listeners: item.numberOfListeners as number,
+        })),
       latestRelease,
       fetchedAt: new Date().toISOString(),
     };
