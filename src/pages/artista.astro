@@ -6,13 +6,13 @@ import {
   SITE_TITLE,
   ARTIST_MONTHLY_LISTENERS,
   ARTIST_FOLLOWERS,
+  ARTIST_TOP_TRACK,
   DISCOGRAPHY,
   SPOTIFY_ARTIST_URL,
   SPOTIFY_EMBED_ARTIST,
   INSTAGRAM_URL,
 } from "../data/siteConfig";
 
-const totalStreams = DISCOGRAPHY.reduce((sum, t) => sum + (t.streams || 0), 0);
 const featuredCover =
   DISCOGRAPHY.find((t) => t.title === "Yo te kiero solo")?.coverUrl || "";
 const topTracks = [...DISCOGRAPHY]
@@ -61,22 +61,29 @@ const sections = [
 
           <div class="perfil-stats">
             <div class="stat">
-              <span class="stat__value">{ARTIST_MONTHLY_LISTENERS}</span>
+              <span class="stat__value" data-stat="listeners"
+                >{ARTIST_MONTHLY_LISTENERS.toLocaleString("es-MX")}</span
+              >
               <span class="stat__label">oyentes mensuales</span>
             </div>
             <div class="stat">
-              <span class="stat__value">{ARTIST_FOLLOWERS}</span>
+              <span class="stat__value" data-stat="followers"
+                >{ARTIST_FOLLOWERS.toLocaleString("es-MX")}</span
+              >
               <span class="stat__label">seguidores</span>
             </div>
             <div class="stat">
               <span class="stat__value">{DISCOGRAPHY.length}</span>
-              <span class="stat__label">singles</span>
+              <span class="stat__label">lanzamientos</span>
             </div>
             <div class="stat">
-              <span class="stat__value">{totalStreams.toLocaleString("es-MX")}</span>
-              <span class="stat__label">streams totales</span>
+              <span class="stat__value stat__value--text" data-stat="top"
+                >{ARTIST_TOP_TRACK}</span
+              >
+              <span class="stat__label">top track</span>
             </div>
           </div>
+          <p class="stats-note" data-stats-note>Datos de Spotify</p>
 
           <a
             href={SPOTIFY_ARTIST_URL}
@@ -293,6 +300,37 @@ const sections = [
     })();
   </script>
 
+  <script is:inline>
+    (() => {
+      const stats = document.querySelector(".perfil-stats");
+      if (!stats) return;
+
+      fetch("/api/artist-stats", { headers: { Accept: "application/json" } })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data) => {
+          if (!data || data.source !== "spotify") return;
+
+          const setValue = (key, value) => {
+            if (value === null || value === undefined || value === "") return;
+            const node = stats.querySelector(`[data-stat="${key}"]`);
+            if (node) node.textContent = value;
+          };
+
+          if (typeof data.monthlyListeners === "number") {
+            setValue("listeners", data.monthlyListeners.toLocaleString("es-MX"));
+          }
+          if (typeof data.followers === "number") {
+            setValue("followers", data.followers.toLocaleString("es-MX"));
+          }
+          setValue("top", data.topTrack);
+
+          const note = document.querySelector("[data-stats-note]");
+          if (note) note.textContent = "Datos en vivo de Spotify";
+        })
+        .catch(() => {});
+    })();
+  </script>
+
   <style>
 .section-scroller {
   height: calc(100dvh - var(--header-h));
@@ -468,7 +506,7 @@ const sections = [
   border: 1px solid var(--line);
   border-bottom: 0;
   max-width: 460px;
-  margin: 0 0 1.5rem;
+  margin: 0 0 0.75rem;
   background: var(--bg-soft);
 }
 .stat {
@@ -490,6 +528,11 @@ const sections = [
   color: var(--ink);
   line-height: 0.95;
 }
+.stat__value--text {
+  font-size: clamp(0.95rem, 3vw, 1.15rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
 .stat__label {
   font-family: var(--font-mono);
   font-size: 0.48rem;
@@ -498,6 +541,20 @@ const sections = [
   text-transform: uppercase;
   letter-spacing: 0.1em;
   line-height: 1.4;
+}
+
+.stats-note {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 1.5rem;
+}
+.stats-note::before {
+  content: "● ";
+  color: var(--accent);
 }
 
 .scroll-hint {
@@ -830,7 +887,7 @@ const sections = [
   }
   .perfil-visual { margin-bottom: 0; margin-right: 0; flex-shrink: 0; }
   .perfil-content { text-align: left; }
-  .perfil-stats { margin: 0 0 1.5rem; max-width: 560px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .perfil-stats { margin: 0 0 0.75rem; max-width: 560px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .stat { border-right: 1px solid var(--line); }
   .stat:nth-child(2n) { border-right: 1px solid var(--line); }
   .stat:last-child { border-right: 0; }
