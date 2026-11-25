@@ -63,8 +63,8 @@ const navItems = [
     align-items: center;
     justify-content: space-between;
     height: var(--header-h);
-    padding: 0 1.25rem;
-    background: rgba(0, 0, 0, 0.9);
+    padding: 0 clamp(1.25rem, 4vw, 3rem);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.92), rgba(255, 255, 255, 0.06));
     backdrop-filter: blur(18px) saturate(1.2);
     -webkit-backdrop-filter: blur(18px) saturate(1.2);
     border-bottom: 1px solid var(--line-strong);
@@ -112,7 +112,7 @@ const navItems = [
     text-decoration: none;
     letter-spacing: 0.14em;
     padding: 0.5rem 0.8rem;
-    border-radius: 0;
+    border-radius: 10px;
     transition: color 0.18s, background 0.18s, border-color 0.18s;
     -webkit-tap-highlight-color: transparent;
     border: 1px solid transparent;
@@ -134,16 +134,17 @@ const navItems = [
     align-items: center;
     justify-content: center;
     gap: 5px;
-    width: 40px; height: 40px;
-    background: none;
-    border: none;
+    width: 44px; height: 44px;
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
     color: #ffffff;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.2s;
+    transition: background 0.2s, color 0.2s;
     padding: 0;
   }
-  .site-header__menu-btn:hover { opacity: 1; color: var(--accent); }
+  .site-header__menu-btn:hover { color: var(--accent); background: rgba(255, 255, 255, 0.06); }
 
   .site-header__menu-line {
     display: block;
