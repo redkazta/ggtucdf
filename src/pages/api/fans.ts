@@ -28,9 +28,26 @@ export const GET: APIRoute = async ({ cookies }) => {
 
   if (error) {
     console.error("[api/fans] Supabase query failed:", error);
-    return jsonResponse({ error: "No se pudieron cargar los fans." }, 500, {
-      "Cache-Control": "no-store",
-    });
+
+    if (error.code === "42P01") {
+      return jsonResponse(
+        {
+          error:
+            "Falta la tabla fans_gargut. Ejecuta supabase/fans_gargut.sql en Supabase.",
+        },
+        500,
+        { "Cache-Control": "no-store" }
+      );
+    }
+
+    return jsonResponse(
+      {
+        error:
+          "No se pudieron cargar los fans. Revisa la service role key y que la tabla fans_gargut exista.",
+      },
+      500,
+      { "Cache-Control": "no-store" }
+    );
   }
 
   return jsonResponse({ fans: data ?? [] }, 200, {

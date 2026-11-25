@@ -1,22 +1,42 @@
 <div class="admin-table-container" id="adminTable">
-  <div class="loading" id="loading">Cargando fans...</div>
-  <div class="error" id="error" style="display:none"></div>
-  <div class="empty" id="empty" style="display:none">No hay fans registrados todavía.</div>
-  <table class="fans-table" id="fansTable" style="display:none">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Email</th>
-        <th>WhatsApp</th>
-        <th>Fecha</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody id="fansBody"></tbody>
-  </table>
+  <div class="table-head">
+    <div>
+      <span class="kicker">03 / Registros</span>
+      <h2>Fans del Drop Room</h2>
+    </div>
+    <span class="table-count" id="fanCount">—</span>
+  </div>
+
+  <div class="table-shell">
+    <div class="state" id="loading">Cargando fans...</div>
+    <div class="state state--error" id="error" style="display:none">
+      <span class="state__title" id="errorTitle"></span>
+      <span class="state__hint" id="errorHint"></span>
+    </div>
+    <div class="state" id="empty" style="display:none">
+      No hay fans registrados todavía.
+    </div>
+
+    <div class="table-scroll">
+      <table class="fans-table" id="fansTable" style="display:none">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>WhatsApp</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="fansBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="admin-actions" id="adminActions" style="display:none">
     <button type="button" class="copy-all-btn" id="copyAllBtn">
-      Copiar todos los números (coma-separados)
+      Copiar todos los números <span aria-hidden="true">→</span>
     </button>
   </div>
 </div>
@@ -26,20 +46,26 @@
 
   const loadingEl = document.getElementById("loading");
   const errorEl = document.getElementById("error");
+  const errorTitleEl = document.getElementById("errorTitle");
+  const errorHintEl = document.getElementById("errorHint");
   const emptyEl = document.getElementById("empty");
   const tableEl = document.getElementById("fansTable");
   const bodyEl = document.getElementById("fansBody");
   const actionsEl = document.getElementById("adminActions");
   const copyAllBtn = document.getElementById("copyAllBtn");
+  const countEl = document.getElementById("fanCount");
 
   if (
     loadingEl &&
     errorEl &&
+    errorTitleEl &&
+    errorHintEl &&
     emptyEl &&
     tableEl &&
     bodyEl &&
     actionsEl &&
-    copyAllBtn
+    copyAllBtn &&
+    countEl
   ) {
     let fans = [];
 
@@ -88,10 +114,19 @@
       return cell;
     }
 
+    function showError(title, hint) {
+      errorTitleEl.textContent = title;
+      errorHintEl.textContent = hint ?? "";
+      errorHintEl.style.display = hint ? "block" : "none";
+      errorEl.style.display = "flex";
+      loadingEl.style.display = "none";
+    }
+
     function render() {
       loadingEl.style.display = "none";
       errorEl.style.display = "none";
       bodyEl.replaceChildren();
+      countEl.textContent = `${String(fans.length).padStart(2, "0")} registros`;
 
       if (fans.length === 0) {
         emptyEl.style.display = "block";
@@ -106,12 +141,16 @@
 
       const fragment = document.createDocumentFragment();
 
-      for (const fan of fans) {
+      fans.forEach((fan, index) => {
         const row = document.createElement("tr");
         const name = String(fan.nombre ?? "");
         const whatsapp = String(fan.whatsapp ?? "");
 
+        const indexCell = makeCell(String(index + 1).padStart(2, "0"));
+        indexCell.className = "cell-index";
+
         row.append(
+          indexCell,
           makeCell(name),
           makeCell(String(fan.email ?? "")),
           makeCell(whatsapp),
@@ -131,7 +170,7 @@
         actionCell.appendChild(copyButton);
         row.appendChild(actionCell);
         fragment.appendChild(row);
-      }
+      });
 
       bodyEl.appendChild(fragment);
     }
@@ -143,15 +182,25 @@
         });
 
         if (response.status === 401) {
-          errorEl.textContent =
-            "Tu sesión ha expirado. Recarga la página para volver a entrar.";
-          errorEl.style.display = "block";
-          loadingEl.style.display = "none";
+          showError(
+            "Tu sesión ha expirado.",
+            "Recarga la página para volver a entrar."
+          );
           return;
         }
 
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+          const payload = await response.json().catch(() => null);
+          const serverMessage =
+            typeof payload?.error === "string" ? payload.error : null;
+
+          showError(
+            serverMessage ?? `No se pudieron cargar los fans (HTTP ${response.status}).`,
+            response.status === 503
+              ? "Revisa PUBLIC_SUPABASE_URL y PRIVATE_SUPABASE_SERVICE_ROLE_KEY en Vercel."
+              : "Verifica que ejecutaste supabase/fans_gargut.sql en Supabase y que la service role key es correcta."
+          );
+          return;
         }
 
         const payload = await response.json();
@@ -159,9 +208,10 @@
         render();
       } catch (error) {
         console.error("[AdminTable] Could not load fans:", error);
-        errorEl.textContent = "No se pudieron cargar los fans.";
-        errorEl.style.display = "block";
-        loadingEl.style.display = "none";
+        showError(
+          "No se pudieron cargar los fans.",
+          "No hubo respuesta del servidor. Intenta recargar la página."
+        );
       }
     }
 
@@ -184,131 +234,171 @@
 
 <style>
   .admin-table-container {
-    max-width: 860px;
+    max-width: 1080px;
     margin: 0 auto;
-    padding: 0;
   }
 
-  .loading,
-  .error,
-  .empty {
-    text-align: center;
-    padding: 2.25rem 1.5rem;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  .table-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--line-strong);
   }
-  .error { color: #ff6b76; border-color: rgba(225, 29, 46, 0.28); }
+  .table-head h2 {
+    margin-top: 0.35rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 5vw, 2.3rem);
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .table-count {
+    font-family: var(--font-mono);
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .table-shell {
+    border: 1px solid var(--line-strong);
+    background: var(--bg-soft);
+  }
+
+  .state {
+    padding: 2rem 1.25rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    line-height: 1.7;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .state--error {
+    flex-direction: column;
+    gap: 0.35rem;
+    border-left: 3px solid var(--accent);
+    color: var(--accent-bright);
+    text-align: left;
+  }
+  .state__title {
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+  .state__hint {
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+    text-transform: none;
+    font-size: 0.6rem;
+  }
+
+  .table-scroll { overflow-x: auto; }
 
   .fans-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-    box-shadow: 0 22px 50px -34px rgba(0, 0, 0, 0.95);
-    font-size: 0.82rem;
+    border-collapse: collapse;
+    font-size: 0.8rem;
   }
   .fans-table th {
-    background: rgba(225, 29, 46, 0.09);
-    color: var(--text);
+    padding: 0.65rem 0.8rem;
+    background: var(--ink);
+    color: var(--bg);
     text-align: left;
-    padding: 0.8rem 0.85rem;
-    font-family: var(--font-display);
+    font-family: var(--font-mono);
     text-transform: uppercase;
-    font-size: 0.68rem;
-    font-weight: 400;
-    letter-spacing: 0.14em;
-    border-bottom: 1px solid var(--accent-line);
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
     white-space: nowrap;
   }
   .fans-table td {
-    padding: 0.8rem 0.85rem;
-    border-bottom: 1px solid var(--border);
+    padding: 0.7rem 0.8rem;
+    border-bottom: 1px solid var(--line);
     color: var(--text-soft);
-    font-size: 0.82rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
     overflow-wrap: anywhere;
   }
-  .fans-table tr:last-child td { border-bottom: none; }
-  .fans-table tbody tr {
-    transition: background 0.2s ease;
-  }
-  .fans-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.035);
+  .fans-table tbody tr:last-child td { border-bottom: none; }
+  .fans-table tbody tr { transition: background 0.18s ease; }
+  .fans-table tbody tr:hover { background: var(--accent-soft); }
+  .fans-table tbody tr:hover .cell-index { color: var(--accent); }
+  .cell-index {
+    color: var(--text-dim);
+    font-weight: 700;
+    letter-spacing: 0.08em;
   }
 
   .copy-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.35rem 0.7rem;
-    border-radius: 999px;
-    background: var(--accent-soft);
-    color: var(--accent-bright);
-    border: 1px solid var(--accent-line);
-    font-family: var(--font-display);
-    font-size: 0.64rem;
-    letter-spacing: 0.1em;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s, color 0.2s, box-shadow 0.25s, border-color 0.2s;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   }
   .copy-btn:hover {
-    background: rgba(225, 29, 46, 0.22);
-    color: #fff;
-    box-shadow: 0 0 20px -6px var(--accent-glow);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
   }
-  .copy-btn:active { transform: scale(0.96); }
 
   .admin-actions {
-    margin-top: 1.5rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+    margin-top: 1rem;
   }
   .copy-all-btn {
-    padding: 0.7rem 1.4rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--text-soft);
-    border: 1px solid var(--border-strong);
-    font-family: var(--font-display);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.8rem 1rem 0.72rem;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.3s;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease,
+      box-shadow 0.18s ease, transform 0.18s ease;
   }
   .copy-all-btn:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent-line);
-    color: var(--text);
-    box-shadow: 0 0 26px -8px var(--accent-glow);
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--accent);
   }
-  .copy-all-btn:active { transform: scale(0.985); }
 
   @media (max-width: 640px) {
-    .admin-table-container {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .fans-table {
-      min-width: 620px;
-    }
-    .fans-table th,
-    .fans-table td {
-      padding: 0.65rem 0.6rem;
-      font-size: 0.74rem;
-    }
+    .fans-table { min-width: 660px; }
+    .table-count { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .fans-table tbody tr,
     .copy-btn,
     .copy-all-btn { transition: none; }
+    .copy-all-btn:hover { transform: none; }
   }
 </style>

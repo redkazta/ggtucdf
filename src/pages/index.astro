@@ -1,15 +1,17 @@
 ---
 import Analytics from "@vercel/analytics/astro";
 import Hero from "../components/Hero.astro";
+import Header from "../components/Header.astro";
+import MobileDrawer from "../components/MobileDrawer.astro";
 import RegisterSW from "../components/RegisterSW.astro";
 import {
   HERO_VIDEO_URL,
   TRACK_SRC,
-  KAZTA_IG_LOGO,
   KAZTA_INSTAGRAM_URL,
   YOUTUBE_URL,
   SPOTIFY_URL,
   INSTAGRAM_URL,
+  TIKTOK_URL,
   SITE_URL,
   SITE_TITLE,
   SITE_DESCRIPTION,
@@ -18,6 +20,33 @@ import {
   SITE_THEME_COLOR,
   OG_IMAGE_URL,
 } from "../data/siteConfig";
+
+const indexLinks = [
+  {
+    num: "01",
+    title: "Música",
+    description: "Discografía completa, el último drop y el contador del próximo.",
+    href: "/musica",
+  },
+  {
+    num: "02",
+    title: "Artista",
+    description: "Quién es Gargut, de dónde viene y hacia dónde va.",
+    href: "/artista",
+  },
+  {
+    num: "03",
+    title: "Videos",
+    description: "Clips oficiales, reels y experimentos visuales.",
+    href: "/videos",
+  },
+  {
+    num: "04",
+    title: "Drop Room",
+    description: "Acceso anticipado a drops, fechas y contenido exclusivo.",
+    href: "/drop-room",
+  },
+];
 ---
 
 <html lang="es">
@@ -57,11 +86,7 @@ import {
       description: SITE_DESCRIPTION,
       url: SITE_URL,
       image: OG_IMAGE_URL,
-      sameAs: [
-        YOUTUBE_URL,
-        SPOTIFY_URL,
-        INSTAGRAM_URL,
-      ],
+      sameAs: [YOUTUBE_URL, SPOTIFY_URL, INSTAGRAM_URL],
     })} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -69,423 +94,263 @@ import {
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
     />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
     />
-    <link rel="prefetch" href="/artista" as="document" />
 
     <style is:global>
       :root {
-        --bg: #050506;
-        --text: #ffffff;
-        --text-soft: #e2e2e7;
-        --text-muted: #a7a7b0;
-        --border: rgba(255, 255, 255, 0.08);
-        --accent: #e11d2e;
-        --accent-bright: #ff3d4c;
-        --accent-deep: #9e0f1c;
-        --accent-glow: rgba(225, 29, 46, 0.45);
+        --bg: #070708;
+        --bg-soft: #0b0b0d;
+        --bg-elevated: #111113;
+
+        --ink: #f4f1e8;
+        --text: #f4f1e8;
+        --text-soft: #d8d4ca;
+        --text-muted: #99958c;
+        --text-dim: #6a675f;
+
+        --line: rgba(244, 241, 232, 0.12);
+        --line-soft: rgba(244, 241, 232, 0.06);
+        --line-strong: rgba(244, 241, 232, 0.32);
+        --surface: rgba(244, 241, 232, 0.03);
+        --surface-2: rgba(244, 241, 232, 0.05);
+        --surface-3: rgba(244, 241, 232, 0.08);
+        --border: var(--line);
+        --border-strong: var(--line-strong);
+
+        --accent: #ff2338;
+        --accent-bright: #ff5a68;
+        --accent-deep: #ad0012;
+        --accent-soft: rgba(255, 35, 56, 0.1);
+        --accent-line: rgba(255, 35, 56, 0.55);
+        --accent-glow: rgba(255, 35, 56, 0.35);
+
+        --radius-sm: 0px;
+        --radius: 0px;
+        --radius-lg: 2px;
+        --shadow-deep: 10px 10px 0 rgba(0, 0, 0, 0.55);
+        --shadow-hard: 5px 5px 0 var(--ink);
+
+        --font-display: "Anton", "Arial Narrow", Impact, sans-serif;
+        --font-body: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --font-mono: "Space Mono", "Courier New", monospace;
+        --header-h: 78px;
       }
+
+      @media (min-width: 768px) {
+        :root { --header-h: 94px; }
+      }
+
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body {
-        background-color: #050506;
-        background-image:
-          radial-gradient(1000px 700px at 50% -10%, rgba(225, 29, 46, 0.1), transparent 62%),
-          radial-gradient(900px 700px at 50% 110%, rgba(225, 29, 46, 0.05), transparent 60%),
-          linear-gradient(180deg, #09090b 0%, #060607 55%, #050506 100%);
-        color: var(--text-soft);
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-        overflow-x: hidden;
+
+      html {
+        background: var(--bg);
+        scroll-behavior: smooth;
+      }
+
+      body {
         min-height: 100dvh;
+        overflow-x: hidden;
+        color: var(--text-soft);
+        font-family: var(--font-body);
+        background-color: var(--bg);
+        background-image:
+          linear-gradient(rgba(244, 241, 232, 0.032) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(244, 241, 232, 0.032) 1px, transparent 1px),
+          radial-gradient(1000px 620px at 50% -12%, rgba(255, 35, 56, 0.09), transparent 64%);
+        background-size: 80px 80px, 80px 80px, 100% 100%;
+        background-attachment: fixed;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
       }
+
+      a { color: inherit; }
+
       ::selection {
-        background: rgba(225, 29, 46, 0.45);
+        background: var(--accent);
         color: #ffffff;
       }
-      .scanlines {
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 0;
+      }
+
+      .home-grain {
         position: fixed;
         inset: 0;
-        z-index: 9999;
+        z-index: 9998;
         pointer-events: none;
-        opacity: 0.018;
-        background: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-          rgba(0, 0, 0, 0.15) 2px,
-          rgba(0, 0, 0, 0.15) 4px
-        );
-      }
-      .scanlines::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        opacity: 0.9;
+        opacity: 0.035;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         background-size: 180px 180px;
       }
-    </style>
 
-    <style>
-      .cta-stack {
-        position: fixed;
-        left: 50%;
-        bottom: max(1.2rem, env(safe-area-inset-bottom, 0px));
-        z-index: 100;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.35rem;
-        width: max-content;
-        max-width: 96vw;
-        pointer-events: none;
-      }
-      .cta-stack > * { pointer-events: auto; }
-
-      .cta-icon {
-        display: block;
-        line-height: 0;
-        text-decoration: none;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        filter: drop-shadow(0 3px 12px rgba(0,0,0,0.55));
-        transition: transform 0.2s ease, filter 0.3s ease;
-        position: relative;
-      }
-      .cta-icon::after {
-        content: "";
-        position: absolute;
-        inset: -8px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-      }
-      .cta-icon:hover { filter: drop-shadow(0 4px 20px rgba(0,0,0,0.7)) brightness(1.15); transform: scale(1.12); }
-      .cta-icon:hover::after { opacity: 1; }
-      .cta-icon:active { transform: scale(0.94); }
-      .cta-icon__logo { display: block; width: 88px; height: 88px; object-fit: contain; }
-      @media (max-width: 767px) { .cta-icon__logo { width: 76px; height: 76px; } }
-      @media (min-width: 1200px) { .cta-icon__logo { width: 96px; height: 96px; } }
-
-      .cta-label {
-        font-family: "Archivo Black", sans-serif;
-        font-style: italic;
-        text-transform: uppercase;
-        color: #ffffff;
-        text-align: center;
-        line-height: 1.05;
-        letter-spacing: 0.04em;
-        text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 20px rgba(225, 29, 46,0.15);
-        pointer-events: none;
-        user-select: none;
-      }
-      .cta-label--big {
-        font-size: clamp(1.1rem, 3.2vmin, 1.6rem);
-      }
-      .cta-label--small {
-        font-size: clamp(0.78rem, 2.2vmin, 1.05rem);
-        color: #e0e0e0;
-      }
-      .cta-arrows {
-        font-size: clamp(1rem, 2.6vmin, 1.4rem);
-        letter-spacing: -0.1em;
-        line-height: 1;
-        animation: arrow-drift 2s ease-in-out infinite;
-      }
-      @keyframes arrow-drift {
-        0%, 100% { opacity: 0.7; transform: translateX(0); }
-        50% { opacity: 1; transform: translateX(2px); }
-      }
-      .cta-label--outnow {
-        color: var(--accent-bright);
-        animation: outnow-glow 2s ease-in-out infinite;
-      }
-      @keyframes outnow-glow {
-        0%, 100% { text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 10px rgba(225, 29, 46,0.3); }
-        50% { text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 30px rgba(225, 29, 46,0.6); }
-      }
-
-      .cta-ig {
-        position: fixed;
-        right: max(0.6rem, env(safe-area-inset-right, 0px));
-        bottom: max(8.5rem, env(safe-area-inset-bottom, 0px));
-        z-index: 110; display: block;
-        text-decoration: none;
-        color: rgba(240,240,240,0.88); cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        filter: drop-shadow(0 2px 10px rgba(0,0,0,0.55));
-        transition: transform 0.15s ease, filter 0.2s;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.25);
-        border-radius: 8px;
-        padding: 0.35rem 0.5rem;
-        width: 120px !important;
-        min-height: 80px !important;
-      }
-      .cta-ig:hover { filter: drop-shadow(0 3px 14px rgba(0,0,0,0.7)); transform: scale(1.03); background: rgba(255,255,255,0.15); }
-      .cta-ig:active { transform: scale(0.98); }
-      .cta-ig__eyebrow { display: block; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.04em; line-height: 1.1; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.85); }
-      .cta-ig__logo-wrap {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100% !important;
-        height: 48px !important;
-        background: #ffffff !important;
-        border-radius: 4px;
-        overflow: hidden;
-        border: 1px solid rgba(0,0,0,0.1);
-      }
-      .cta-ig__logo {
-        display: block;
-        width: 100% !important;
-        height: 48px !important;
-        object-fit: contain !important;
-        object-position: center !important;
-      }
-      .cta-ig__logo-text {
-        display: none;
-        font-family: "Archivo Black", sans-serif;
-        font-size: 1.05rem;
-        color: #000000;
-        letter-spacing: 0.06em;
-        line-height: 1;
-        text-transform: lowercase;
-      }
-      @media (min-width: 768px) {
-        .cta-ig { bottom: max(6.5rem, env(safe-area-inset-bottom, 0px)); width: 150px !important; padding: 0.4rem 0.6rem; }
-        .cta-ig__logo-wrap { height: 60px !important; }
-        .cta-ig__logo { height: 60px !important; }
-        .cta-ig__logo-text { font-size: 1.3rem; }
-        .cta-ig__eyebrow { font-size: 0.7rem; }
-      }
-
-      .cta-enter {
-        position: relative;
+      .kicker {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 0.8rem;
-        text-decoration: none;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        margin-top: 1.2rem;
-        padding: 1.4rem 4rem;
-        border: 2.5px solid rgba(225, 29, 46, 0.65);
-        border-radius: 999px;
-        background: linear-gradient(135deg, rgba(225, 29, 46, 0.18), rgba(158, 15, 28, 0.3));
-        backdrop-filter: blur(10px);
-        box-shadow: 0 0 28px rgba(225, 29, 46, 0.35), 0 6px 32px rgba(0,0,0,0.45);
-        transition: background 0.3s ease, border-color 0.3s ease, transform 0.15s ease, box-shadow 0.3s ease;
-        overflow: hidden;
-        animation: cta-glow-pulse 3s ease-in-out infinite;
-      }
-      .cta-enter:hover {
-        background: linear-gradient(135deg, rgba(225, 29, 46, 0.35), rgba(158, 15, 28, 0.45));
-        border-color: rgba(255, 90, 90, 0.95);
-        transform: scale(1.08);
-        box-shadow: 0 0 45px rgba(225, 29, 46, 0.6), 0 8px 40px rgba(0,0,0,0.55);
-      }
-      .cta-enter:active { transform: scale(0.95); }
-      .cta-enter__text {
-        position: relative;
-        z-index: 2;
-        font-family: "Archivo Black", sans-serif;
-        font-style: italic;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.22em;
         text-transform: uppercase;
-        font-size: clamp(1.1rem, 3.6vmin, 1.7rem);
-        color: #ffffff;
-        letter-spacing: 0.12em;
-        line-height: 1;
-        white-space: nowrap;
-        user-select: none;
-        text-shadow: 0 2px 16px rgba(0,0,0,0.7), 0 0 14px rgba(225, 29, 46,0.5);
-        animation: text-zoom-pulse 3s ease-in-out infinite;
+        color: var(--accent);
       }
-      .cta-enter__arrow {
-        position: relative;
-        z-index: 2;
-        font-size: clamp(0.9rem, 2.4vmin, 1.3rem);
-        color: rgba(255, 200, 200, 0.9);
-        line-height: 1;
-        animation: enter-bounce 1.4s ease-in-out infinite;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.6);
-      }
-      .cta-enter__glow {
-        position: absolute;
-        inset: 0;
-        border-radius: 999px;
-        background: radial-gradient(circle at 50% 120%, rgba(255,80,80,0.4), transparent 55%);
-        opacity: 0.5;
-        transition: opacity 0.4s ease;
-        pointer-events: none;
-        animation: glow-pulse 3s ease-in-out infinite;
-      }
-      .cta-enter:hover .cta-enter__glow { opacity: 1; }
-      @keyframes enter-bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(5px); }
-      }
-      @keyframes cta-glow-pulse {
-        0%, 100% { box-shadow: 0 0 28px rgba(225, 29, 46, 0.3), 0 6px 32px rgba(0,0,0,0.45); border-color: rgba(225, 29, 46, 0.55); }
-        50% { box-shadow: 0 0 48px rgba(225, 29, 46, 0.55), 0 6px 32px rgba(0,0,0,0.45); border-color: rgba(255, 61, 76, 0.85); }
-      }
-      @keyframes text-zoom-pulse {
-        0%, 100% { transform: scale(1); text-shadow: 0 2px 16px rgba(0,0,0,0.7), 0 0 14px rgba(225, 29, 46,0.5); }
-        50% { transform: scale(1.04); text-shadow: 0 2px 20px rgba(0,0,0,0.8), 0 0 28px rgba(255,60,60,0.75); }
-      }
-      @keyframes glow-pulse {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 0.75; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .cta-enter__arrow { animation: none; }
-        .cta-enter { animation: none; }
-        .cta-enter__text { animation: none; }
-        .cta-enter__glow { animation: none; }
-      }
-      @media (max-width: 767px) {
-        .cta-enter { padding: 1.2rem 2.8rem; margin-top: 1.2rem; }
-        .cta-enter__text { font-size: clamp(0.95rem, 3.2vmin, 1.3rem); letter-spacing: 0.1em; }
-        .cta-enter__arrow { font-size: clamp(0.75rem, 2vmin, 1rem); }
-      }
-
-      .sound-cluster {
-        position: fixed;
-        top: max(0.5rem, env(safe-area-inset-top, 0px));
-        left: max(0.5rem, env(safe-area-inset-left, 0px));
-        z-index: 100; display: flex; align-items: center; gap: 0.1rem;
-      }
-      .sound-toggle {
-        width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 8px; background: rgba(10,10,10,0.85); color: #e0e0e0;
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-        transition: background 0.2s, transform 0.1s;
-      }
-      .sound-toggle:hover { background: rgba(255,255,255,0.08); }
-      .sound-toggle:active { transform: scale(0.95); }
-      .sound-toggle svg { width: 22px; height: 22px; fill: currentColor; }
-
-      .err-msg {
-        position: fixed; bottom: calc(50% - 8rem); left: 50%;
-        transform: translateX(-50%); z-index: 25; max-width: min(32rem, 92vw);
-        text-align: center; font-size: 0.85rem; color: #f09090; pointer-events: none;
-      }
-
-      .sound-hint {
-        position: fixed; inset: 0; z-index: 99;
-        display: block; pointer-events: none;
-      }
-      .sound-hint.is-dismissed { display: none; }
-      @keyframes sound-hint-pulse {
-        0%, 100% { transform: translate(0, 0); }
-        50% { transform: translate(-4px, -3px); }
-      }
-      .sound-hint__inner {
-        width: 100%; height: 100%;
-        color: #f0f0f0;
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
-        animation: sound-hint-pulse 0.9s ease-in-out infinite;
-        will-change: transform;
-        overflow: visible;
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .sound-hint__inner { animation: none; }
+      .kicker::before {
+        content: "";
+        width: 20px;
+        height: 1px;
+        background: currentColor;
       }
     </style>
   </head>
 
   <body>
-    <div class="scanlines" aria-hidden="true"></div>
+    <div class="home-grain" aria-hidden="true"></div>
     <Analytics />
     <RegisterSW />
-    <Hero videoUrl={HERO_VIDEO_URL} title={SITE_TITLE} />
 
-    <p class="err-msg" id="err-msg" role="status"></p>
+    <Header />
+    <MobileDrawer />
 
-    <div class="sound-cluster">
-      <button class="sound-toggle" id="soundToggle" type="button" aria-label="Activar o desactivar sonido">
-        <svg id="soundOnIcon" viewBox="0 0 24 24" style="display:none" aria-hidden="true">
-          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path>
-        </svg>
-        <svg id="soundOffIcon" viewBox="0 0 24 24" style="display:block" aria-hidden="true">
-          <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path>
-        </svg>
-      </button>
-    </div>
+    <main class="home">
+      <Hero videoUrl={HERO_VIDEO_URL}>
+        <div class="poster">
+          <div class="poster__meta">
+            <span class="poster__meta-item">
+              <i class="poster__dot" aria-hidden="true"></i>
+              Sitio oficial / 2026
+            </span>
+            <span class="poster__meta-item">Guadalajara, MX — 20.67° N</span>
+          </div>
 
-    <div class="sound-hint" id="soundHint" aria-hidden="true">
-      <svg class="sound-hint__inner" id="soundHintSvg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
-        <defs>
-          <marker id="soundHintArrowEnd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"></path>
-          </marker>
-        </defs>
-        <line id="soundHintLine" x1="0" y1="0" x2="0" y2="0" fill="none" stroke="currentColor" stroke-width="3.85" stroke-linecap="round" marker-end="url(#soundHintArrowEnd)"></line>
-      </svg>
-    </div>
+          <div class="poster__core">
+            <p class="poster__overline">Música urbana / MX</p>
+            <h1 class="poster__name">GARGUT</h1>
+            <p class="poster__tagline">
+              <span>TIENE UN CHINGO</span>
+              <span class="poster__tagline-outline">DE FERIA</span>
+            </p>
+          </div>
 
-    <div class="cta-stack">
-      <a href={SPOTIFY_URL} target="_blank" rel="noopener" class="cta-icon" aria-label="Escuchar en Spotify">
-        <img class="cta-icon__logo" src="/brand/spotify.svg" width="88" height="88" alt="" decoding="async" />
-      </a>
+          <div class="poster__bottom">
+            <div class="poster__release">
+              <span class="kicker">Out now / 2026</span>
+              <a
+                href={SPOTIFY_URL}
+                target="_blank"
+                rel="noopener"
+                class="poster__track"
+              >
+                Yo te kiero solo <span aria-hidden="true">↗</span>
+              </a>
 
-      <div class="cta-label cta-label--big">
-        <span class="cta-arrows">&#171;&#171;</span> YO TE KIERO SOLO <span class="cta-arrows">&#187;&#187;</span>
-      </div>
-      <div class="cta-label cta-label--big cta-label--outnow">OUT NOW</div>
+              <div class="poster__socials">
+                <a href={SPOTIFY_URL} target="_blank" rel="noopener">Spotify</a>
+                <a href={YOUTUBE_URL} target="_blank" rel="noopener">YouTube</a>
+                <a href={INSTAGRAM_URL} target="_blank" rel="noopener">Instagram</a>
+                <a href={TIKTOK_URL} target="_blank" rel="noopener">TikTok</a>
+                <button
+                  type="button"
+                  class="sound-toggle"
+                  id="soundToggle"
+                  aria-pressed="false"
+                  aria-label="Activar sonido"
+                >
+                  Sonido <span id="soundState">Off</span>
+                </button>
+              </div>
+            </div>
 
-      <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="cta-icon" aria-label="Gargut en YouTube">
-        <img class="cta-icon__logo" src="/brand/youtube.svg" width="88" height="88" alt="" decoding="async" />
-      </a>
+            <div class="poster__actions">
+              <a href="/artista" class="home-cta home-cta--primary">
+                <span class="home-cta__label">Entrar a la experiencia</span>
+                <span class="home-cta__arrow" aria-hidden="true">→</span>
+              </a>
+              <a href="/drop-room" class="home-cta">
+                <span class="home-cta__label">Drop Room</span>
+                <span class="home-cta__arrow" aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
 
-      <div class="cta-label cta-label--small">
-        <span class="cta-arrows">&#8593;&#8593;</span> VER VISUALIZER <span class="cta-arrows">&#8593;&#8593;</span>
-      </div>
+          <span class="poster__side" aria-hidden="true">
+            GGT / 001 — Música urbana — Guadalajara — MX
+          </span>
+        </div>
+      </Hero>
 
-      <a href="/artista" class="cta-enter" aria-label="Entrar a Experiencia Espiritual">
-        <span class="cta-enter__glow" aria-hidden="true"></span>
-        <span class="cta-enter__text">EXPERIENCIA ESPIRITUAL</span>
-        <span class="cta-enter__arrow" aria-hidden="true">&#9660;</span>
-      </a>
-    </div>
+      <section class="home-index" aria-labelledby="index-title">
+        <header class="home-index__head">
+          <div>
+            <span class="kicker">Índice / 2026</span>
+            <h2 id="index-title">El chingo<br />de feria</h2>
+          </div>
+          <p>
+            Todo lo que está pasando alrededor de Gargut. Elige por dónde entrar.
+          </p>
+        </header>
 
-    <a href={KAZTA_INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Hecho por: young_kazta, abrir Instagram">
-      <span class="cta-ig__eyebrow">Hecho por:</span>
-      <div class="cta-ig__logo-wrap">
-        <img class="cta-ig__logo" src={KAZTA_IG_LOGO} alt="young_kazta logo" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <span class="cta-ig__logo-text" style="display:none;">young_kazta</span>
-      </div>
-    </a>
+        <div class="index-grid">
+          {indexLinks.map((item) => (
+            <a class="index-card" href={item.href}>
+              <span class="index-card__num" aria-hidden="true">{item.num}</span>
+              <div class="index-card__body">
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </div>
+              <span class="index-card__arrow" aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </div>
+
+        <div class="home-meta">
+          <div class="home-meta__links">
+            <a href={KAZTA_INSTAGRAM_URL} target="_blank" rel="noopener">
+              Sitio por young_kazta ↗
+            </a>
+            <a href="/privacidad">Aviso de privacidad</a>
+          </div>
+          <div class="home-meta__stamp">
+            <span>GGT</span>
+            <span>GDL / MX</span>
+          </div>
+        </div>
+      </section>
+    </main>
 
     <audio id="track" preload="none" loop playsinline muted data-src={TRACK_SRC}></audio>
 
     <script>
-      (function() {
+      (function () {
         const audio = document.getElementById("track") as HTMLAudioElement | null;
         const btn = document.getElementById("soundToggle");
-        const onIcon = document.getElementById("soundOnIcon") as HTMLElement | null;
-        const offIcon = document.getElementById("soundOffIcon") as HTMLElement | null;
-        if (!audio || !btn || !onIcon || !offIcon) return;
+        const state = document.getElementById("soundState");
+        if (!audio || !btn || !state) return;
 
         let soundEnabled = false;
+
         function update() {
-          onIcon.style.display = soundEnabled ? "block" : "none";
-          offIcon.style.display = soundEnabled ? "none" : "block";
+          state.textContent = soundEnabled ? "On" : "Off";
+          btn.setAttribute("aria-pressed", soundEnabled ? "true" : "false");
+          btn.setAttribute(
+            "aria-label",
+            soundEnabled ? "Desactivar sonido" : "Activar sonido"
+          );
+          btn.classList.toggle("is-on", soundEnabled);
         }
 
         btn.addEventListener("click", () => {
           if (!soundEnabled) {
             if (!audio.src) {
-              audio.src = (audio.dataset.src as string) || "";
+              audio.src = audio.dataset.src || "";
               audio.load();
             }
             soundEnabled = true;
@@ -498,62 +363,455 @@ import {
             update();
           }
         });
-
-        // Sound hint arrow geometry
-        const soundHint = document.getElementById("soundHint");
-        const soundHintSvg = document.getElementById("soundHintSvg");
-        const soundHintLine = document.getElementById("soundHintLine");
-        if (soundHint && soundHintSvg && soundHintLine && btn) {
-          function dismissSoundHint() {
-            soundHint.classList.add("is-dismissed");
-          }
-          function updateSoundHintGeometry() {
-            if (soundHint.classList.contains("is-dismissed")) return;
-            const hR = soundHint.getBoundingClientRect();
-            const w = hR.width;
-            const h = hR.height;
-            if (w < 2 || h < 2) return;
-            const bR = btn.getBoundingClientRect();
-            const cx = bR.left - hR.left + bR.width * 0.5;
-            const cy = bR.top - hR.top + bR.height * 0.5;
-            let kx = w * 0.76;
-            let ky = h * 0.66;
-            let dxk = cx - kx;
-            let dyk = cy - ky;
-            let L = Math.hypot(dxk, dyk);
-            if (L < 20) { kx = w * 0.72; ky = h * 0.7; dxk = cx - kx; dyk = cy - ky; L = Math.hypot(dxk, dyk); }
-            if (L < 12) return;
-            const ux = dxk / L;
-            const uy = dyk / L;
-            const gap = 44;
-            const tail = 58;
-            const bx = cx - ux * gap;
-            const by = cy - uy * gap;
-            const ax = bx - ux * tail;
-            const ay = by - uy * tail;
-            soundHintSvg.setAttribute("viewBox", `0 0 ${w} ${h}`);
-            soundHintLine.setAttribute("x1", String(ax));
-            soundHintLine.setAttribute("y1", String(ay));
-            soundHintLine.setAttribute("x2", String(bx));
-            soundHintLine.setAttribute("y2", String(by));
-            soundHintLine.setAttribute("stroke-width", String(3.85));
-          }
-          function scheduleUpdate() {
-            requestAnimationFrame(() => updateSoundHintGeometry());
-          }
-          scheduleUpdate();
-          window.addEventListener("resize", scheduleUpdate, { passive: true });
-          if (typeof ResizeObserver !== "undefined") {
-            new ResizeObserver(() => scheduleUpdate()).observe(soundHint);
-          }
-          window.addEventListener("orientationchange", scheduleUpdate, { passive: true });
-          if (window.visualViewport) {
-            window.visualViewport.addEventListener("resize", scheduleUpdate, { passive: true });
-          }
-          document.addEventListener("click", dismissSoundHint, { once: true });
-          btn.addEventListener("click", dismissSoundHint, { once: true });
-        }
       })();
     </script>
   </body>
 </html>
+
+<style>
+  .home {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ---------- PÓSTER PRINCIPAL ---------- */
+  .poster {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.75rem;
+    min-height: 100dvh;
+    padding: calc(var(--header-h) + 1.1rem) 1rem 1.5rem;
+  }
+
+  .poster__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .poster__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.48rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .poster__meta-item:last-child { color: var(--text-dim); }
+  .poster__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    animation: poster-blink 1.8s steps(2, end) infinite;
+  }
+  @keyframes poster-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .poster__core {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: auto 0;
+  }
+  .poster__overline {
+    margin-bottom: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .poster__name {
+    margin-top: 0.04em;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(5rem, 27vw, 20rem);
+    line-height: 0.8;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    color: var(--ink);
+    animation: poster-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .poster__tagline {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.35rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 9vw, 7rem);
+    line-height: 0.88;
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
+    animation: poster-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+  .poster__tagline span:first-child { color: var(--ink); }
+  .poster__tagline-outline {
+    margin-left: 0.14em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--accent);
+    text-stroke: 1.5px var(--accent);
+  }
+
+  .poster__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .poster__release {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .poster__track {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 5.5vw, 2rem);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.18s ease;
+  }
+  .poster__track span {
+    font-size: 0.6em;
+    color: var(--accent);
+    transition: transform 0.18s ease;
+  }
+  .poster__track:hover { color: var(--accent-bright); }
+  .poster__track:hover span { transform: translate(2px, -2px); }
+
+  .poster__socials {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.7rem;
+    margin-top: 0.35rem;
+  }
+  .poster__socials a,
+  .sound-toggle {
+    position: relative;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.18s ease;
+  }
+  .poster__socials a:hover,
+  .sound-toggle:hover { color: var(--ink); }
+  .poster__socials a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: var(--line-strong);
+    transition: background 0.18s ease;
+  }
+  .poster__socials a:hover::after { background: var(--accent); }
+
+  .sound-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.1rem;
+    padding: 0.18rem 0.4rem;
+    border: 1px solid var(--line-strong);
+  }
+  .sound-toggle span { color: var(--accent); }
+  .sound-toggle.is-on { border-color: var(--accent); color: var(--ink); }
+  .sound-toggle.is-on span { color: #3ddc73; }
+
+  .poster__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .home-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1rem 0.9rem;
+    border: 1px solid var(--line-strong);
+    background: rgba(7, 7, 8, 0.55);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.18s ease,
+      color 0.18s ease, border-color 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .home-cta__arrow { font-size: 0.9rem; line-height: 1; }
+  .home-cta:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--accent);
+  }
+  .home-cta--primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .home-cta--primary:hover {
+    background: var(--accent-bright);
+    border-color: var(--accent-bright);
+    color: #ffffff;
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+
+  .poster__side {
+    display: none;
+  }
+
+  /* ---------- ÍNDICE ---------- */
+  .home-index {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 1rem 2rem;
+    border-top: 1px solid var(--line);
+  }
+  .home-index__head {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin-bottom: 1.75rem;
+  }
+  .home-index__head h2 {
+    margin-top: 0.8rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 10vw, 5rem);
+    font-weight: 400;
+    line-height: 0.82;
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .home-index__head p {
+    max-width: 340px;
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--accent);
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .index-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+  .index-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    min-height: 168px;
+    padding: 1rem 1rem 1.1rem;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    text-decoration: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.18s ease,
+      border-color 0.18s ease, color 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .index-card__num {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .index-card__body h3 {
+    margin-bottom: 0.3rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 7vw, 2.4rem);
+    font-weight: 400;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .index-card__body p {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+    color: var(--text-dim);
+  }
+  .index-card__arrow {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    transition: transform 0.18s ease, color 0.18s ease;
+  }
+  .index-card:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+  .index-card:hover .index-card__num,
+  .index-card:hover .index-card__body h3,
+  .index-card:hover .index-card__body p,
+  .index-card:hover .index-card__arrow {
+    color: #ffffff;
+  }
+  .index-card:hover .index-card__arrow { transform: translate(2px, -2px); }
+
+  .home-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line-strong);
+  }
+  .home-meta__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+  .home-meta__links a {
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.18s ease;
+  }
+  .home-meta__links a:hover { color: var(--accent); }
+  .home-meta__stamp {
+    display: flex;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  @keyframes poster-rise {
+    from { opacity: 0; transform: translateY(34px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- DESKTOP ---------- */
+  @media (min-width: 768px) {
+    .poster {
+      padding: calc(var(--header-h) + 1.5rem) 2.25rem 2rem;
+      gap: 2.25rem;
+    }
+    .poster__meta-item { font-size: 0.55rem; letter-spacing: 0.2em; }
+
+    .poster__core { padding-left: 0.2rem; }
+    .poster__name { font-size: clamp(9rem, 22vw, 21rem); }
+    .poster__tagline {
+      flex-direction: row;
+      gap: 0.28em;
+      align-items: baseline;
+      margin-top: 0.5rem;
+      font-size: clamp(3rem, 8.6vw, 8rem);
+    }
+    .poster__tagline-outline { margin-left: 0; }
+
+    .poster__bottom {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2.5rem;
+      padding-top: 1.25rem;
+    }
+    .poster__actions {
+      width: 320px;
+      flex-shrink: 0;
+    }
+
+    .poster__side {
+      position: absolute;
+      top: 50%;
+      right: -0.35rem;
+      display: block;
+      transform: translateY(-50%) rotate(90deg);
+      transform-origin: center;
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .home-index { padding: 4.5rem 2.25rem 2.5rem; }
+    .home-index__head {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 3rem;
+      margin-bottom: 2.25rem;
+    }
+    .index-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+    .index-card { min-height: 210px; padding: 1.15rem 1.15rem 1.25rem; }
+  }
+
+  @media (min-width: 1100px) {
+    .index-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+    .poster { padding-left: 2.75rem; padding-right: 2.75rem; }
+    .home-index { padding-left: 2.75rem; padding-right: 2.75rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .poster__name,
+    .poster__tagline { animation: none; }
+    .poster__dot { animation: none; }
+    .home-cta,
+    .index-card { transition: none; }
+    .home-cta:hover,
+    .index-card:hover { transform: none; }
+  }
+</style>

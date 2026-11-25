@@ -3,92 +3,136 @@ import { SPOTIFY_ARTIST_URL, YOUTUBE_URL } from "../data/siteConfig";
 ---
 
 <footer class="page-footer">
-  <div class="page-footer__divider" aria-hidden="true"></div>
-  <div class="page-footer__links">
-    <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="footer-link footer-link--spotify">
-      <span class="footer-link__icon" aria-hidden="true">&#9836;</span>
-      <span class="footer-link__text">Spotify</span>
-    </a>
-    <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="footer-link footer-link--youtube">
-      <span class="footer-link__icon" aria-hidden="true">&#9654;</span>
-      <span class="footer-link__text">YouTube</span>
-    </a>
+  <div class="page-footer__top">
+    <div class="page-footer__brand" aria-hidden="true">GARGUT<span>®</span></div>
+
+    <nav class="page-footer__links" aria-label="Enlaces de Gargut">
+      <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="footer-link">
+        <span class="footer-link__index">01</span>
+        <span class="footer-link__text">Spotify</span>
+        <span class="footer-link__arrow" aria-hidden="true">↗</span>
+      </a>
+      <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="footer-link">
+        <span class="footer-link__index">02</span>
+        <span class="footer-link__text">YouTube</span>
+        <span class="footer-link__arrow" aria-hidden="true">↗</span>
+      </a>
+      <a href="/drop-room" class="footer-link">
+        <span class="footer-link__index">03</span>
+        <span class="footer-link__text">Drop Room</span>
+        <span class="footer-link__arrow" aria-hidden="true">→</span>
+      </a>
+    </nav>
   </div>
-  <p class="page-footer__copy">Gargut &mdash; Guadalajara, México</p>
+
+  <div class="page-footer__bottom">
+    <span>Gargut — Guadalajara, México</span>
+    <span>Música urbana / MX</span>
+  </div>
 </footer>
 
 <style>
   .page-footer {
-    padding: 2.75rem 1.25rem 2rem;
-    text-align: center;
+    margin-top: 4rem;
+    border-top: 1px solid var(--line-strong);
+    background: var(--bg);
   }
 
-  .page-footer__divider {
-    width: 72px;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      var(--accent-line) 50%,
-      transparent 100%
-    );
-    box-shadow: 0 0 14px -2px var(--accent-glow);
-    margin: 0 auto 1.75rem;
+  .page-footer__top {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2.5rem 1.25rem 2rem;
+  }
+
+  .page-footer__brand {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 18vw, 9rem);
+    line-height: 0.78;
+    letter-spacing: -0.02em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--line-strong);
+    user-select: none;
+  }
+  .page-footer__brand span {
+    -webkit-text-stroke: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    vertical-align: super;
   }
 
   .page-footer__links {
     display: flex;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    border-top: 1px solid var(--line);
   }
 
   .footer-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.6rem 1.15rem;
-    border-radius: 999px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.8rem 0.1rem;
+    border-bottom: 1px solid var(--line);
     text-decoration: none;
-    font-family: var(--font-display);
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    transition: background 0.2s, padding 0.2s;
     -webkit-tap-highlight-color: transparent;
-    border: 1px solid var(--border);
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: var(--text-soft);
   }
   .footer-link:hover {
-    transform: translateY(-1px);
-    border-color: var(--accent-line);
-    color: var(--text);
-    box-shadow: 0 0 28px -8px var(--accent-glow);
+    background: var(--surface);
+    padding-left: 0.5rem;
   }
-  .footer-link:active { transform: scale(0.98); }
 
-  .footer-link--spotify .footer-link__icon { color: #1db954; }
-  .footer-link--youtube .footer-link__icon { color: var(--accent-bright); }
-
-  .footer-link__icon {
-    font-size: 0.8rem;
+  .footer-link__index {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+  .footer-link__text {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
     line-height: 1;
-    filter: drop-shadow(0 0 8px currentColor);
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .footer-link__arrow {
+    font-family: var(--font-mono);
+    color: var(--text-dim);
+    transition: transform 0.2s, color 0.2s;
+  }
+  .footer-link:hover .footer-link__arrow {
+    color: var(--accent);
+    transform: translate(2px, -2px);
   }
 
-  .page-footer__copy {
-    font-family: var(--font-body);
-    font-size: 0.68rem;
-    color: var(--text-dim);
-    letter-spacing: 0.1em;
+  .page-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.9rem 1.25rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
+    color: var(--text-dim);
   }
 
   @media (min-width: 768px) {
-    .page-footer { padding: 3.25rem 2.5rem 2rem; }
-    .footer-link { font-size: 0.95rem; padding: 0.65rem 1.35rem; }
+    .page-footer { margin-top: 6rem; }
+    .page-footer__top {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      align-items: end;
+      gap: 3rem;
+      padding: 3rem 2.25rem 2.25rem;
+    }
+    .page-footer__bottom { padding: 0.9rem 2.25rem; }
+    .footer-link__text { font-size: 2rem; }
   }
 </style>

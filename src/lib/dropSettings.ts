@@ -72,7 +72,10 @@ export async function loadDropSettings(): Promise<DropSettingsResult> {
       settings: FALLBACK_DROP_SETTINGS,
       configured: true,
       source: "fallback",
-      error: "No se pudieron leer los ajustes; se muestran los valores por defecto.",
+      error:
+        error.code === "42P01"
+          ? "Falta la tabla drop_settings. Ejecuta supabase/drop_settings.sql en Supabase."
+          : "No se pudieron leer los ajustes. Revisa la service role key y que la tabla drop_settings exista.",
     };
   }
 
