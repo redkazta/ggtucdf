@@ -24,6 +24,9 @@ interface TokenCache {
 
 let tokenCache: TokenCache | undefined;
 
+/** Raised when the server credentials are missing or rejected by Spotify. */
+class SpotifyCredentialsError extends Error {}
+
 function releaseDateScore(date: string | undefined): number {
   if (!date) return 0;
 
@@ -55,7 +58,9 @@ async function getAccessToken(): Promise<string | null> {
   });
 
   if (!response.ok) {
-    throw new Error(`Spotify token request failed with ${response.status}`);
+    throw new SpotifyCredentialsError(
+      `Spotify token request failed with ${response.status}`
+    );
   }
 
   const data = (await response.json()) as {
@@ -87,7 +92,10 @@ export const GET: APIRoute = async () => {
     const accessToken = await getAccessToken();
     if (!accessToken) {
       return jsonResponse(
-        { error: "Spotify no está configurado en el servidor." },
+        {
+          error: "Spotify no está configurado en el servidor.",
+          code: "SPOTIFY_NOT_CONFIGURED",
+        },
         503,
         { "Cache-Control": "no-store" }
       );
@@ -150,8 +158,24 @@ export const GET: APIRoute = async () => {
     throw new Error("No playable Spotify track found");
   } catch (error) {
     console.error("[api/latest-spotify]", error);
+
+    if (error instanceof SpotifyCredentialsError) {
+      return jsonResponse(
+        {
+          error:
+            "Spotify rechazó las credenciales. Revisa SPOTIFY_CLIENT_ID y SPOTIFY_CLIENT_SECRET en Vercel.",
+          code: "SPOTIFY_AUTH_FAILED",
+        },
+        503,
+        { "Cache-Control": "no-store" }
+      );
+    }
+
     return jsonResponse(
-      { error: "No se pudo consultar el último lanzamiento." },
+      {
+        error: "No se pudo consultar el último lanzamiento.",
+        code: "SPOTIFY_UPSTREAM_ERROR",
+      },
       502,
       { "Cache-Control": "no-store" }
     );
