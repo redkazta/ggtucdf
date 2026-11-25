@@ -425,4 +425,23 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
     .video-card:hover,
     .reel-card:hover { transform: none; }
   }
+  /* REDISEÑO / VIDEOS */
+  .videos-page { padding-top: 1rem; }
+  .featured-grid, .video-grid, .reel-grid { gap: 1.1rem; }
+  .featured-card__title, .video-card__title, .reel-card__title {
+    padding: 1rem 1.1rem 0.9rem;
+    font-size: clamp(1rem, 2.6vw, 1.4rem);
+  }
+  .ig-feature { border-radius: 14px; padding: 1.5rem; }
+  .ig-feature:hover { background: #ffffff; border-color: #ffffff; color: #000000; }
+  .ig-feature:hover :is(.ig-feature__eyebrow, .ig-feature__word, .ig-feature__cta) { color: #000000; }
+  .featured-card__tag, .featured-card__index, .video-card__index, .reel-card__index {
+    border-radius: 8px;
+    margin: 0.5rem;
+  }
+  .section-bar { padding-top: 0.75rem; padding-bottom: 0.9rem; }
+
+  @media (min-width: 900px) {
+    .featured-card__title, .video-card__title { font-size: 1.25rem; }
+  }
 </style>

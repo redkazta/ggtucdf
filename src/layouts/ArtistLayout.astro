@@ -291,7 +291,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         width: 100%;
       }
 
-      /* Sistema de botones: rectos, mono, sombra dura */
+      /* Sistema de botones moderno: redondeado, limpio y de alto contraste */
       .btn {
         position: relative;
         display: inline-flex;
@@ -302,7 +302,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         border-radius: 12px;
         border: 1px solid var(--line-strong);
         font-family: var(--font-mono);
-        font-size: 0.68rem;
+        font-size: 0.72rem;
         font-weight: 700;
         line-height: 1;
         letter-spacing: 0.16em;
@@ -318,19 +318,19 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
           color 0.2s ease,
           border-color 0.2s ease;
       }
-      .btn:active { transform: translate(1px, 1px); box-shadow: none; }
+      .btn:active { transform: translateY(1px); box-shadow: none; }
 
       .btn--primary {
         background: var(--accent);
         border-color: var(--accent);
         color: #ffffff;
-        box-shadow: 5px 5px 0 var(--ink);
+        box-shadow: 0 12px 34px rgba(255, 35, 56, 0.28);
       }
       .btn--primary:hover {
         background: var(--accent-bright);
         border-color: var(--accent-bright);
-        transform: translate(-2px, -2px);
-        box-shadow: 8px 8px 0 var(--ink);
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(255, 35, 56, 0.36);
       }
 
       .btn--outline {
@@ -339,19 +339,63 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         color: var(--ink);
       }
       .btn--outline:hover {
-        background: var(--ink);
-        border-color: var(--ink);
-        color: var(--bg);
-        transform: translate(-2px, -2px);
-        box-shadow: 5px 5px 0 var(--accent);
+        background: #ffffff;
+        border-color: #ffffff;
+        color: #000000;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(255, 255, 255, 0.16);
       }
 
       .btn--ghost {
-        background: transparent;
-        border-color: transparent;
-        color: var(--text-muted);
+        background: var(--surface);
+        border-color: var(--line);
+        color: #ffffff;
       }
-      .btn--ghost:hover { color: var(--ink); background: var(--surface-2); }
+      .btn--ghost:hover { color: #ffffff; background: var(--surface-2); border-color: var(--line-strong); }
+
+      /* Rediseño compartido de páginas internas: tarjetas limpias y redondeadas. */
+      .artist-main .page-head {
+        padding: clamp(1.5rem, 4vw, 3rem);
+        border: 1px solid var(--line-strong);
+        border-radius: 24px;
+        background:
+          radial-gradient(120% 140% at 100% 0%, rgba(255, 35, 56, 0.18), transparent 62%),
+          linear-gradient(180deg, var(--bg-elevated), var(--bg-soft));
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+      }
+
+      .artist-main :is(
+        .track-card,
+        .featured-card,
+        .video-card,
+        .reel-card,
+        .featured-embed,
+        .droproom-cta,
+        .drop-countdown,
+        .drop-room-form,
+        .auth-panel,
+        .table-shell,
+        .legal-item,
+        .metric,
+        .signal__embed,
+        .connect__link,
+        .portrait__frame
+      ) {
+        border-radius: 16px;
+        overflow: hidden;
+      }
+
+      .artist-main :is(.track-card, .featured-card, .video-card, .reel-card):hover {
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--accent);
+      }
+
+      .artist-main :is(.section-bar, .sec-head) {
+        margin-bottom: 1.5rem;
+      }
+
+      .artist-main .section-bar h2 {
+        color: #ffffff;
+      }
 
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }

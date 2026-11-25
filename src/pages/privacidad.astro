@@ -225,4 +225,28 @@ const sections = [
     .legal-item { padding: 1.5rem 0.1rem 1.6rem; }
     .legal-item__body { padding-top: 0.15rem; }
   }
+  /* REDISEÑO / LEGAL */
+  .privacy-aside {
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line-strong);
+    border-radius: 24px;
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(255, 35, 56, 0.18), transparent 62%),
+      var(--bg-elevated);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  }
+  .legal-item {
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    margin-bottom: 1rem;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  }
+  .legal-item + .legal-item { margin-top: 1rem; }
+  .privacy-end {
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+  }
 </style>
