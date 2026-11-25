@@ -19,6 +19,7 @@ export const GET: APIRoute = async () => {
         monthlyListeners: overview.monthlyListeners,
         followers: overview.followers,
         topTrack: overview.topTrack,
+        topCities: overview.topCities,
         latestRelease: overview.latestRelease,
         source: "spotify",
         fetchedAt: overview.fetchedAt,
@@ -35,6 +36,7 @@ export const GET: APIRoute = async () => {
       monthlyListeners: null,
       followers: null,
       topTrack: null,
+      topCities: null,
       latestRelease: LATEST_RELEASE,
       source: "config",
       fallback: {

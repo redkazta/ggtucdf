@@ -1,918 +1,1277 @@
 ---
 import ArtistLayout from "../layouts/ArtistLayout.astro";
-import PageFooter from "../components/PageFooter.astro";
-import Skeleton from "../components/Skeleton.astro";
 import {
-  SITE_TITLE,
-  ARTIST_MONTHLY_LISTENERS,
-  ARTIST_FOLLOWERS,
-  ARTIST_TOP_TRACK,
   DISCOGRAPHY,
   SPOTIFY_ARTIST_URL,
   SPOTIFY_EMBED_ARTIST,
   INSTAGRAM_URL,
+  YOUTUBE_URL,
+  TIKTOK_URL,
+  ARTIST_MONTHLY_LISTENERS,
+  ARTIST_FOLLOWERS,
+  ARTIST_TOP_TRACK,
 } from "../data/siteConfig";
 
-const featuredCover =
-  DISCOGRAPHY.find((t) => t.title === "Yo te kiero solo")?.coverUrl || "";
-const topTracks = [...DISCOGRAPHY]
-  .sort((a, b) => (b.streams || 0) - (a.streams || 0))
-  .slice(0, 6);
+const ARTIST_PORTRAIT =
+  "https://image-cdn-ak.spotifycdn.com/image/ab676161000051746acea7d61302e68f4f1320f8";
 
-const sections = [
-  { id: "perfil", label: "Perfil" },
-  { id: "musica", label: "Música" },
-  { id: "escena", label: "Escena" },
-  { id: "conecta", label: "Conecta" },
+const releases = [...DISCOGRAPHY].sort((a, b) => {
+  if (b.year !== a.year) return b.year - a.year;
+  const streamsA = a.streams ?? -1;
+  const streamsB = b.streams ?? -1;
+  if (streamsA !== streamsB) return streamsB - streamsA;
+  return a.title.localeCompare(b.title);
+});
+
+const firstYear = Math.min(...DISCOGRAPHY.map((track) => track.year));
+
+const formatPlays = (value?: number) =>
+  typeof value === "number" && value > 0 ? value.toLocaleString("es-MX") : "—";
+
+const cityFallback = [
+  { city: "Ciudad de México", country: "MX", listeners: 614 },
+  { city: "Guadalajara", country: "MX", listeners: 465 },
+  { city: "Zapopan", country: "MX", listeners: 216 },
+  { city: "Bogotá", country: "CO", listeners: 204 },
+  { city: "Lima", country: "PE", listeners: 202 },
 ];
+
+const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
 ---
 
 <ArtistLayout
   title="Artista"
-  description={`${SITE_TITLE} — Artista independiente de Guadalajara, México.`}
+  description="Gargut — expediente del artista: oyentes, catálogo y señal desde Guadalajara, México."
 >
-  <div class="section-scroller" id="sectionScroller">
-    <!-- SECCIÓN 1: PERFIL -->
-    <section class="artist-section" id="sec-perfil" data-index="0" aria-label="Perfil">
-      <div class="section-inner">
-        <div class="perfil-visual">
-          {featuredCover ? (
-            <div class="cover-wrap">
+  <div class="dossier">
+    <div class="progress" aria-hidden="true"><span data-progress></span></div>
+    <div class="rail" aria-hidden="true">EXPEDIENTE 003 — GARGUT — GUADALAJARA, MX</div>
+
+    <!-- HERO -->
+    <header class="hero" id="perfil">
+      <div class="wrap">
+        <div class="hero__top">
+          <span class="hero__tag">EXP. 003 / ARTISTA</span>
+          <span class="hero__tag">GDL · MX</span>
+          <span class="hero__tag hero__tag--live"><i aria-hidden="true"></i> Spotify en vivo</span>
+        </div>
+
+        <div class="hero__main">
+          <div class="hero__copy">
+            <p class="hero__eyebrow">Rap / Trap / Ruido propio</p>
+            <h1 class="hero__title" aria-label="Gargut">
+              <span aria-hidden="true">GAR</span>
+              <span class="hero__title-outline" aria-hidden="true">GUT</span>
+            </h1>
+            <p class="hero__lead">
+              Singles, colaboraciones y frecuencias bajas desde Guadalajara.
+              Sin disquera grande, sin fórmula y sin pedir permiso.
+            </p>
+            <div class="hero__actions">
+              <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="btn btn--primary">
+                Escuchar en Spotify <span aria-hidden="true">↗</span>
+              </a>
+              <a href="#catalogo" class="btn btn--outline">
+                Ver catálogo <span aria-hidden="true">↓</span>
+              </a>
+            </div>
+          </div>
+
+          <figure class="portrait">
+            <div class="portrait__frame">
               <img
-                src={featuredCover}
-                alt=""
-                class="perfil-cover"
-                width="300"
-                height="300"
+                src={ARTIST_PORTRAIT}
+                alt="Gargut — retrato oficial de Spotify"
+                width="640"
+                height="640"
+                loading="eager"
                 decoding="async"
-                onload="this.classList.add('is-loaded'); this.nextElementSibling?.classList.add('is-hidden');"
               />
-              <div class="cover-skeleton" aria-hidden="true">
-                <Skeleton width="100%" height="100%" borderRadius="0" />
-              </div>
+              <span class="portrait__tape" aria-hidden="true"></span>
+              <span class="portrait__tag">FIG. 01</span>
             </div>
-          ) : (
-            <div class="perfil-cover-placeholder" aria-hidden="true" />
-          )}
+            <figcaption class="portrait__cap">Retrato oficial · Spotify for Artists</figcaption>
+          </figure>
         </div>
 
-        <div class="perfil-content">
-          <h1 class="perfil-name">{SITE_TITLE}</h1>
-
-          <div class="perfil-stats">
-            <div class="stat">
-              <span class="stat__value" data-stat="listeners"
-                >{ARTIST_MONTHLY_LISTENERS.toLocaleString("es-MX")}</span
-              >
-              <span class="stat__label">oyentes mensuales</span>
-            </div>
-            <div class="stat">
-              <span class="stat__value" data-stat="followers"
-                >{ARTIST_FOLLOWERS.toLocaleString("es-MX")}</span
-              >
-              <span class="stat__label">seguidores</span>
-            </div>
-            <div class="stat">
-              <span class="stat__value">{DISCOGRAPHY.length}</span>
-              <span class="stat__label">lanzamientos</span>
-            </div>
-            <div class="stat">
-              <span class="stat__value stat__value--text" data-stat="top"
-                >{ARTIST_TOP_TRACK}</span
-              >
-              <span class="stat__label">top track</span>
-            </div>
+        <dl class="ficha">
+          <div class="ficha__item">
+            <dt>Origen</dt>
+            <dd>Guadalajara, MX</dd>
           </div>
-          <p class="stats-note" data-stats-note>Datos de Spotify</p>
+          <div class="ficha__item">
+            <dt>Activo desde</dt>
+            <dd>{firstYear}</dd>
+          </div>
+          <div class="ficha__item">
+            <dt>Sello</dt>
+            <dd>dxf prod</dd>
+          </div>
+          <div class="ficha__item">
+            <dt>Top track</dt>
+            <dd data-stat="top">{ARTIST_TOP_TRACK}</dd>
+          </div>
+          <div class="ficha__item">
+            <dt>Género</dt>
+            <dd>Rap / Trap</dd>
+          </div>
+        </dl>
+      </div>
+    </header>
 
-          <a
-            href={SPOTIFY_ARTIST_URL}
-            target="_blank"
-            rel="noopener"
-            class="btn btn--primary"
-          >
-            Escuchar en Spotify
-          </a>
+    <!-- MARQUEE -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        {[0, 1].map(() => (
+          <div class="marquee__group">
+            <span class="marquee__label">Oyentes mensuales</span>
+            <span class="marquee__num" data-stat="listeners">{ARTIST_MONTHLY_LISTENERS.toLocaleString("es-MX")}</span>
+            <span class="marquee__star">✳</span>
+            <span class="marquee__label">Seguidores</span>
+            <span class="marquee__num" data-stat="followers">{ARTIST_FOLLOWERS.toLocaleString("es-MX")}</span>
+            <span class="marquee__star">✳</span>
+            <span class="marquee__label">Top track</span>
+            <span class="marquee__num" data-stat="top">{ARTIST_TOP_TRACK}</span>
+            <span class="marquee__star">✳</span>
+            <span class="marquee__label">Guadalajara · MX</span>
+            <span class="marquee__star">✳</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- 01 NÚMEROS -->
+    <section class="section numbers" id="numeros" aria-labelledby="numeros-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <span class="sec-head__num">01</span>
+          <h2 class="sec-head__title" id="numeros-title">En números</h2>
+          <span class="sec-head__meta">Spotify / cada 30 min</span>
         </div>
-      </div>
 
-      <div class="scroll-hint" aria-hidden="true">
-        <span class="scroll-hint__line" />
-        <span class="scroll-hint__text">Scroll</span>
-      </div>
-    </section>
-
-    <!-- SECCIÓN 2: MÚSICA -->
-    <section class="artist-section" id="sec-musica" data-index="1" aria-label="Música">
-      <div class="section-inner section-inner--wide">
-        <span class="section-eyebrow">Música</span>
-        <h2 class="section-headline">Discografia</h2>
-        <div class="music-grid">
-          {topTracks.map((track) => (
-            <a
-              href={track.spotifyUrl}
-              target="_blank"
-              rel="noopener"
-              class="music-card"
-              aria-label={`Escuchar ${track.title}`}
+        <div class="numbers__grid" data-reveal>
+          <article class="metric metric--xl">
+            <span class="metric__value" data-stat="listeners"
+              >{ARTIST_MONTHLY_LISTENERS.toLocaleString("es-MX")}</span
             >
-              <div class="music-card__cover-wrap">
-                {track.coverUrl ? (
-                  <>
-                    <img
-                      src={track.coverUrl}
-                      alt=""
-                      class="music-card__cover"
-                      width="300"
-                      height="300"
-                      loading="lazy"
-                      decoding="async"
-                      onload="this.classList.add('is-loaded'); this.nextElementSibling?.classList.add('is-hidden');"
-                    />
-                    <div class="music-card__skeleton" aria-hidden="true">
-                      <Skeleton width="100%" height="100%" borderRadius="0" />
-                    </div>
-                  </>
-                ) : (
-                  <div class="music-card__fallback">
-                    <span>{track.title.charAt(0)}</span>
-                  </div>
-                )}
-                <div class="music-card__overlay">
-                  <span class="music-card__play">&#9654;</span>
-                </div>
-              </div>
-              <div class="music-card__info">
-                <h3 class="music-card__title">{track.title}</h3>
-                <div class="music-card__meta">
-                  <span>{track.year}</span>
-                  <span class="badge" data-type={track.type}>
-                    {track.type === "solo" ? "Solo" : "Colab"}
-                  </span>
-                </div>
-              </div>
-            </a>
+            <span class="metric__label">oyentes<br />mensuales</span>
+          </article>
+          <article class="metric">
+            <span class="metric__value" data-stat="followers"
+              >{ARTIST_FOLLOWERS.toLocaleString("es-MX")}</span
+            >
+            <span class="metric__label">seguidores</span>
+          </article>
+          <article class="metric">
+            <span class="metric__value">{DISCOGRAPHY.length}</span>
+            <span class="metric__label">lanzamientos</span>
+          </article>
+          <article class="metric metric--text">
+            <span class="metric__value" data-stat="top">{ARTIST_TOP_TRACK}</span>
+            <span class="metric__label">track más escuchado</span>
+          </article>
+        </div>
+
+        <p class="numbers__note" data-stats-note>Datos públicos de Spotify · respaldo local si la API no responde</p>
+      </div>
+    </section>
+
+    <!-- 02 MANIFIESTO -->
+    <section class="manifesto" aria-label="Bio del artista">
+      <div class="manifesto__inner" data-reveal>
+        <span class="manifesto__label">BIO / SPOTIFY</span>
+        <blockquote class="manifesto__quote">“me sobra el Mojo y soy el Matusalén”</blockquote>
+        <p class="manifesto__text">
+          Gargut construye su catálogo a golpe de singles: colaboraciones, freestyles
+          y un sello propio, <strong>dxf prod</strong>. Este expediente reúne lo que
+          Spotify sabe de él: cuántos lo escuchan, desde dónde suena y qué track pega
+          más fuerte. El resto se resuelve dándole play.
+        </p>
+        <p class="manifesto__sign">— GARGUT / GDL</p>
+      </div>
+    </section>
+
+    <!-- 03 CIUDADES -->
+    <section class="section cities" id="ciudades" aria-labelledby="ciudades-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <span class="sec-head__num">02</span>
+          <h2 class="sec-head__title" id="ciudades-title">Dónde suena</h2>
+          <span class="sec-head__meta">Oyentes por ciudad</span>
+        </div>
+
+        <ul class="cities__list" data-cities data-reveal>
+          {cityFallback.map((city, index) => (
+            <li class="city">
+              <span class="city__rank">{String(index + 1).padStart(2, "0")}</span>
+              <span class="city__name">{city.city}</span>
+              <span class="city__bar" aria-hidden="true">
+                <span style={`width:${Math.round((city.listeners / cityMax) * 100)}%`}></span>
+              </span>
+              <span class="city__count">{city.listeners.toLocaleString("es-MX")}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
 
-    <!-- SECCIÓN 3: ESCENA -->
-    <section class="artist-section" id="sec-escena" data-index="2" aria-label="Escena">
-      <div class="section-inner section-inner--wide">
-        <span class="section-eyebrow">Escena</span>
-        <h2 class="section-headline">Spotify</h2>
+    <!-- 04 CATÁLOGO -->
+    <section class="section catalog" id="catalogo" aria-labelledby="catalogo-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <span class="sec-head__num">03</span>
+          <h2 class="sec-head__title" id="catalogo-title">Catálogo</h2>
+          <span class="sec-head__meta">{releases.length} releases · 2025—2026</span>
+        </div>
 
-        <div class="embed-wrap">
-          <div class="embed-skeleton" data-embed-skeleton aria-hidden="true">
-            <Skeleton width="100%" height="360px" borderRadius="12px" />
+        <ol class="releases" data-reveal>
+          {releases.map((track, index) => (
+            <li class="release">
+              <a
+                class="release__link"
+                href={track.spotifyUrl}
+                target="_blank"
+                rel="noopener"
+                aria-label={`Escuchar ${track.title} en Spotify`}
+              >
+                <span class="release__index">{String(index + 1).padStart(2, "0")}</span>
+                <span class="release__cover">
+                  {track.coverUrl ? (
+                    <img src={track.coverUrl} alt="" width="120" height="120" loading="lazy" decoding="async" />
+                  ) : (
+                    <span class="release__cover-fallback" aria-hidden="true">{track.title.charAt(0)}</span>
+                  )}
+                </span>
+                <span class="release__main">
+                  <span class="release__title">{track.title}</span>
+                  <span class="release__meta">
+                    {track.year} · {track.type === "solo" ? "Solo" : "Colab"}
+                    {track.collaborators?.length ? ` · ${track.collaborators.join(" / ")}` : ""}
+                  </span>
+                </span>
+                <span class="release__plays">{formatPlays(track.streams)}</span>
+                <span class="release__arrow" aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <p class="catalog__note">Reproducciones reales de Spotify al momento de actualizar el catálogo.</p>
+      </div>
+    </section>
+
+    <!-- 05 SEÑAL -->
+    <section class="section signal" id="senal" aria-labelledby="senal-title">
+      <div class="wrap">
+        <div class="sec-head">
+          <span class="sec-head__num">04</span>
+          <h2 class="sec-head__title" id="senal-title">Señal</h2>
+          <span class="sec-head__meta">Embed oficial</span>
+        </div>
+
+        <div class="signal__grid" data-reveal>
+          <div class="signal__copy">
+            <h3>El catálogo completo, sin intermediarios.</h3>
+            <p>
+              Dale play desde aquí mismo. El reproductor jala directo de Spotify,
+              así que lo que suene es exactamente lo que está publicado.
+            </p>
+            <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="btn btn--outline">
+              Abrir perfil de artista <span aria-hidden="true">↗</span>
+            </a>
           </div>
-          <iframe
-            class="embed-iframe"
-            src={SPOTIFY_EMBED_ARTIST}
-            width="100%"
-            height="360"
-            style="border-radius:0; border:0;"
-            allow="encrypted-media"
-            loading="lazy"
-            title="Gargut en Spotify"
-            onload="this.closest('.embed-wrap').querySelector('[data-embed-skeleton]')?.classList.add('is-hidden'); this.classList.add('is-loaded');"
-          />
+
+          <div class="signal__embed">
+            <div class="signal__chrome" aria-hidden="true">
+              <span>SPOTIFY / ARTIST</span>
+              <span>GUT—003</span>
+            </div>
+            <iframe
+              src={SPOTIFY_EMBED_ARTIST}
+              width="100%"
+              height="352"
+              style="border:0;"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              title="Gargut en Spotify"
+            />
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- SECCIÓN 4: CONECTA -->
-    <section class="artist-section" id="sec-conecta" data-index="3" aria-label="Conecta">
-      <div class="section-inner section-inner--center">
-        <span class="section-eyebrow">Conecta</span>
-        <h2 class="section-headline section-headline--big">Enlaces</h2>
-
-        <div class="connect-grid">
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="connect-card connect-card--ig">
-            <span class="connect-card__icon">&#9670;</span>
-            <span class="connect-card__label">Instagram</span>
+    <!-- 05 CONEXIÓN -->
+    <section class="connect" id="conecta" aria-labelledby="conecta-title">
+      <div class="wrap">
+        <h2 class="connect__word" id="conecta-title">GARGUT</h2>
+        <div class="connect__links">
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="connect__link">
+            <span>Instagram</span><span aria-hidden="true">↗</span>
+          </a>
+          <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="connect__link">
+            <span>Spotify</span><span aria-hidden="true">↗</span>
+          </a>
+          <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="connect__link">
+            <span>YouTube</span><span aria-hidden="true">↗</span>
+          </a>
+          <a href={TIKTOK_URL} target="_blank" rel="noopener" class="connect__link">
+            <span>TikTok</span><span aria-hidden="true">↗</span>
           </a>
         </div>
-
-        <PageFooter />
+        <div class="connect__base">
+          <span>Gargut — Guadalajara, México</span>
+          <span>© {new Date().getFullYear()} / dxf prod</span>
+        </div>
       </div>
     </section>
   </div>
 
-  <!-- Navegacion lateral -->
-  <nav class="section-dots" id="sectionDots" aria-label="Navegacion de secciones">
-    {sections.map((sec, i) => (
-      <button
-        class={`section-dot ${i === 0 ? "is-active" : ""}`}
-        data-index={i}
-        aria-label={sec.label}
-        type="button"
-      >
-        <span class="section-dot__label">{sec.label}</span>
-      </button>
-    ))}
-  </nav>
-
-  <script is:inline>
-    (function () {
-      const scroller = document.getElementById("sectionScroller");
-      const dots = document.querySelectorAll(".section-dot");
-      const sections = document.querySelectorAll(".artist-section");
-      if (!scroller || !dots.length || !sections.length) return;
-
-      let current = 0;
-      let isSnapping = false;
-
-      function activate(index) {
-        current = index;
-        dots.forEach((d, i) => {
-          d.classList.toggle("is-active", i === index);
-        });
-      }
-
-      function scrollToSection(index) {
-        if (index < 0 || index >= sections.length) return;
-        isSnapping = true;
-        sections[index].scrollIntoView({ behavior: "smooth", block: "start" });
-        activate(index);
-        setTimeout(() => { isSnapping = false; }, 600);
-      }
-
-      dots.forEach((dot) => {
-        dot.addEventListener("click", () => {
-          const idx = parseInt(dot.dataset.index || "0", 10);
-          scrollToSection(idx);
-        });
-      });
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (isSnapping) return;
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const idx = parseInt((entry.target).dataset.index || "0", 10);
-              activate(idx);
-            }
-          });
-        },
-        { root: scroller, threshold: 0.55 }
-      );
-
-      sections.forEach((sec) => observer.observe(sec));
-
-      // Entrance animations
-      const entranceObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("is-visible");
-            }
-          });
-        },
-        { root: scroller, threshold: 0.15 }
-      );
-
-      sections.forEach((sec) => entranceObserver.observe(sec));
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowDown" || e.key === "PageDown") {
-          e.preventDefault();
-          scrollToSection(current + 1);
-        } else if (e.key === "ArrowUp" || e.key === "PageUp") {
-          e.preventDefault();
-          scrollToSection(current - 1);
-        }
-      });
-
-      let touchStartY = 0;
-      scroller.addEventListener("touchstart", (e) => {
-        touchStartY = e.touches[0].clientY;
-      }, { passive: true });
-
-      scroller.addEventListener("touchend", (e) => {
-        const diff = touchStartY - e.changedTouches[0].clientY;
-        if (Math.abs(diff) > 50) {
-          if (diff > 0) scrollToSection(current + 1);
-          else scrollToSection(current - 1);
-        }
-      }, { passive: true });
-    })();
-  </script>
-
   <script is:inline>
     (() => {
-      const stats = document.querySelector(".perfil-stats");
-      if (!stats) return;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /* Barra de progreso */
+      const progress = document.querySelector("[data-progress]");
+      if (progress) {
+        const updateProgress = () => {
+          const root = document.documentElement;
+          const max = root.scrollHeight - root.clientHeight;
+          progress.style.width = `${max > 0 ? (root.scrollTop / max) * 100 : 0}%`;
+        };
+        window.addEventListener("scroll", updateProgress, { passive: true });
+        window.addEventListener("resize", updateProgress);
+        updateProgress();
+      }
+
+      /* Aparición de bloques */
+      const revealables = document.querySelectorAll("[data-reveal]");
+      if (reduceMotion || !("IntersectionObserver" in window)) {
+        revealables.forEach((element) => element.classList.add("is-visible"));
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            });
+          },
+          { threshold: 0.12 }
+        );
+        revealables.forEach((element) => observer.observe(element));
+      }
+
+      /* Datos en vivo */
+      const setText = (key, value) => {
+        if (value === null || value === undefined || value === "") return;
+        document.querySelectorAll(`[data-stat="${key}"]`).forEach((node) => {
+          node.textContent = value;
+        });
+      };
+
+      const formatNumber = (value) =>
+        typeof value === "number" ? value.toLocaleString("es-MX") : null;
+
+      const CITY_NAMES = {
+        "Mexico City": "Ciudad de México",
+        "Mexico city": "Ciudad de México",
+        Bogota: "Bogotá",
+        "Bogotá": "Bogotá",
+      };
+
+      const renderCities = (cities) => {
+        const list = document.querySelector("[data-cities]");
+        if (!list || !Array.isArray(cities) || cities.length === 0) return;
+
+        const top = cities.slice(0, 5);
+        const max = Math.max(...top.map((city) => Number(city.listeners) || 0), 1);
+        const items = Array.from(list.querySelectorAll(".city"));
+
+        items.forEach((item, index) => {
+          const city = top[index];
+          if (!city) {
+            item.hidden = true;
+            return;
+          }
+
+          item.hidden = false;
+          const name = CITY_NAMES[city.city] || city.city;
+          const rank = item.querySelector(".city__rank");
+          const label = item.querySelector(".city__name");
+          const fill = item.querySelector(".city__bar span");
+          const count = item.querySelector(".city__count");
+
+          if (rank) rank.textContent = String(index + 1).padStart(2, "0");
+          if (label) label.textContent = name;
+          if (fill) fill.style.width = `${Math.round(((Number(city.listeners) || 0) / max) * 100)}%`;
+          if (count) count.textContent = (Number(city.listeners) || 0).toLocaleString("es-MX");
+        });
+      };
 
       fetch("/api/artist-stats", { headers: { Accept: "application/json" } })
         .then((response) => (response.ok ? response.json() : null))
         .then((data) => {
           if (!data || data.source !== "spotify") return;
 
-          const setValue = (key, value) => {
-            if (value === null || value === undefined || value === "") return;
-            const node = stats.querySelector(`[data-stat="${key}"]`);
-            if (node) node.textContent = value;
-          };
-
-          if (typeof data.monthlyListeners === "number") {
-            setValue("listeners", data.monthlyListeners.toLocaleString("es-MX"));
-          }
-          if (typeof data.followers === "number") {
-            setValue("followers", data.followers.toLocaleString("es-MX"));
-          }
-          setValue("top", data.topTrack);
+          setText("listeners", formatNumber(data.monthlyListeners));
+          setText("followers", formatNumber(data.followers));
+          setText("top", data.topTrack);
+          renderCities(data.topCities);
 
           const note = document.querySelector("[data-stats-note]");
-          if (note) note.textContent = "Datos en vivo de Spotify";
+          if (note) note.textContent = "Datos en vivo de Spotify · se actualizan cada 30 min";
         })
         .catch(() => {});
     })();
   </script>
 
   <style>
-.section-scroller {
-  height: calc(100dvh - var(--header-h));
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  counter-reset: section;
-}
-.section-scroller::-webkit-scrollbar { display: none; }
+    .dossier {
+      position: relative;
+    }
 
-.artist-section {
-  position: relative;
-  min-height: calc(100dvh - var(--header-h));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  padding: 1.5rem 1rem;
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.artist-section.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+    .wrap {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding-left: clamp(1rem, 4vw, 3.5rem);
+      padding-right: clamp(1rem, 4vw, 3.5rem);
+    }
 
-.section-inner {
-  width: 100%;
-  max-width: 540px;
-}
-.section-inner--wide { max-width: 760px; }
-.section-inner--narrow { max-width: 560px; }
-.section-inner--center { text-align: center; }
+    /* Progreso + riel */
+    .progress {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      right: 0;
+      height: 2px;
+      z-index: 260;
+      background: var(--line-soft);
+      pointer-events: none;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      transition: width 0.12s linear;
+    }
+    .rail {
+      display: none;
+    }
 
-.section-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin-bottom: 0.8rem;
-}
-.section-eyebrow::before {
-  counter-increment: section;
-  content: "0" counter(section);
-  padding: 0.16rem 0.3rem;
-  background: var(--accent);
-  color: #ffffff;
-  font-size: 0.5rem;
-  letter-spacing: 0.06em;
-}
-.section-eyebrow::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
+    /* HERO */
+    .hero {
+      padding: clamp(1rem, 3vw, 2rem) 0 clamp(2rem, 4vw, 3rem);
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .hero__top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem 1.5rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: clamp(1.75rem, 4vw, 3rem);
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .hero__tag--live {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-left: auto;
+      color: var(--accent);
+    }
+    .hero__tag--live i {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.75); }
+    }
 
-.section-headline {
-  position: relative;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(2.4rem, 9vw, 4rem);
-  color: var(--ink);
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  line-height: 0.85;
-  margin-bottom: 1.35rem;
-  padding-bottom: 0.65rem;
-  border-bottom: 1px solid var(--line-strong);
-}
-.section-headline::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 72px;
-  height: 3px;
-  background: var(--accent);
-}
-.section-inner--center .section-headline::after {
-  left: 50%;
-  transform: translateX(-50%);
-}
-.section-headline--big {
-  font-size: clamp(2.8rem, 11vw, 5rem);
-}
+    .hero__main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(2rem, 4vw, 3rem);
+      align-items: end;
+    }
 
-.section-lead {
-  font-size: 0.86rem;
-  color: var(--text-muted);
-  line-height: 1.7;
-  margin-bottom: 1.5rem;
-}
-.section-lead--center {
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
-}
+    .hero__eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .hero__title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(5.5rem, 19vw, 13rem);
+      line-height: 0.76;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin: 0;
+    }
+    .hero__title span {
+      display: block;
+    }
+    .hero__title-outline {
+      color: transparent;
+      -webkit-text-stroke: clamp(1px, 0.22vw, 3px) var(--ink);
+    }
+    .hero__lead {
+      max-width: 40ch;
+      margin-top: 1.5rem;
+      color: var(--text-muted);
+      font-size: clamp(0.9rem, 1.1vw, 1.02rem);
+      line-height: 1.65;
+    }
+    .hero__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.75rem;
+    }
 
-/* PERFIL */
-.perfil-visual {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.75rem;
-}
-.cover-wrap {
-  position: relative;
-  width: 176px;
-  height: 176px;
-}
-.cover-skeleton {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  transition: opacity 0.4s ease;
-}
-.cover-skeleton.is-hidden { opacity: 0; pointer-events: none; }
+    .portrait {
+      justify-self: start;
+      width: min(100%, 390px);
+      margin: 0;
+    }
+    .portrait__frame {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      background: var(--bg-elevated);
+      border: 1px solid var(--line-strong);
+      box-shadow: 14px 14px 0 var(--accent);
+    }
+    .portrait__frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(1) contrast(1.06) brightness(0.95);
+      transform: scale(1.01);
+      transition: filter 0.4s ease, transform 0.6s ease;
+    }
+    .portrait:hover img {
+      filter: grayscale(0) contrast(1.02) brightness(1);
+      transform: scale(1.035);
+    }
+    .portrait__tape {
+      position: absolute;
+      top: -10px;
+      left: -14px;
+      width: 104px;
+      height: 24px;
+      background: #f4f1e8;
+      opacity: 0.82;
+      transform: rotate(-6deg);
+    }
+    .portrait__tag {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      padding: 0.3rem 0.45rem;
+      background: var(--ink);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+    }
+    .portrait__cap {
+      margin-top: 1.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
 
-.perfil-cover {
-  width: 176px;
-  height: 176px;
-  object-fit: cover;
-  border-radius: 0;
-  border: 1px solid var(--line-strong);
-  box-shadow: 9px 9px 0 var(--accent);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  filter: grayscale(0.35) contrast(1.08);
-}
-.perfil-cover.is-loaded { opacity: 1; }
-.perfil-cover-placeholder {
-  width: 176px;
-  height: 176px;
-  border-radius: 0;
-  background: var(--bg-elevated);
-  border: 1px solid var(--line-strong);
-  box-shadow: 9px 9px 0 var(--accent);
-}
+    .ficha {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+      margin: clamp(2rem, 5vw, 3.5rem) 0 0;
+      border-top: 1px solid var(--line-strong);
+      border-left: 1px solid var(--line);
+    }
+    .ficha__item {
+      padding: 0.75rem 0.85rem;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      min-width: 0;
+    }
+    .ficha__item:last-child {
+      grid-column: 1 / -1;
+    }
+    .ficha__item dt {
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.35rem;
+    }
+    .ficha__item dd {
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-.perfil-content { text-align: left; }
-.perfil-name {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(2.6rem, 10vw, 4.4rem);
-  color: var(--ink);
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  line-height: 0.82;
-  overflow-wrap: anywhere;
-  margin-bottom: 1.25rem;
-}
-.perfil-bio {
-  font-size: 0.86rem;
-  color: var(--text-muted);
-  line-height: 1.7;
-  max-width: 460px;
-  margin: 0 0 1.5rem;
-}
+    /* MARQUEE */
+    .marquee {
+      overflow: hidden;
+      background: var(--accent);
+      color: #0a0a0b;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .marquee__track {
+      display: flex;
+      width: max-content;
+      animation: marquee 34s linear infinite;
+    }
+    .marquee:hover .marquee__track {
+      animation-play-state: paused;
+    }
+    .marquee__group {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      padding: 0.65rem 1.1rem;
+    }
+    .marquee__label {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.72;
+    }
+    .marquee__num {
+      font-family: var(--font-display);
+      font-size: clamp(1.15rem, 2vw, 1.5rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    .marquee__star {
+      font-size: 0.9rem;
+      opacity: 0.75;
+    }
+    @keyframes marquee {
+      to { transform: translateX(-50%); }
+    }
 
-.perfil-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-  border: 1px solid var(--line);
-  border-bottom: 0;
-  max-width: 460px;
-  margin: 0 0 0.75rem;
-  background: var(--bg-soft);
-}
-.stat {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.15rem;
-  padding: 0.7rem 0.75rem 0.6rem;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  transition: background 0.2s ease;
-}
-.stat:nth-child(2n) { border-right: 0; }
-.stat:hover { background: var(--surface-2); }
-.stat__value {
-  font-family: var(--font-display);
-  font-size: clamp(1.3rem, 4vw, 1.7rem);
-  color: var(--ink);
-  line-height: 0.95;
-}
-.stat__value--text {
-  font-size: clamp(0.95rem, 3vw, 1.15rem);
-  line-height: 1.15;
-  overflow-wrap: anywhere;
-}
-.stat__label {
-  font-family: var(--font-mono);
-  font-size: 0.48rem;
-  font-weight: 700;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  line-height: 1.4;
-}
+    /* SECCIONES */
+    .section {
+      padding: clamp(3rem, 7vw, 6rem) 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .sec-head {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: baseline;
+      gap: 0.6rem 1rem;
+      padding-bottom: 1rem;
+      margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .sec-head__num {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+    }
+    .sec-head__title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      line-height: 0.88;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .sec-head__meta {
+      grid-column: 2;
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
 
-.stats-note {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  margin: 0 0 1.5rem;
-}
-.stats-note::before {
-  content: "● ";
-  color: var(--accent);
-}
+    /* NÚMEROS */
+    .numbers__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--line-strong);
+      background: var(--line);
+    }
+    .metric {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.5rem;
+      min-height: 150px;
+      padding: 1.1rem;
+      background: var(--bg-soft);
+    }
+    .metric--xl {
+      grid-column: 1 / -1;
+      background:
+        radial-gradient(120% 140% at 0% 0%, rgba(255, 35, 56, 0.14), transparent 62%),
+        var(--bg-soft);
+    }
+    .metric--text {
+      grid-column: 1 / -1;
+    }
+    .metric__value {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.2rem, 7vw, 3.6rem);
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .metric--xl .metric__value {
+      font-size: clamp(4.2rem, 9.5vw, 8.2rem);
+      color: var(--accent);
+      line-height: 0.82;
+    }
+    .metric--text .metric__value {
+      font-size: clamp(1.4rem, 3.6vw, 2.2rem);
+      text-transform: uppercase;
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+    .metric__label {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      line-height: 1.6;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .numbers__note,
+    .catalog__note {
+      margin-top: 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
 
-.scroll-hint {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  opacity: 0.6;
-  pointer-events: none;
-}
-.scroll-hint__line {
-  display: block;
-  width: 1px;
-  height: 30px;
-  background: linear-gradient(180deg, transparent, var(--accent));
-}
-.scroll-hint__text {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-}
-@keyframes hint-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
-}
+    /* MANIFIESTO */
+    .manifesto {
+      background: #f4f1e8;
+      color: #0b0b0c;
+      padding: clamp(3rem, 8vw, 7rem) 0;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .manifesto__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 3.5rem);
+    }
+    .manifesto__label {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+    }
+    .manifesto__quote {
+      margin: 1.1rem 0 1.9rem;
+      max-width: 18ch;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(2.4rem, 7.5vw, 6rem);
+      line-height: 0.94;
+      letter-spacing: -0.015em;
+      color: #0b0b0c;
+    }
+    .manifesto__text {
+      max-width: 62ch;
+      font-size: clamp(0.92rem, 1.15vw, 1.02rem);
+      line-height: 1.75;
+      color: #2c2c2c;
+    }
+    .manifesto__text strong {
+      color: #0b0b0c;
+      font-weight: 700;
+    }
+    .manifesto__sign {
+      margin-top: 1.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #6a675f;
+    }
 
-.story-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.story-body p {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  line-height: 1.7;
-}
+    /* CIUDADES */
+    .cities__list {
+      list-style: none;
+      border-top: 1px solid var(--line-strong);
+    }
+    .city {
+      display: grid;
+      grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+      grid-template-areas:
+        "rank name count"
+        "rank bar bar";
+      align-items: center;
+      gap: 0.4rem 0.75rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .city[hidden] {
+      display: none;
+    }
+    .city__rank {
+      grid-area: rank;
+      align-self: start;
+      padding-top: 0.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .city__name {
+      grid-area: name;
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 2.4vw, 1.55rem);
+      line-height: 1;
+      text-transform: uppercase;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .city__bar {
+      grid-area: bar;
+      display: block;
+      height: 9px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .city__bar span {
+      display: block;
+      height: 100%;
+      background: var(--accent);
+      animation: grow 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      transform-origin: left;
+    }
+    @keyframes grow {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    .city__count {
+      grid-area: count;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-align: right;
+      color: var(--text-soft);
+    }
 
-/* MUSICA */
-.music-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7rem;
-}
-.music-card {
-  display: flex;
-  flex-direction: column;
-  border-radius: 0;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-  border: 1px solid var(--line);
-  background: var(--bg-soft);
-  transition: transform 0.16s ease, border-color 0.2s ease, box-shadow 0.16s ease;
-}
-.music-card:hover {
-  transform: translate(-3px, -3px);
-  border-color: var(--accent);
-  box-shadow: 6px 6px 0 var(--accent);
-}
-.music-card__cover-wrap {
-  position: relative;
-  aspect-ratio: 1;
-  border-radius: 0;
-  overflow: hidden;
-  background: var(--bg-elevated);
-  border-bottom: 1px solid var(--line);
-}
-.music-card__cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0;
-  filter: grayscale(1) contrast(1.08);
-  transition: opacity 0.35s ease, filter 0.35s ease, transform 0.5s ease;
-}
-.music-card:hover .music-card__cover {
-  filter: grayscale(0);
-  transform: scale(1.04);
-}
-.music-card__cover.is-loaded { opacity: 1; }
-.music-card__skeleton {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  transition: opacity 0.35s ease;
-}
-.music-card__skeleton.is-hidden { opacity: 0; pointer-events: none; }
-.music-card__fallback {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-elevated);
-}
-.music-card__fallback span {
-  font-family: var(--font-display);
-  font-size: 2.6rem;
-  color: var(--line-strong);
-}
-.music-card__overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 0.55rem;
-  background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.55));
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-.music-card:hover .music-card__overlay { opacity: 1; }
-.music-card__play {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  padding-left: 2px;
-  border-radius: 0;
-  font-size: 0.7rem;
-  color: #ffffff;
-  background: var(--accent);
-  line-height: 1;
-  transform: translateY(4px);
-  transition: transform 0.2s ease;
-}
-.music-card:hover .music-card__play { transform: translateY(0); }
-.music-card__info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.6rem 0.65rem 0.7rem;
-}
-.music-card__title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 1rem;
-  color: var(--ink);
-  letter-spacing: 0.01em;
-  line-height: 1.05;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.music-card__meta {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  font-weight: 700;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.badge {
-  font-family: var(--font-mono);
-  font-size: 0.48rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.18rem 0.35rem;
-  border-radius: 0;
-  background: transparent;
-  border: 1px solid var(--line-strong);
-  color: var(--text-muted);
-  line-height: 1;
-}
-.badge[data-type="solo"] {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #ffffff;
-}
+    /* CATÁLOGO */
+    .releases {
+      list-style: none;
+      border-top: 1px solid var(--line-strong);
+    }
+    .release {
+      border-bottom: 1px solid var(--line);
+    }
+    .release__link {
+      display: grid;
+      grid-template-columns: 1.6rem 44px minmax(0, 1fr) auto 1rem;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.6rem 0;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.18s ease, color 0.18s ease, padding 0.18s ease;
+    }
+    .release__index {
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      font-weight: 700;
+      color: var(--text-dim);
+    }
+    .release__cover {
+      display: block;
+      width: 44px;
+      height: 44px;
+      overflow: hidden;
+      background: var(--bg-elevated);
+      border: 1px solid var(--line);
+    }
+    .release__cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(1);
+      transition: filter 0.25s ease, transform 0.45s ease;
+    }
+    .release__cover-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--line-strong);
+    }
+    .release__main {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0;
+    }
+    .release__title {
+      font-family: var(--font-display);
+      font-size: clamp(1.05rem, 2.6vw, 1.75rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.18s ease;
+    }
+    .release__meta {
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.18s ease;
+    }
+    .release__plays {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--text-soft);
+      white-space: nowrap;
+      transition: color 0.18s ease;
+    }
+    .release__arrow {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      transition: transform 0.2s ease, color 0.18s ease;
+    }
 
-.embed-wrap {
-  position: relative;
-  border-radius: 0;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
-  background: var(--bg-soft);
-}
-.embed-skeleton {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  transition: opacity 0.5s ease;
-}
-.embed-skeleton.is-hidden { opacity: 0; pointer-events: none; }
-.embed-iframe {
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  display: block;
-}
-.embed-iframe.is-loaded { opacity: 1; }
+    /* SEÑAL */
+    .signal__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.75rem;
+      align-items: start;
+    }
+    .signal__copy h3 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+      line-height: 0.92;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+    .signal__copy p {
+      max-width: 40ch;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .signal__embed {
+      position: relative;
+      padding: 0.6rem;
+      border: 1px solid var(--line-strong);
+      background: var(--bg-soft);
+      border-left: 3px solid var(--accent);
+    }
+    .signal__chrome {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0 0.15rem 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.48rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .signal__embed iframe {
+      display: block;
+      width: 100%;
+      border: 0;
+    }
 
-/* CONECTA */
-.connect-grid {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
-}
-.connect-card {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.35rem;
-  width: 160px;
-  height: 104px;
-  padding: 0.7rem;
-  border-radius: 0;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.2s ease;
-  border: 1px solid var(--line);
-  background: var(--bg-soft);
-  color: var(--ink);
-}
-.connect-card:hover {
-  transform: translate(-3px, -3px);
-  border-color: var(--accent);
-  box-shadow: 6px 6px 0 var(--accent);
-}
-.connect-card:active { transform: translate(1px, 1px); box-shadow: none; }
-.connect-card__icon {
-  font-size: 1.3rem;
-  line-height: 1;
-  color: var(--accent);
-}
-.connect-card__label {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-.connect-card--spotify,
-.connect-card--youtube,
-.connect-card--ig { color: var(--ink); border-color: var(--line); }
+    /* CONEXIÓN */
+    .connect {
+      padding-top: clamp(2.5rem, 6vw, 4.5rem);
+      overflow: hidden;
+    }
+    .connect__word {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(4.5rem, 19vw, 15rem);
+      line-height: 0.76;
+      letter-spacing: -0.02em;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--line-strong);
+      margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+      white-space: nowrap;
+    }
+    .connect__links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+    .connect__link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.95rem 1rem;
+      background: var(--bg);
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 2.4vw, 1.35rem);
+      text-transform: uppercase;
+      color: var(--ink);
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+    .connect__link:hover {
+      background: var(--accent);
+      color: #0a0a0b;
+    }
+    .connect__base {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem 1.5rem;
+      padding: 1.1rem 0 2rem;
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
 
-/* NAVEGACION LATERAL */
-.section-dots {
-  position: fixed;
-  right: 0.7rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 300;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.55rem;
-}
-.section-dot {
-  position: relative;
-  width: 18px;
-  height: 2px;
-  border-radius: 0;
-  border: 0;
-  background: var(--line-strong);
-  cursor: pointer;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.25s, width 0.25s;
-}
-.section-dot.is-active {
-  width: 34px;
-  background: var(--accent);
-}
-.section-dot__label {
-  position: absolute;
-  right: 42px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: var(--font-mono);
-  font-size: 0.52rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.2s;
-  pointer-events: none;
-}
-.section-dot:hover .section-dot__label,
-.section-dot.is-active .section-dot__label {
-  opacity: 1;
-}
+    /* Aparición */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    [data-reveal].is-visible {
+      opacity: 1;
+      transform: none;
+    }
 
-@media (min-width: 768px) {
-  .artist-section { padding: 2rem 2.5rem; }
-  .section-inner { max-width: 660px; }
-  .section-inner--wide { max-width: 900px; }
-  .section-inner--narrow { max-width: 640px; }
+    /* TABLET */
+    @media (min-width: 640px) {
+      .hero__main {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+        gap: 2rem;
+      }
+      .portrait {
+        justify-self: end;
+      }
+      .ficha {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .ficha__item:last-child {
+        grid-column: auto;
+      }
+      .metric {
+        min-height: 180px;
+        padding: 1.35rem;
+      }
+      .metric--xl {
+        grid-column: 1 / -1;
+      }
+      .metric--text {
+        grid-column: 1 / -1;
+      }
+    }
 
-  .perfil-visual { margin-bottom: 2rem; }
-  .cover-wrap { width: 220px; height: 220px; }
-  .perfil-cover { width: 220px; height: 220px; }
-  .perfil-cover-placeholder { width: 220px; height: 220px; }
-  .perfil-stats { max-width: 540px; }
-  .stat { padding: 0.8rem 0.9rem 0.7rem; }
+    /* DESKTOP */
+    @media (min-width: 900px) {
+      .hero__main {
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+        gap: clamp(2rem, 5vw, 5rem);
+      }
+      .portrait {
+        justify-self: end;
+      }
+      .ficha {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+      .numbers__grid {
+        grid-template-columns: 2.2fr 1fr 1fr 1.5fr;
+      }
+      .metric--xl,
+      .metric--text {
+        grid-column: auto;
+      }
+      .metric--xl {
+        min-height: 230px;
+      }
+      .sec-head {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+      }
+      .sec-head__meta {
+        grid-column: 3;
+        text-align: right;
+      }
+      .city {
+        grid-template-columns: 3rem minmax(0, 1fr) minmax(140px, 2.2fr) 5rem;
+        grid-template-areas: "rank name bar count";
+        gap: 1.25rem;
+        padding: 0.9rem 0;
+      }
+      .city__rank {
+        align-self: center;
+        padding-top: 0;
+        font-size: 0.6rem;
+      }
+      .city__count {
+        font-size: 0.72rem;
+      }
+      .release__link {
+        grid-template-columns: 3rem 64px minmax(0, 1fr) 8rem 1.5rem;
+        gap: 1.25rem;
+        padding: 0.7rem 0.5rem 0.7rem 0;
+      }
+      .release__cover {
+        width: 64px;
+        height: 64px;
+      }
+      .release__link:hover {
+        background: var(--accent);
+        color: #0a0a0b;
+        padding-left: 0.9rem;
+      }
+      .release__link:hover .release__title,
+      .release__link:hover .release__plays {
+        color: #0a0a0b;
+      }
+      .release__link:hover .release__meta,
+      .release__link:hover .release__index,
+      .release__link:hover .release__arrow {
+        color: rgba(10, 10, 11, 0.66);
+      }
+      .release__link:hover .release__cover img {
+        filter: grayscale(0);
+        transform: scale(1.06);
+      }
+      .release__link:hover .release__arrow {
+        transform: translate(3px, -3px);
+      }
+      .signal__grid {
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+        gap: clamp(2rem, 4vw, 4rem);
+      }
+      .connect__links {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
 
-  .music-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; }
-  .connect-card { width: 180px; height: 112px; }
-  .section-dots { right: 1rem; }
-}
+    @media (min-width: 1180px) {
+      .rail {
+        display: block;
+        position: fixed;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%) rotate(180deg);
+        writing-mode: vertical-rl;
+        z-index: 240;
+        font-family: var(--font-mono);
+        font-size: 0.5rem;
+        font-weight: 700;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        pointer-events: none;
+      }
+    }
 
-@media (min-width: 1024px) {
-  .section-inner { max-width: 760px; }
-  .section-inner--wide { max-width: 1040px; }
-  .section-inner--narrow { max-width: 700px; }
+    @media (max-width: 400px) {
+      .release__link {
+        grid-template-columns: 1.2rem 36px minmax(0, 1fr) auto 0.8rem;
+        gap: 0.5rem;
+      }
+      .release__cover {
+        width: 36px;
+        height: 36px;
+      }
+      .release__plays {
+        font-size: 0.52rem;
+      }
+    }
 
-  #sec-perfil .section-inner {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    text-align: left;
-    gap: 3rem;
-    max-width: 980px;
-  }
-  .perfil-visual { margin-bottom: 0; margin-right: 0; flex-shrink: 0; }
-  .perfil-content { text-align: left; }
-  .perfil-stats { margin: 0 0 0.75rem; max-width: 560px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .stat { border-right: 1px solid var(--line); }
-  .stat:nth-child(2n) { border-right: 1px solid var(--line); }
-  .stat:last-child { border-right: 0; }
-  .perfil-name { font-size: clamp(3rem, 5vw, 4.4rem); }
-
-  .music-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
-  .music-card__title { font-size: 1.1rem; }
-
-  .connect-card { width: 200px; height: 120px; }
-  .connect-card__icon { font-size: 1.5rem; }
-  .connect-card__label { font-size: 1.25rem; }
-
-  .section-dots { right: 1.5rem; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .section-scroller { scroll-behavior: auto; }
-  .scroll-hint { animation: none; }
-  .artist-section {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .music-card, .music-card__cover, .connect-card { transition: none; }
-  .music-card:hover, .connect-card:hover { transform: none; }
-}
-</style>
+    @media (prefers-reduced-motion: reduce) {
+      .marquee__track,
+      .hero__tag--live i,
+      .city__bar span {
+        animation: none;
+      }
+      [data-reveal] {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+      .progress span {
+        transition: none;
+      }
+      .portrait__frame img,
+      .release__link,
+      .release__cover img,
+      .connect__link {
+        transition: none;
+      }
+    }
+  </style>
 </ArtistLayout>
