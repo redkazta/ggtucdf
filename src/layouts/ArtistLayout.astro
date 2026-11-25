@@ -10,14 +10,26 @@ import {
   KAZTA_INSTAGRAM_URL,
 } from "../data/siteConfig";
 
+interface RailLink {
+  href: string;
+  label: string;
+}
+
+interface Rail {
+  number: string;
+  label: string;
+  links?: RailLink[];
+}
+
 interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
   theme?: "dark" | "red";
+  rail?: Rail;
 }
 
-const { title, description, noindex = false, theme = "dark" } = Astro.props;
+const { title, description, noindex = false, theme = "dark", rail } = Astro.props;
 const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
 const pageDesc = description || SITE_DESCRIPTION;
 const canonicalURL = new URL(Astro.url.pathname, SITE_URL).href;
@@ -57,11 +69,11 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
     />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
     />
 
     <style is:global>
@@ -605,18 +617,18 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         --accent-glow: rgba(255, 35, 56, 0.45);
         --success: #8bf0a8;
         --success-deep: #3ddc73;
-        --font-display: "Anton", "Arial Narrow", Impact, sans-serif;
+        --font-display: "Archivo Black", "Anton", "Arial Narrow", Impact, sans-serif;
         --font-body: "Archivo", "Space Grotesk", system-ui, sans-serif;
         --shadow-deep: 12px 12px 0 rgba(0, 0, 0, 0.8);
         --shadow-hard: 6px 6px 0 var(--accent);
         position: relative;
         color: #ffffff;
-        background-color: var(--bg);
+        background-color: #a80016;
         background-image:
-          radial-gradient(1100px 680px at 50% -12%, rgba(255, 35, 56, 0.22), transparent 64%),
-          linear-gradient(rgba(255, 35, 56, 0.06) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 35, 56, 0.06) 1px, transparent 1px);
-        background-size: 100% 100%, 72px 72px, 72px 72px;
+          radial-gradient(1200px 720px at 50% -14%, rgba(0, 0, 0, 0.38), transparent 64%),
+          linear-gradient(rgba(0, 0, 0, 0.18) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 0, 0, 0.18) 1px, transparent 1px);
+        background-size: 100% 100%, 64px 64px, 64px 64px;
         font-family: var(--font-body);
       }
       main.artist-main.theme-red ::selection { background: var(--accent); color: #ffffff; }
@@ -624,13 +636,13 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
 
       /* Héroe rojo */
       main.artist-main.theme-red .internal-hero {
-        border: 1px solid rgba(255, 255, 255, 0.22);
+        border: 1px solid var(--accent);
         border-top: 8px solid #ffffff;
         border-radius: 0;
         background:
-          radial-gradient(130% 150% at 100% 0%, rgba(255, 255, 255, 0.2), transparent 55%),
-          linear-gradient(135deg, #e0001e 0%, #9b0014 58%, #62000c 100%);
-        box-shadow: 14px 14px 0 rgba(255, 35, 56, 0.3);
+          radial-gradient(120% 140% at 100% 0%, rgba(255, 35, 56, 0.16), transparent 58%),
+          linear-gradient(180deg, #100000, #050000);
+        box-shadow: 16px 16px 0 rgba(0, 0, 0, 0.38);
       }
       main.artist-main.theme-red .internal-hero__top {
         border-bottom: 1px solid rgba(255, 255, 255, 0.4);
@@ -638,11 +650,10 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
       }
       main.artist-main.theme-red .internal-hero__title {
         color: #ffffff;
-        font-size: clamp(3.2rem, 13vw, 9.5rem);
-        line-height: 0.8;
-        letter-spacing: -0.02em;
+        font-size: clamp(2.7rem, 10.5vw, 7.5rem);
+        line-height: 0.86;
+        letter-spacing: -0.045em;
         text-transform: uppercase;
-        text-shadow: 0 10px 0 rgba(0, 0, 0, 0.24);
       }
       main.artist-main.theme-red .internal-hero__title span {
         margin-top: 0.18em;
@@ -685,8 +696,8 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         .drop-facts div,
         .admin-facts div
       ) {
-        background: #0a0002;
-        border-color: rgba(255, 255, 255, 0.28);
+        background: var(--accent);
+        border-color: rgba(0, 0, 0, 0.35);
         border-radius: 0 !important;
       }
       main.artist-main.theme-red :is(
@@ -717,10 +728,18 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         color: #0a0002;
       }
 
-      main.artist-main.theme-red .section-heading { border-bottom: 2px solid var(--accent); }
+      main.artist-main.theme-red .section-heading {
+        margin-left: calc(-1 * clamp(1rem, 4vw, 2.5rem));
+        margin-right: calc(-1 * clamp(1rem, 4vw, 2.5rem));
+        margin-top: clamp(2rem, 5vw, 3rem);
+        margin-bottom: 1.25rem;
+        padding: 0.9rem clamp(1rem, 4vw, 2.5rem);
+        background: #000000;
+        border-bottom: 2px solid var(--accent);
+      }
       main.artist-main.theme-red .section-heading h2 {
         color: #ffffff;
-        letter-spacing: -0.01em;
+        letter-spacing: -0.02em;
         text-transform: uppercase;
       }
       main.artist-main.theme-red .section-heading span { color: var(--accent); }
@@ -791,7 +810,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
 
       /* CTA del Drop Room en /musica */
       main.artist-main.theme-red .drop-cta {
-        border-color: var(--accent);
+        border: 1px solid rgba(255, 255, 255, 0.65);
         border-radius: 0;
         background:
           radial-gradient(120% 120% at 100% 0%, rgba(255, 255, 255, 0.22), transparent 60%),
@@ -813,6 +832,48 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         background: #0a0002;
         border-color: #0a0002;
         color: #ffffff;
+      }
+
+      @media (max-width: 640px) {
+        main.artist-main.theme-red .section-heading {
+          flex-direction: column;
+          align-items: flex-start;
+          flex-wrap: wrap;
+          row-gap: 0.35rem;
+        }
+        main.artist-main.theme-red .section-heading span {
+          font-size: 0.56rem;
+          white-space: normal;
+        }
+        main.artist-main.theme-red :is(.music-stats, .video-stats) {
+          grid-template-columns: 1fr;
+        }
+        main.artist-main.theme-red :is(.music-stats div, .video-stats div) {
+          flex-direction: row;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 0.75rem;
+          padding: 0.65rem 0.8rem;
+        }
+        main.artist-main.theme-red :is(.music-stats dd, .video-stats dd),
+        main.artist-main.theme-red .music-stats div:last-child dd {
+          font-size: 1.1rem;
+          white-space: nowrap;
+        }
+        main.artist-main.theme-red .quick-stats {
+          grid-template-columns: 1fr;
+        }
+        main.artist-main.theme-red .quick-stats article {
+          flex-direction: row;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 0.75rem;
+          padding: 0.65rem 0.8rem;
+        }
+        main.artist-main.theme-red .quick-stats strong {
+          font-size: 1.1rem;
+          white-space: nowrap;
+        }
       }
 
       /* Geometría dura */
@@ -873,12 +934,12 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
 
       /* /artista */
       main.artist-main.theme-red .hero {
-        border: 1px solid rgba(255, 255, 255, 0.22);
+        border: 1px solid var(--accent);
         border-top: 8px solid #ffffff;
         background:
-          radial-gradient(130% 150% at 100% 0%, rgba(255, 255, 255, 0.2), transparent 55%),
-          linear-gradient(135deg, #e0001e 0%, #9b0014 58%, #62000c 100%);
-        box-shadow: 14px 14px 0 rgba(255, 35, 56, 0.3);
+          radial-gradient(120% 140% at 100% 0%, rgba(255, 35, 56, 0.16), transparent 58%),
+          linear-gradient(180deg, #100000, #050000);
+        box-shadow: 16px 16px 0 rgba(0, 0, 0, 0.38);
       }
       main.artist-main.theme-red .hero__title { color: #ffffff; text-shadow: 0 10px 0 rgba(0, 0, 0, 0.24); }
       main.artist-main.theme-red .hero__title .outline { -webkit-text-stroke-color: #ffffff; }
@@ -910,8 +971,8 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         color: #0a0002;
       }
       main.artist-main.theme-red .quick-stats article {
-        background: #0a0002;
-        border-color: rgba(255, 255, 255, 0.28);
+        background: var(--accent);
+        border-color: rgba(0, 0, 0, 0.35);
       }
       main.artist-main.theme-red :is(.quick-stats__label, .quick-stats strong) { color: #ffffff; }
       main.artist-main.theme-red .portrait__frame {
@@ -924,8 +985,8 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         border-color: var(--accent-line);
         background:
           radial-gradient(120% 140% at 100% 0%, rgba(255, 35, 56, 0.16), transparent 62%),
-          linear-gradient(180deg, #140003, #080001);
-        box-shadow: 10px 10px 0 rgba(255, 35, 56, 0.16);
+          linear-gradient(180deg, #100000, #050000);
+        box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.35);
       }
       main.artist-main.theme-red .tabs { background: #000000; border-color: var(--accent-line); }
       main.artist-main.theme-red .tabs__btn:hover { background: rgba(255, 35, 56, 0.18); }
@@ -933,32 +994,37 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
       /* Privacidad sobre héroe rojo */
       main.artist-main.theme-red .privacy-meta,
       main.artist-main.theme-red .privacy-index { border-top-color: rgba(255, 255, 255, 0.4); }
-      main.artist-main.theme-red .privacy-index a:hover { background: rgba(0, 0, 0, 0.22); }
-      main.artist-main.theme-red .privacy-index a span { color: #0a0002; }
+      main.artist-main.theme-red .privacy-index a:hover { background: var(--accent); }
+      main.artist-main.theme-red .privacy-index a span { color: var(--accent); }
+      main.artist-main.theme-red .privacy-index a:hover span { color: #ffffff; }
       main.artist-main.theme-red .privacy-index__label { color: #ffffff; }
+      main.artist-main.theme-red .privacy-hero .privacy-title {
+        font-size: clamp(2.2rem, 3.4vw, 3.6rem);
+        line-height: 0.9;
+      }
 
-      /* Footer rojo a sangre */
+      /* Footer negro sobre lienzo rojo */
       main.artist-main.theme-red .page-footer {
         max-width: none;
         padding: 0;
-        background: var(--accent);
+        background: #000000;
       }
       main.artist-main.theme-red .page-footer__inner {
         max-width: 1320px;
         margin: 0 auto;
         padding: 2rem clamp(1rem, 4vw, 2.5rem);
-        border-top: 0;
+        border-top: 2px solid var(--accent);
       }
       main.artist-main.theme-red :is(.page-footer__word, .page-footer__copy) { color: #ffffff; }
-      main.artist-main.theme-red .page-footer__word span { color: #0a0002; }
+      main.artist-main.theme-red .page-footer__word span { color: var(--accent); }
       main.artist-main.theme-red :is(.footer-link, .footer-link--spotify, .footer-link--youtube) {
         color: #ffffff;
         border-color: rgba(255, 255, 255, 0.65);
       }
       main.artist-main.theme-red .footer-link:hover {
-        background: #ffffff;
-        border-color: #ffffff;
-        color: #0a0002 !important;
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff !important;
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -972,8 +1038,31 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     <Header />
     <MobileDrawer />
 
-    <main class:list={["artist-main", theme === "red" && "theme-red"]}>
-      <slot />
+    <main class:list={["artist-main", theme === "red" && "theme-red", rail && "has-rail"]}>
+      {rail ? (
+        <aside class="dossier-rail" aria-label={`Índice de ${rail.label}`}>
+          <div class="dossier-rail__inner">
+            <div class="dossier-rail__head">
+              <span class="dossier-rail__num">{rail.number}</span>
+              <span class="dossier-rail__label">{rail.label}</span>
+            </div>
+            {rail.links && rail.links.length > 0 ? (
+              <nav class="dossier-rail__nav" aria-label="Secciones">
+                {rail.links.map((link, index) => (
+                  <a href={link.href}>
+                    <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                    {link.label}
+                  </a>
+                ))}
+              </nav>
+            ) : null}
+            <span class="dossier-rail__meta">GGT / 2026</span>
+          </div>
+        </aside>
+      ) : null}
+      <div class="artist-content">
+        <slot />
+      </div>
     </main>
 
     <footer class="wildforge-branding" aria-label="Hecho por dev_kazta">
@@ -1001,6 +1090,135 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     position: relative;
     padding-top: var(--header-h);
     min-height: 100dvh;
+  }
+  .artist-main.has-rail {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
+  }
+  .artist-content { min-width: 0; }
+
+  .dossier-rail {
+    position: sticky;
+    top: var(--header-h);
+    align-self: start;
+    height: calc(100dvh - var(--header-h));
+    background: #000000;
+    border-right: 1px solid #ff2338;
+    z-index: 120;
+  }
+  .dossier-rail__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+    padding: 1.5rem 1.15rem;
+  }
+  .dossier-rail__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  .dossier-rail__num {
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 4.5vw, 4.5rem);
+    line-height: 0.8;
+    color: #ffffff;
+  }
+  .dossier-rail__label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    line-height: 1.3;
+    text-transform: uppercase;
+    color: #ff2338;
+  }
+  .dossier-rail__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .dossier-rail__nav a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.5rem 0.55rem;
+    border-left: 2px solid transparent;
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+  .dossier-rail__nav a span { color: #ff2338; }
+  .dossier-rail__nav a:hover {
+    background: #ff2338;
+    border-color: #ffffff;
+  }
+  .dossier-rail__nav a:hover span { color: #ffffff; }
+  .dossier-rail__meta {
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #ffffff;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  @media (max-width: 1023px) {
+    .artist-main.has-rail { display: block; }
+    .dossier-rail {
+      position: static;
+      height: auto;
+      border-right: 0;
+      border-bottom: 1px solid #ff2338;
+    }
+    .dossier-rail__inner {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-areas: "head nav";
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+    }
+    .dossier-rail__head {
+      grid-area: head;
+      flex-direction: row;
+      align-items: baseline;
+      gap: 0.55rem;
+      padding: 0;
+      border: 0;
+    }
+    .dossier-rail__num { font-size: 2.2rem; }
+    .dossier-rail__label { font-size: 0.58rem; white-space: nowrap; }
+    .dossier-rail__nav {
+      grid-area: nav;
+      flex-direction: row;
+      gap: 0.25rem;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .dossier-rail__nav::-webkit-scrollbar { display: none; }
+    .dossier-rail__nav a {
+      flex: 0 0 auto;
+      padding: 0.45rem 0.55rem;
+      border-left: 0;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+    }
+    .dossier-rail__nav a:hover { border-color: #ffffff; }
+    .dossier-rail__meta { display: none; }
   }
 
   .wildforge-branding {

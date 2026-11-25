@@ -23,6 +23,14 @@ const benefits = [
   title="Drop Room"
   description="Únete al Drop Room de Gargut y entérate antes que nadie del próximo lanzamiento y del contenido exclusivo."
   theme="red"
+  rail={{
+    number: "04",
+    label: "Drop Room",
+    links: [
+      { href: "#por-que", label: "Por qué entrar" },
+      { href: "#registro", label: "Registro" },
+    ],
+  }}
 >
   <div class="internal-shell drop-page">
     <header class="internal-hero">
@@ -64,7 +72,7 @@ const benefits = [
     </header>
 
     <div class="drop-layout">
-      <section class="drop-pitch" aria-labelledby="dropBenefitsTitle">
+      <section class="drop-pitch" id="por-que" aria-labelledby="dropBenefitsTitle">
         <div class="drop-pitch__head">
           <span class="kicker">Por qué entrar</span>
           <h2 id="dropBenefitsTitle">Lo que recibes</h2>
@@ -99,7 +107,7 @@ const benefits = [
         </div>
       </section>
 
-      <div class="drop-form-col">
+      <div class="drop-form-col" id="registro">
         <DropRoomForm />
       </div>
     </div>
@@ -141,7 +149,7 @@ const benefits = [
     align-items: baseline;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.8rem 0;
+    padding: 0.75rem 0.8rem;
     border-bottom: 1px solid var(--line);
   }
   .drop-facts dt {
@@ -195,17 +203,18 @@ const benefits = [
   .benefits {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0;
     list-style: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
   }
   .benefits li {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.9rem;
-    padding: 1rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--surface);
+    padding: 1rem 0;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
   }
   .benefits__index {
     display: flex;
@@ -239,10 +248,10 @@ const benefits = [
   }
 
   .privacy-card {
-    padding: 1rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--surface);
+    padding: 1rem 0 0;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
   }
   .privacy-card__label {
     display: block;

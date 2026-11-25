@@ -3,22 +3,8 @@ import ArtistLayout from "../layouts/ArtistLayout.astro";
 import PageFooter from "../components/PageFooter.astro";
 import { INSTAGRAM_URL, YOUTUBE_URL } from "../data/siteConfig";
 
-const featured = [
-  {
-    title: "FENTATRIP",
-    type: "youtube",
-    id: "txWFWxLmix0",
-    tag: "La Rola Main",
-  },
-  {
-    title: "¿Qué es el FENTATRIP?",
-    type: "instagram",
-    id: "DZByY6CRlAX",
-    tag: "El Contexto",
-  },
-];
-
 const youtubeVideos = [
+  { title: "FENTATRIP", id: "txWFWxLmix0" },
   { title: "Gargut - Experiencia Espiritual X @zacklyvibes", id: "NdQbpB4QggQ" },
   { title: "Gargut - Yo te kiero solo X @buzk09", id: "lVGN_fBoaOU" },
   { title: "Gargut - El Primer Artista", id: "IpWeeG1wiBE" },
@@ -38,7 +24,19 @@ const instagramReels = [
 const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
 ---
 
-<ArtistLayout title="Videos" description="Videos oficiales de Garguttieneunchingodeferia — YouTube, Instagram y TikTok." theme="red">
+<ArtistLayout
+  title="Videos"
+  description="Videos oficiales de Garguttieneunchingodeferia — YouTube, Instagram y TikTok."
+  theme="red"
+  rail={{
+    number: "03",
+    label: "Videos",
+    links: [
+      { href: "#destacados", label: "Consola" },
+      { href: "#reels", label: "Reels" },
+    ],
+  }}
+>
   <div class="internal-shell videos-page">
     <header class="internal-hero">
       <div class="internal-hero__top">
@@ -54,7 +52,7 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
           </p>
           <div class="internal-hero__actions">
             <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="btn btn--primary">
-              Ver canal <span aria-hidden="true">↗</span>
+              Abrir YouTube <span aria-hidden="true">↗</span>
             </a>
             <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="btn btn--outline">
               Instagram <span aria-hidden="true">↗</span>
@@ -64,10 +62,6 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
 
         <dl class="video-stats">
           <div>
-            <dt>Destacados</dt>
-            <dd>{String(featured.length).padStart(2, "0")}</dd>
-          </div>
-          <div>
             <dt>Videos</dt>
             <dd>{String(youtubeVideos.length).padStart(2, "0")}</dd>
           </div>
@@ -75,118 +69,122 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
             <dt>Reels</dt>
             <dd>{String(instagramReels.length).padStart(2, "0")}</dd>
           </div>
+          <div>
+            <dt>Canal</dt>
+            <dd>YT</dd>
+          </div>
         </dl>
       </div>
     </header>
 
-    <section class="featured-section" aria-labelledby="featuredTitle">
+    <section id="destacados" aria-labelledby="consoleTitle">
       <div class="section-heading">
-        <h2 id="featuredTitle">Destacados</h2>
-        <span>01 / Selección</span>
+        <h2 id="consoleTitle">Consola de video</h2>
+        <span>Playlist / YouTube</span>
       </div>
 
-      <div class="featured-grid">
-        {featured.map((item, i) => (
-          <article class={`featured-card ${item.type === "youtube" ? "featured-card--youtube" : "featured-card--ig"}`}>
-            <div class="media-frame">
-              {item.type === "youtube" ? (
-                <iframe
-                  class="media-iframe"
-                  src={youtubeEmbed(item.id)}
-                  title={item.title}
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                />
-              ) : (
-                <a
-                  class="ig-feature"
-                  href={INSTAGRAM_URL}
-                  target="_blank"
-                  rel="noopener"
-                  aria-label="Ver el Instagram de Gargut"
-                >
-                  <span class="ig-feature__grid" aria-hidden="true"></span>
-                  <span class="ig-feature__eyebrow">Instagram / Reels</span>
-                  <span class="ig-feature__word">Instagram</span>
-                  <span class="ig-feature__cta">Ver visuales <span aria-hidden="true">↗</span></span>
-                </a>
-              )}
-              <span class="media-tag">{item.tag}</span>
-              <span class="media-index">{String(i + 1).padStart(2, "0")}</span>
+      <div class="video-console">
+        <div class="video-console__screen">
+          <div class="video-console__frame">
+            <iframe
+              id="videoMain"
+              src={youtubeEmbed(youtubeVideos[0].id)}
+              title={youtubeVideos[0].title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            />
+          </div>
+          <div class="video-console__now">
+            <div>
+              <span class="video-console__label">Ahora suena</span>
+              <h3 id="videoNow">{youtubeVideos[0].title}</h3>
             </div>
-            <h3 class="featured-card__title">{item.title}</h3>
-          </article>
-        ))}
+            <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="video-console__link">
+              YouTube <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <ol class="playlist">
+          {youtubeVideos.map((video, i) => (
+            <li>
+              <button
+                type="button"
+                class:list={["playlist__item", { "is-active": i === 0 }]}
+                data-video-id={video.id}
+                data-video-title={video.title}
+                aria-label={`Reproducir ${video.title}`}
+              >
+                <span class="playlist__num">{String(i + 1).padStart(2, "0")}</span>
+                <span class="playlist__title">{video.title}</span>
+                <span class="playlist__arrow" aria-hidden="true">▶</span>
+              </button>
+            </li>
+          ))}
+        </ol>
       </div>
+
+      <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="ig-strip">
+        <span class="ig-strip__eyebrow">Instagram / El contexto</span>
+        <strong>¿Qué es el FENTATRIP?</strong>
+        <span class="ig-strip__cta">Ver visuales <span aria-hidden="true">↗</span></span>
+      </a>
     </section>
 
-    <section class="video-section" aria-labelledby="youtubeTitle">
-      <div class="section-heading">
-        <h2 id="youtubeTitle">Videos oficiales</h2>
-        <span>02 / YouTube</span>
-      </div>
-      <div class="video-grid">
-        {youtubeVideos.map((v, i) => (
-          <article class="video-card">
-            <div class="media-frame">
-              <iframe
-                class="media-iframe"
-                src={youtubeEmbed(v.id)}
-                title={v.title}
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              />
-              <span class="media-index">{String(i + 1).padStart(2, "0")}</span>
-            </div>
-            <h3 class="video-card__title">{v.title}</h3>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="video-section" aria-labelledby="reelsTitle">
+    <section id="reels" aria-labelledby="reelsTitle">
       <div class="section-heading">
         <h2 id="reelsTitle">Reels</h2>
-        <span>03 / Instagram</span>
+        <span>Desliza / Instagram</span>
       </div>
-      <div class="reel-grid">
-        {instagramReels.map((r, i) => (
-          <article class="reel-card">
-            <div class="media-frame media-frame--reel">
-              <a
-                class="ig-feature ig-feature--reel"
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener"
-                aria-label={r.title ? `Ver reel: ${r.title}` : "Ver el Instagram de Gargut"}
-              >
-                <span class="ig-feature__grid" aria-hidden="true"></span>
-                <span class="ig-feature__eyebrow">Instagram</span>
-                <span class="ig-feature__word">Reels</span>
-                <span class="ig-feature__cta">Ver más <span aria-hidden="true">↗</span></span>
-              </a>
-              <span class="media-index">{String(i + 1).padStart(2, "0")}</span>
-            </div>
-            <h3 class="reel-card__title">{r.title || "Ver reel"}</h3>
-          </article>
+
+      <div class="reel-strip">
+        {instagramReels.map((reel, i) => (
+          <a
+            class="reel-tile"
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener"
+            aria-label={reel.title ? `Ver reel: ${reel.title}` : "Ver el Instagram de Gargut"}
+          >
+            <span class="reel-tile__index">{String(i + 1).padStart(2, "0")}</span>
+            <span class="reel-tile__grid" aria-hidden="true"></span>
+            <span class="reel-tile__word">Reel</span>
+            <span class="reel-tile__title">{reel.title || "Ver en Instagram"}</span>
+          </a>
         ))}
       </div>
     </section>
-
-    <div class="videos-footer">
-      <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="btn btn--outline">
-        Ver todo en YouTube <span aria-hidden="true">↗</span>
-      </a>
-      <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="btn btn--outline">
-        Ver todo en Instagram <span aria-hidden="true">↗</span>
-      </a>
-    </div>
   </div>
 
   <PageFooter />
 </ArtistLayout>
+
+<script>
+  const player = document.getElementById("videoMain") as HTMLIFrameElement | null;
+  const nowTitle = document.getElementById("videoNow");
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-video-id]"));
+
+  if (player && nowTitle && buttons.length > 0) {
+    const activate = (button) => {
+      const id = button.dataset.videoId;
+      const title = button.dataset.videoTitle ?? "Video";
+      if (!id) return;
+
+      player.src = `https://www.youtube.com/embed/${id}`;
+      player.title = title;
+      nowTitle.textContent = title;
+
+      buttons.forEach((item) => {
+        item.classList.toggle("is-active", item === button);
+      });
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => activate(button));
+    });
+  }
+</script>
 
 <style>
   .videos-page { padding-top: clamp(0.75rem, 2.5vw, 1.25rem); }
@@ -209,9 +207,7 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
     flex-direction: column;
     gap: 0.3rem;
     padding: 0.9rem 0.8rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--surface);
+    border: 1px solid rgba(0, 0, 0, 0.35);
   }
   .video-stats dt {
     font-family: var(--font-mono);
@@ -220,193 +216,245 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
     letter-spacing: 0.1em;
     line-height: 1.3;
     text-transform: uppercase;
-    color: var(--ink);
+    color: #ffffff;
   }
   .video-stats dd {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(1.35rem, 4vw, 2.1rem);
+    font-size: clamp(1.2rem, 2.4vw, 1.7rem);
     line-height: 1;
-    color: var(--ink);
+    color: #ffffff;
   }
 
-  /* Tarjetas de video */
-  .featured-grid {
+  /* Consola */
+  .video-console {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
-    align-items: start;
+    background: #000000;
+    border: 1px solid var(--accent);
+    box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.35);
   }
-  .video-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    align-items: start;
-  }
-  .reel-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.8rem;
-    align-items: start;
-  }
-
-  .featured-card,
-  .video-card,
-  .reel-card {
-    display: flex;
-    flex-direction: column;
-    align-self: start;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    overflow: hidden;
-    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-soft));
-    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.42);
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .featured-card:hover,
-  .video-card:hover,
-  .reel-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--accent);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--accent);
-  }
-
-  .media-frame {
+  .video-console__screen { min-width: 0; }
+  .video-console__frame {
     position: relative;
     aspect-ratio: 16 / 9;
-    background: #050506;
+    background: #050000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
-  .media-frame--reel { aspect-ratio: 4 / 5; }
-
-  .media-iframe {
+  .video-console__frame iframe {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     border: 0;
     display: block;
-    filter: grayscale(0.1) contrast(1.03);
+    filter: grayscale(0.2) contrast(1.04);
     transition: filter 0.3s ease;
   }
-  .featured-card:hover .media-iframe,
-  .video-card:hover .media-iframe { filter: grayscale(0) contrast(1.02); }
+  .video-console:hover .video-console__frame iframe { filter: grayscale(0) contrast(1.02); }
 
-  .media-tag,
-  .media-index {
-    position: absolute;
-    z-index: 2;
-    padding: 0.34rem 0.52rem;
-    border-radius: 8px;
+  .video-console__now {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    padding: 1rem 1.1rem;
+  }
+  .video-console__label {
+    display: block;
+    margin-bottom: 0.35rem;
     font-family: var(--font-mono);
     font-size: 0.58rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
-    line-height: 1;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    pointer-events: none;
+    color: var(--accent);
   }
-  .media-tag {
-    top: 0.6rem;
-    left: 0.6rem;
-    background: var(--accent);
-    color: #ffffff;
-  }
-  .media-index {
-    top: 0.6rem;
-    right: 0.6rem;
-    background: var(--ink);
-    color: var(--bg);
-  }
-
-  .featured-card__title,
-  .video-card__title,
-  .reel-card__title {
-    padding: 0.9rem 1rem 1rem;
+  .video-console__now h3 {
     font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2.8vw, 1.8rem);
     font-weight: 400;
-    font-size: clamp(1rem, 2.6vw, 1.3rem);
     line-height: 1.1;
     text-transform: uppercase;
-    color: var(--ink);
+    color: #ffffff;
   }
-  .video-card__title {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  .video-console__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--accent);
+    white-space: nowrap;
   }
+  .video-console__link:hover { color: var(--accent); }
 
-  /* Portada Instagram */
-  .ig-feature {
-    position: absolute;
-    inset: 0;
+  .playlist {
     display: flex;
     flex-direction: column;
+    list-style: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .playlist li { border-bottom: 1px solid rgba(255, 255, 255, 0.18); }
+  .playlist li:last-child { border-bottom: 0; }
+  .playlist__item {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: center;
-    gap: 0.55rem;
-    padding: 1.2rem;
-    text-decoration: none;
+    gap: 0.7rem;
+    width: 100%;
+    padding: 0.8rem 0.9rem;
+    border: 0;
+    background: transparent;
     color: #ffffff;
-    background:
-      radial-gradient(220px 160px at 50% 28%, rgba(255, 35, 56, 0.28), transparent 72%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-    transition: background 0.2s ease, color 0.2s ease;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
   }
-  .ig-feature__grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
-    background-size: 26px 26px;
-    opacity: 0.45;
-    transition: opacity 0.2s ease;
+  .playlist__num {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    line-height: 1;
+    color: var(--accent);
   }
-  .ig-feature:hover {
-    background: #ffffff;
-    color: #000000;
-  }
-  .ig-feature:hover .ig-feature__grid { opacity: 0.12; }
-  .ig-feature__eyebrow,
-  .ig-feature__word,
-  .ig-feature__cta { position: relative; z-index: 1; }
-  .ig-feature__eyebrow {
+  .playlist__title {
     font-family: var(--font-mono);
     font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: inherit;
   }
-  .ig-feature__word {
-    font-family: var(--font-display);
-    font-size: clamp(1.8rem, 7vw, 2.8rem);
-    line-height: 1;
-    text-transform: uppercase;
-    color: inherit;
-  }
-  .ig-feature__cta {
-    font-family: var(--font-mono);
-    font-size: 0.56rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: inherit;
-  }
-  .ig-feature--reel .ig-feature__word { font-size: clamp(1.4rem, 6vw, 2.1rem); }
+  .playlist__arrow { font-size: 0.62rem; color: var(--accent); }
+  .playlist__item:hover { background: #ffffff; color: #000000; }
+  .playlist__item:hover .playlist__num,
+  .playlist__item:hover .playlist__arrow { color: #000000; }
+  .playlist__item.is-active { background: var(--accent); color: #ffffff; }
+  .playlist__item.is-active .playlist__num,
+  .playlist__item.is-active .playlist__arrow { color: #ffffff; }
 
-  .videos-footer {
+  .ig-strip {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.7rem;
-    margin-top: clamp(2rem, 5vw, 3rem);
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+    margin-top: 1rem;
+    padding: 1rem 1.1rem;
+    background: #000000;
+    border: 1px solid var(--accent);
+    border-left: 6px solid var(--accent);
+    text-decoration: none;
+    color: #ffffff;
   }
+  .ig-strip__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .ig-strip strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2.8vw, 1.7rem);
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .ig-strip__cta {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+  .ig-strip:hover { background: var(--accent); }
+  .ig-strip:hover :is(.ig-strip__eyebrow, .ig-strip__cta) { color: #ffffff; }
+
+  /* Carrusel de reels */
+  .reel-strip {
+    display: flex;
+    gap: 0.8rem;
+    overflow-x: auto;
+    padding-bottom: 0.6rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
+  }
+  .reel-tile {
+    position: relative;
+    flex: 0 0 220px;
+    aspect-ratio: 4 / 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.9rem;
+    overflow: hidden;
+    background:
+      radial-gradient(80% 70% at 50% 25%, rgba(255, 35, 56, 0.28), transparent 70%),
+      #000000;
+    border: 1px solid var(--accent);
+    text-decoration: none;
+    color: #ffffff;
+    scroll-snap-align: start;
+    transition: background 0.18s ease;
+  }
+  .reel-tile__index {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .reel-tile__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.4;
+  }
+  .reel-tile__word {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .reel-tile__title {
+    position: relative;
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .reel-tile:hover { background: var(--accent); }
+  .reel-tile:hover .reel-tile__grid { opacity: 0.15; }
 
   @media (min-width: 640px) {
-    .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .reel-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .video-console { grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.85fr); }
+    .playlist { border-top: 0; border-left: 1px solid rgba(255, 255, 255, 0.2); }
+    .reel-strip { gap: 1rem; }
+    .reel-tile { flex-basis: 240px; }
   }
 
   @media (min-width: 900px) {
@@ -414,19 +462,9 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
     .video-stats { align-self: end; }
   }
 
-  @media (min-width: 1024px) {
-    .video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
-    .reel-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .featured-card,
-    .video-card,
-    .reel-card,
-    .media-iframe,
-    .ig-feature { transition: none; }
-    .featured-card:hover,
-    .video-card:hover,
-    .reel-card:hover { transform: none; }
+    .video-console__frame iframe,
+    .playlist__item,
+    .reel-tile { transition: none; }
   }
 </style>

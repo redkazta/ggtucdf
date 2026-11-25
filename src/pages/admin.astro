@@ -18,7 +18,21 @@ const today = new Intl.DateTimeFormat("es-MX", {
 }).format(new Date());
 ---
 
-<ArtistLayout title="Admin" noindex theme="red">
+<ArtistLayout
+  title="Admin"
+  noindex
+  theme="red"
+  rail={{
+    number: "06",
+    label: "Admin",
+    links: authenticated
+      ? [
+          { href: "#drop-settings", label: "Drops" },
+          { href: "#adminTable", label: "Registros" },
+        ]
+      : undefined,
+  }}
+>
   <div class="internal-shell admin-page">
     <header class="internal-hero">
       <div class="internal-hero__top">
@@ -135,7 +149,7 @@ const today = new Intl.DateTimeFormat("es-MX", {
     align-items: baseline;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.8rem 0;
+    padding: 0.75rem 0.8rem;
     border-bottom: 1px solid var(--line);
   }
   .admin-facts dt {
