@@ -1,0 +1,127 @@
+---
+import { SPOTIFY_URL } from '../data/siteConfig';
+---
+
+<form id="dropRoomForm" class="drop-room-form">
+  <input type="text" name="nombre" placeholder="Nombre" required />
+  <input type="email" name="email" placeholder="Email" required />
+  <input type="tel" name="whatsapp" placeholder="WhatsApp (+52...)" required />
+  <label class="checkbox-label">
+    <input type="checkbox" name="acepto_privacidad" required />
+    <span>Acepto el aviso de privacidad y recibir contenido exclusivo</span>
+  </label>
+  <button type="submit">Unirme al Drop Room</button>
+  <p id="formError" class="error-message"></p>
+</form>
+
+<script client:load>
+  const form = document.getElementById('dropRoomForm');
+  const errorEl = document.getElementById('formError');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+
+    // Validación
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const whatsappRegex = /^\+?\d{7,15}$/;
+
+    if (!emailRegex.test(data.email)) {
+      errorEl.textContent = 'Por favor, introduce un email válido.';
+      errorEl.className = 'error-message';
+      return;
+    }
+    if (!whatsappRegex.test(data.whatsapp)) {
+      errorEl.textContent = 'Por favor, introduce un número de WhatsApp válido (ej. +521234567890).';
+      errorEl.className = 'error-message';
+      return;
+    }
+    if (!data.acepto_privacidad) {
+      errorEl.textContent = 'Debes aceptar el aviso de privacidad.';
+      errorEl.className = 'error-message';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/register-fan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: data.nombre,
+          email: data.email,
+          whatsapp: data.whatsapp,
+          acepto_privacidad: data.acepto_privacidad === 'on',
+        }),
+      });
+
+      if (res.ok) {
+        form.reset();
+        errorEl.textContent = '¡Te has unido al Drop Room! Revisa tu email.';
+        errorEl.className = 'success-message';
+      } else {
+        const err = await res.json();
+        errorEl.textContent = err.error || 'Hubo un error al registrarte.';
+        errorEl.className = 'error-message';
+      }
+    } catch (err) {
+      errorEl.textContent = 'No se pudo conectar al servidor.';
+      errorEl.className = 'error-message';
+    }
+  });
+</script>
+
+<style>
+  .drop-room-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  input {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-family: inherit;
+  }
+  input:focus {
+    outline: none;
+    border-color: #ff3333;
+  }
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+  }
+  .checkbox-label input {
+    width: auto;
+    margin-top: 0.2rem;
+  }
+  button {
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: none;
+    background: #ff3333;
+    color: #fff;
+    font-family: "Bebas Neue", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  button:hover { background: #e02a2a; }
+  button:active { transform: scale(0.98); }
+  .error-message, .success-message {
+    font-size: 0.8rem;
+    text-align: center;
+    min-height: 1.2rem;
+  }
+  .error-message { color: #ff3333; }
+  .success-message { color: #1db954; }
+</style>

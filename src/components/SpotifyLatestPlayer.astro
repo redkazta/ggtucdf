@@ -1,0 +1,80 @@
+---
+import { SPOTIFY_TRACK_ID } from '../data/siteConfig';
+---
+
+<div class="spotify-player" id="spotifyPlayer">
+  <div class="spotify-skeleton" data-skeleton aria-hidden="true">
+    <div class="skeleton-bar"></div>
+    <div class="skeleton-bar"></div>
+  </div>
+</div>
+
+<script client:load>
+  const container = document.getElementById('spotifyPlayer');
+  const fallbackId = SPOTIFY_TRACK_ID;
+
+  async function loadLatestTrack() {
+    try {
+      const res = await fetch('/api/latest-spotify');
+      if (!res.ok) throw new Error('API error');
+      const { id } = await res.json();
+      renderIframe(id);
+    } catch (err) {
+      console.warn('[SpotifyLatestPlayer] Fallback to static track:', err);
+      renderIframe(fallbackId);
+    }
+  }
+
+  function renderIframe(trackId: string) {
+    const src = `https://open.spotify.com/embed/track/${trackId}`;
+    container.innerHTML = `
+      <iframe
+        src="${src}"
+        class="spotify-iframe"
+        loading="eager"
+        allow="encrypted-media"
+        title="Último lanzamiento en Spotify"
+      ></iframe>
+    `;
+  }
+
+  loadLatestTrack();
+</script>
+
+<style>
+  .spotify-player {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    position: relative;
+  }
+  .spotify-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+  .spotify-skeleton {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .skeleton-bar {
+    height: 12px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.6s ease-in-out infinite;
+  }
+  @keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+</style>
