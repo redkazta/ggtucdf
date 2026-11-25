@@ -1,12 +1,14 @@
 ---
 import { dropConfig } from '../data/dropConfig';
+
+const { showCountdown, nextDropName, nextDropDate, latestReleaseName, latestReleaseUrl } = dropConfig;
 ---
 
-<div class="drop-countdown" id="dropCountdown" data-show={dropConfig.showCountdown}>
-  {#if dropConfig.showCountdown}
+<div class="drop-countdown" id="dropCountdown" data-show={showCountdown}>
+  {#if showCountdown}
     <div class="countdown-header">
       <span class="countdown-label">PRÓXIMO DROP</span>
-      <h2 class="countdown-title">{dropConfig.nextDropName}</h2>
+      <h2 class="countdown-title">{nextDropName}</h2>
     </div>
     <div class="countdown-timer" id="countdownTimer">
       <div class="countdown-unit">
@@ -32,8 +34,8 @@ import { dropConfig } from '../data/dropConfig';
   {:else}
     <div class="latest-drop">
       <span class="countdown-label">ÚLTIMO DROP</span>
-      <a href={dropConfig.latestReleaseUrl} target="_blank" rel="noopener" class="latest-drop-link">
-        {dropConfig.latestReleaseName}
+      <a href={latestReleaseUrl} target="_blank" rel="noopener" class="latest-drop-link">
+        {latestReleaseName}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
           <polyline points="15 3 21 3 21 9"></polyline>
@@ -48,10 +50,7 @@ import { dropConfig } from '../data/dropConfig';
   const timerEl = document.getElementById('countdownTimer');
   const countdownEl = document.getElementById('dropCountdown');
   const showCountdown = countdownEl?.dataset.show === 'true';
-
-  if (!showCountdown || !timerEl) return;
-
-  const target = new Date(dropConfig.nextDropDate);
+  const target = new Date('2026-11-15T00:00:00');
   const daysEl = document.getElementById('days');
   const hoursEl = document.getElementById('hours');
   const minutesEl = document.getElementById('minutes');
@@ -62,7 +61,6 @@ import { dropConfig } from '../data/dropConfig';
     const diff = target - now;
     if (diff <= 0) {
       clearInterval(interval);
-      // Recargar para mostrar "Último Drop"
       window.location.reload();
       return;
     }
@@ -77,7 +75,7 @@ import { dropConfig } from '../data/dropConfig';
   }
 
   const interval = setInterval(update, 1000);
-  update(); // primera ejecución inmediata
+  update();
 </script>
 
 <style>
