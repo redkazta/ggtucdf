@@ -15,113 +15,185 @@ const hasCountdown =
   data-show={String(hasCountdown)}
   data-target={nextDropDate ?? ""}
 >
-  {hasCountdown ? (
-    <>
-      <div class="countdown-header">
-        <span class="countdown-label">PRÓXIMO DROP</span>
-        <h2 class="countdown-title">{nextDropName}</h2>
-      </div>
-      <div class="countdown-timer" id="countdownTimer" role="timer">
-        <div class="countdown-unit">
-          <span class="countdown-value" id="days">00</span>
-          <span class="countdown-unit-label">DÍAS</span>
-        </div>
-        <span class="countdown-separator">:</span>
-        <div class="countdown-unit">
-          <span class="countdown-value" id="hours">00</span>
-          <span class="countdown-unit-label">HRS</span>
-        </div>
-        <span class="countdown-separator">:</span>
-        <div class="countdown-unit">
-          <span class="countdown-value" id="minutes">00</span>
-          <span class="countdown-unit-label">MIN</span>
-        </div>
-        <span class="countdown-separator">:</span>
-        <div class="countdown-unit">
-          <span class="countdown-value" id="seconds">00</span>
-          <span class="countdown-unit-label">SEG</span>
-        </div>
-      </div>
-    </>
-  ) : (
-    <div class="latest-drop">
-      <span class="countdown-label">ÚLTIMO DROP</span>
-      <a href={latestReleaseUrl} target="_blank" rel="noopener" class="latest-drop-link">
-        {latestReleaseName}
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          aria-hidden="true"
-        >
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-          <polyline points="15 3 21 3 21 9"></polyline>
-          <line x1="10" y1="14" x2="21" y2="3"></line>
-        </svg>
-      </a>
+  <div class="latest-drop" data-latest hidden={hasCountdown}>
+    <span class="countdown-label">ÚLTIMO DROP</span>
+    <a
+      href={latestReleaseUrl}
+      target="_blank"
+      rel="noopener"
+      class="latest-drop-link"
+      data-latest-link
+    >
+      <span data-latest-name>{latestReleaseName}</span>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </svg>
+    </a>
+  </div>
+
+  <div class="countdown-content" data-countdown hidden={!hasCountdown}>
+    <div class="countdown-header">
+      <span class="countdown-label">PRÓXIMO DROP</span>
+      <h2 class="countdown-title" data-next-name>{nextDropName}</h2>
     </div>
-  )}
+    <div class="countdown-timer" id="countdownTimer" role="timer">
+      <div class="countdown-unit">
+        <span class="countdown-value" id="days">00</span>
+        <span class="countdown-unit-label">DÍAS</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="hours">00</span>
+        <span class="countdown-unit-label">HRS</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="minutes">00</span>
+        <span class="countdown-unit-label">MIN</span>
+      </div>
+      <span class="countdown-separator">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-value" id="seconds">00</span>
+        <span class="countdown-unit-label">SEG</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-  const countdownEl = document.getElementById("dropCountdown");
-  const timerEl = document.getElementById("countdownTimer");
-  const targetValue = countdownEl?.dataset.target ?? "";
+  const root = document.getElementById("dropCountdown");
 
-  if (
-    countdownEl &&
-    timerEl &&
-    countdownEl.dataset.show === "true" &&
-    targetValue
-  ) {
-    const target = new Date(targetValue).getTime();
+  if (root) {
+    const latest = root.querySelector("[data-latest]");
+    const latestLink = root.querySelector("[data-latest-link]");
+    const latestName = root.querySelector("[data-latest-name]");
+    const countdown = root.querySelector("[data-countdown]");
+    const nextName = root.querySelector("[data-next-name]");
+    const countdownLabel = root.querySelector("[data-countdown] .countdown-label");
 
-    if (Number.isFinite(target)) {
-      const daysEl = document.getElementById("days");
-      const hoursEl = document.getElementById("hours");
-      const minutesEl = document.getElementById("minutes");
-      const secondsEl = document.getElementById("seconds");
-      const labelEl = countdownEl.querySelector(".countdown-label");
+    const daysEl = document.getElementById("days");
+    const hoursEl = document.getElementById("hours");
+    const minutesEl = document.getElementById("minutes");
+    const secondsEl = document.getElementById("seconds");
 
-      let intervalId = 0;
+    let intervalId = 0;
 
-      const setText = (element, value) => {
-        if (element) element.textContent = String(value).padStart(2, "0");
-      };
+    const setText = (element, value) => {
+      if (element) element.textContent = String(value).padStart(2, "0");
+    };
 
-      const update = () => {
-        const diff = target - Date.now();
+    const setVisible = (element, visible) => {
+      if (element) element.hidden = !visible;
+    };
 
-        if (diff <= 0) {
-          if (intervalId) window.clearInterval(intervalId);
-          setText(daysEl, 0);
-          setText(hoursEl, 0);
-          setText(minutesEl, 0);
-          setText(secondsEl, 0);
-          if (labelEl) labelEl.textContent = "DROP DISPONIBLE";
-          return;
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((diff / (1000 * 60)) % 60);
-        const seconds = Math.floor((diff / 1000) % 60);
-
-        setText(daysEl, days);
-        setText(hoursEl, hours);
-        setText(minutesEl, minutes);
-        setText(secondsEl, seconds);
-      };
-
-      update();
-
-      if (target > Date.now()) {
-        intervalId = window.setInterval(update, 1000);
+    const stopTimer = () => {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+        intervalId = 0;
       }
+    };
+
+    const updateCountdown = (target) => {
+      const diff = target - Date.now();
+
+      if (diff <= 0) {
+        stopTimer();
+        setText(daysEl, 0);
+        setText(hoursEl, 0);
+        setText(minutesEl, 0);
+        setText(secondsEl, 0);
+        if (countdownLabel) countdownLabel.textContent = "DROP DISPONIBLE";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      setText(daysEl, days);
+      setText(hoursEl, hours);
+      setText(minutesEl, minutes);
+      setText(secondsEl, seconds);
+    };
+
+    const applySettings = (settings) => {
+      if (!settings || typeof settings !== "object") return;
+
+      if (
+        typeof settings.latestReleaseName === "string" &&
+        settings.latestReleaseName.trim() &&
+        latestName
+      ) {
+        latestName.textContent = settings.latestReleaseName.trim();
+      }
+
+      if (typeof settings.latestReleaseUrl === "string" && latestLink) {
+        try {
+          const url = new URL(settings.latestReleaseUrl);
+          if (url.protocol === "http:" || url.protocol === "https:") {
+            latestLink.href = url.href;
+          }
+        } catch {
+          // Keep the fallback link when the stored URL is invalid.
+        }
+      }
+
+      if (typeof settings.nextDropName === "string" && nextName) {
+        nextName.textContent = settings.nextDropName.trim();
+      }
+
+      const target =
+        typeof settings.nextDropDate === "string"
+          ? Date.parse(settings.nextDropDate)
+          : Number.NaN;
+      const show =
+        Boolean(settings.showCountdown) &&
+        Number.isFinite(target) &&
+        target > Date.now();
+
+      root.dataset.show = String(show);
+      root.dataset.target =
+        typeof settings.nextDropDate === "string" ? settings.nextDropDate : "";
+
+      stopTimer();
+      setVisible(latest, !show);
+      setVisible(countdown, show);
+
+      if (show) {
+        if (countdownLabel) countdownLabel.textContent = "PRÓXIMO DROP";
+        updateCountdown(target);
+        intervalId = window.setInterval(() => updateCountdown(target), 1000);
+      }
+    };
+
+    const initialTarget = Date.parse(root.dataset.target || "");
+    if (root.dataset.show === "true" && Number.isFinite(initialTarget)) {
+      updateCountdown(initialTarget);
+      intervalId = window.setInterval(() => updateCountdown(initialTarget), 1000);
     }
+
+    fetch("/api/drop-config", {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((settings) => {
+        if (settings) applySettings(settings);
+      })
+      .catch((error) => {
+        console.warn("[DropCountdown] Usando configuración local:", error);
+      });
   }
 </script>
 
@@ -136,6 +208,9 @@ const hasCountdown =
     );
     border: 1px solid rgba(255, 50, 50, 0.2);
     text-align: center;
+  }
+  .drop-countdown [hidden] {
+    display: none !important;
   }
   .countdown-header {
     margin-bottom: 1rem;
