@@ -19,15 +19,16 @@ export const SPOTIFY_EMBED_TRACK = `https://open.spotify.com/embed/track/${SPOTI
 /**
  * Metadata del lanzamiento más reciente.
  *
- * La API Web de Spotify ya no expone el catálogo de un artista (álbumes,
- * top tracks, búsqueda) a apps nuevas: esos endpoints responden 403. Por eso
- * el lanzamiento se guarda aquí y se mantiene a mano junto con DISCOGRAPHY.
+ * La API Web oficial de Spotify no expone el catálogo de un artista a las apps
+ * nuevas (responde 403), así que este valor es el respaldo que se muestra si
+ * `getSpotifyArtistOverview()` no puede leer los datos públicos. Se mantiene a
+ * mano junto con DISCOGRAPHY.
  */
 export const LATEST_RELEASE = {
-  id: SPOTIFY_TRACK_ID,
-  name: "Yo te kiero solo",
-  album: "Yo te kiero solo",
-  releaseDate: null as string | null,
+  id: "0j8E2kOCaS6QWbhkyyKp44",
+  name: "TOKE",
+  album: "TOKE",
+  releaseDate: "2026-10-13" as string | null,
 };
 export const INSTAGRAM_URL = "https://www.instagram.com/garguttt/";
 export const TIKTOK_URL = "https://www.tiktok.com/@gargutttt";
@@ -52,8 +53,10 @@ export const SITE_THEME_COLOR = "#000000";
 export const OG_IMAGE_URL = new URL(KAZTA_IG_LOGO, SITE_URL).href;
 
 export const ARTIST_ORIGIN = "Guadalajara, México";
-export const ARTIST_MONTHLY_LISTENERS = "1.7K";
-export const ARTIST_FOLLOWERS = 272;
+/** Respaldo si Spotify no responde. Los valores reales se leen en vivo. */
+export const ARTIST_MONTHLY_LISTENERS = 8926;
+export const ARTIST_FOLLOWERS = 565;
+export const ARTIST_TOP_TRACK = "50 Varos";
 
 export interface Track {
   title: string;
@@ -67,9 +70,18 @@ export interface Track {
 
 export const DISCOGRAPHY: Track[] = [
   {
+    title: "TOKE",
+    year: 2026,
+    streams: 1329,
+    type: "colab",
+    spotifyUrl: "https://open.spotify.com/album/0YUSlxXr1P71zbVtNsfqN5",
+    coverUrl: "https://i.scdn.co/image/ab67616d00001e02a85183c24cce9805eb17e6cd",
+    collaborators: ["brandon dxf", "Vod-K", "Kid Pingo", "sanz.xs"],
+  },
+  {
     title: "Zackly Copula Freestyle",
     year: 2025,
-    streams: 21089,
+    streams: 27918,
     type: "colab",
     spotifyUrl: "https://open.spotify.com/album/2WWA4JDyzFaBmckntw902Z",
     coverUrl: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0211b23fa45a4128167e5770bf",
@@ -78,7 +90,7 @@ export const DISCOGRAPHY: Track[] = [
   {
     title: "Yo te kiero solo",
     year: 2026,
-    streams: 14572,
+    streams: 33095,
     type: "colab",
     spotifyUrl: "https://open.spotify.com/album/4DNc4mnyRFDCYpIL9IRqqZ",
     coverUrl: "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02e7dd3698ba2b17ceb4ceda9f",
@@ -95,7 +107,7 @@ export const DISCOGRAPHY: Track[] = [
   {
     title: "El Primer Artista",
     year: 2026,
-    streams: 2168,
+    streams: 3626,
     type: "solo",
     spotifyUrl: "https://open.spotify.com/album/5iTz24kQ5Dmo4FxeW3Vn8s",
     coverUrl: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e024437e50c9119dbda16a0270c",
@@ -103,6 +115,7 @@ export const DISCOGRAPHY: Track[] = [
   {
     title: "Experiencia Espiritual",
     year: 2026,
+    streams: 4388,
     type: "colab",
     spotifyUrl: "https://open.spotify.com/album/2uqLu8WowZ9Ra7zDETFfZD",
     coverUrl: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e0275915238051dd0872c7fb841",
@@ -111,6 +124,7 @@ export const DISCOGRAPHY: Track[] = [
   {
     title: "Soy Artista o Eso Parece",
     year: 2026,
+    streams: 5359,
     type: "colab",
     spotifyUrl: "https://open.spotify.com/album/28Vdtjsr3wqlsqSX4Ls2J8",
     coverUrl: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02e05bfc9872e18ed532f17846",
@@ -119,6 +133,7 @@ export const DISCOGRAPHY: Track[] = [
   {
     title: "Red House",
     year: 2025,
+    streams: 1109,
     type: "solo",
     spotifyUrl: "https://open.spotify.com/album/1ldXLvpl5KXoagtRZVRaCD",
     coverUrl: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02c500c9ad3eae300e75905f5e",
@@ -126,6 +141,7 @@ export const DISCOGRAPHY: Track[] = [
   {
     title: "Artesania",
     year: 2025,
+    streams: 1573,
     type: "colab",
     spotifyUrl: "https://open.spotify.com/album/2jDHDV8aF0NNy6ocjAKxt0",
     coverUrl: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02f5c3d4834127785782d78e5d",
@@ -134,6 +150,7 @@ export const DISCOGRAPHY: Track[] = [
   {
     title: "Confleis",
     year: 2025,
+    streams: 6316,
     type: "colab",
     spotifyUrl: "https://open.spotify.com/album/0DcIQchijG7NTD123YoSVp",
     coverUrl: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02abe79f9b92cdfd2fd75935ef",
@@ -150,6 +167,7 @@ export const DISCOGRAPHY: Track[] = [
   {
     title: "Gargut Nuevo",
     year: 2025,
+    streams: 13411,
     type: "solo",
     spotifyUrl: "https://open.spotify.com/album/2IgyqLhvBZliOHUGwH5E0P",
     coverUrl: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02031e3cfd1af6ebf410017029",

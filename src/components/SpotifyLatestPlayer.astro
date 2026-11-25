@@ -1,7 +1,7 @@
 ---
-import { SPOTIFY_TRACK_ID } from "../data/siteConfig";
+import { LATEST_RELEASE } from "../data/siteConfig";
 
-const trackId = /^[A-Za-z0-9]{22}$/.test(SPOTIFY_TRACK_ID) ? SPOTIFY_TRACK_ID : "";
+const trackId = /^[A-Za-z0-9]{22}$/.test(LATEST_RELEASE.id) ? LATEST_RELEASE.id : "";
 ---
 
 <div class="spotify-player" id="spotifyPlayer">
@@ -10,6 +10,8 @@ const trackId = /^[A-Za-z0-9]{22}$/.test(SPOTIFY_TRACK_ID) ? SPOTIFY_TRACK_ID : 
       <iframe
         src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`}
         class="spotify-iframe"
+        data-latest-track
+        data-current-id={trackId}
         width="100%"
         height="80"
         style="border:0;"
@@ -20,6 +22,30 @@ const trackId = /^[A-Za-z0-9]{22}$/.test(SPOTIFY_TRACK_ID) ? SPOTIFY_TRACK_ID : 
     ) : null
   }
 </div>
+
+<script is:inline>
+  (() => {
+    const iframe = document.querySelector("[data-latest-track]");
+    if (!iframe) return;
+
+    fetch("/api/latest-spotify", { headers: { Accept: "application/json" } })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!data || data.source !== "spotify") return;
+
+        const id = data.id;
+        if (typeof id !== "string" || !/^[A-Za-z0-9]{22}$/.test(id)) return;
+        if (id === iframe.dataset.currentId) return;
+
+        iframe.src = `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=0`;
+        iframe.dataset.currentId = id;
+        iframe.title = data.name
+          ? `${data.name} en Spotify`
+          : "Último lanzamiento en Spotify";
+      })
+      .catch(() => {});
+  })();
+</script>
 
 <style>
   .spotify-player {
