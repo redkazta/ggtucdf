@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
+export const prerender = false;
+
 const supabase = createClient(
   import.meta.env.PUBLIC_SUPABASE_URL!,
   import.meta.env.PRIVATE_SUPABASE_SERVICE_ROLE_KEY!
@@ -34,7 +36,6 @@ export const POST: APIRoute = async ({ request }) => {
     });
   } catch (e) {
     console.error('Resend error:', e);
-    // No bloqueamos la inserción, solo avisamos
   }
 
   return new Response(JSON.stringify({ success: true }), { status: 200 });
