@@ -10,11 +10,7 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [
     sitemap({
-      filter: (page) =>
-        !page.includes('/admin') &&
-        !page.includes('/musica') &&
-        !page.includes('/videos') &&
-        !page.includes('/drop-room'),
+      filter: (page) => !page.includes('/admin'),
     }),
   ],
 });

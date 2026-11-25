@@ -1,6 +1,5 @@
 ---
 import ArtistLayout from "../layouts/ArtistLayout.astro";
-import PageFooter from "../components/PageFooter.astro";
 import { INSTAGRAM_URL, YOUTUBE_URL } from "../data/siteConfig";
 
 const youtubeVideos = [
@@ -28,136 +27,96 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
   title="Videos"
   description="Videos oficiales de Garguttieneunchingodeferia — YouTube, Instagram y TikTok."
   theme="red"
-  rail={{
-    number: "03",
-    label: "Videos",
-    links: [
-      { href: "#destacados", label: "Consola" },
-      { href: "#reels", label: "Reels" },
-    ],
-  }}
+  board
 >
-  <div class="internal-shell videos-page">
-    <header class="internal-hero">
-      <div class="internal-hero__top">
-        <span class="kicker">03 / Visuales</span>
-        <span class="internal-hero__note">YouTube · Instagram · Reels</span>
-      </div>
-
-      <div class="video-hero">
-        <div>
-          <h1 class="internal-hero__title">Videos<span aria-hidden="true">*</span></h1>
-          <p class="internal-hero__lead">
-            Clips, reels y experimentos visuales. La imagen también suena.
-          </p>
-          <div class="internal-hero__actions">
-            <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="btn btn--primary">
-              Abrir YouTube <span aria-hidden="true">↗</span>
-            </a>
-            <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="btn btn--outline">
-              Instagram <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-        </div>
-
-        <dl class="video-stats">
-          <div>
-            <dt>Videos</dt>
-            <dd>{String(youtubeVideos.length).padStart(2, "0")}</dd>
-          </div>
-          <div>
-            <dt>Reels</dt>
-            <dd>{String(instagramReels.length).padStart(2, "0")}</dd>
-          </div>
-          <div>
-            <dt>Canal</dt>
-            <dd>YT</dd>
-          </div>
-        </dl>
+  <div class="board-page">
+    <header class="board-head">
+      <h1 class="board-head__title">Videos<span aria-hidden="true">*</span></h1>
+      <div class="board-head__meta">
+        <span><b>{youtubeVideos.length}</b> videos</span>
+        <span><b>{instagramReels.length}</b> reels</span>
+        <span>YouTube / Instagram</span>
+        <span><a href={YOUTUBE_URL} target="_blank" rel="noopener">Canal ↗</a></span>
       </div>
     </header>
 
-    <section id="destacados" aria-labelledby="consoleTitle">
-      <div class="section-heading">
-        <h2 id="consoleTitle">Consola de video</h2>
-        <span>Playlist / YouTube</span>
-      </div>
-
-      <div class="video-console">
-        <div class="video-console__screen">
-          <div class="video-console__frame">
-            <iframe
-              id="videoMain"
-              src={youtubeEmbed(youtubeVideos[0].id)}
-              title={youtubeVideos[0].title}
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-            />
-          </div>
-          <div class="video-console__now">
-            <div>
-              <span class="video-console__label">Ahora suena</span>
-              <h3 id="videoNow">{youtubeVideos[0].title}</h3>
+    <div class="board-grid video-board">
+      <section class="board-panel console-panel">
+        <div class="board-panel__head">
+          <span>Consola de video</span>
+          <span>Playlist / YouTube</span>
+        </div>
+        <div class="board-panel__body board-panel__body--flush console-panel__body">
+          <div class="video-console">
+            <div class="video-console__screen">
+              <div class="video-console__frame">
+                <iframe
+                  id="videoMain"
+                  src={youtubeEmbed(youtubeVideos[0].id)}
+                  title={youtubeVideos[0].title}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                />
+              </div>
+              <div class="video-console__now">
+                <div>
+                  <span class="video-console__label">Ahora suena</span>
+                  <h2 id="videoNow">{youtubeVideos[0].title}</h2>
+                </div>
+                <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="video-console__link">
+                  YouTube <span aria-hidden="true">↗</span>
+                </a>
+              </div>
             </div>
-            <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="video-console__link">
-              YouTube <span aria-hidden="true">↗</span>
-            </a>
+
+            <ol class="playlist">
+              {youtubeVideos.map((video, i) => (
+                <li>
+                  <button
+                    type="button"
+                    class:list={["playlist__item", { "is-active": i === 0 }]}
+                    data-video-id={video.id}
+                    data-video-title={video.title}
+                    aria-label={`Reproducir ${video.title}`}
+                  >
+                    <span class="playlist__num">{String(i + 1).padStart(2, "0")}</span>
+                    <span class="playlist__title">{video.title}</span>
+                    <span class="playlist__arrow" aria-hidden="true">▶</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
+      </section>
 
-        <ol class="playlist">
-          {youtubeVideos.map((video, i) => (
-            <li>
-              <button
-                type="button"
-                class:list={["playlist__item", { "is-active": i === 0 }]}
-                data-video-id={video.id}
-                data-video-title={video.title}
-                aria-label={`Reproducir ${video.title}`}
+      <section class="board-panel reels-panel">
+        <div class="board-panel__head">
+          <span>Reels / Instagram</span>
+          <span><a href={INSTAGRAM_URL} target="_blank" rel="noopener">Ver IG ↗</a></span>
+        </div>
+        <div class="board-panel__body board-panel__body--flush reels-panel__body">
+          <div class="reel-strip">
+            {instagramReels.map((reel, i) => (
+              <a
+                class="reel-tile"
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener"
+                aria-label={reel.title ? `Ver reel: ${reel.title}` : "Ver el Instagram de Gargut"}
               >
-                <span class="playlist__num">{String(i + 1).padStart(2, "0")}</span>
-                <span class="playlist__title">{video.title}</span>
-                <span class="playlist__arrow" aria-hidden="true">▶</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="ig-strip">
-        <span class="ig-strip__eyebrow">Instagram / El contexto</span>
-        <strong>¿Qué es el FENTATRIP?</strong>
-        <span class="ig-strip__cta">Ver visuales <span aria-hidden="true">↗</span></span>
-      </a>
-    </section>
-
-    <section id="reels" aria-labelledby="reelsTitle">
-      <div class="section-heading">
-        <h2 id="reelsTitle">Reels</h2>
-        <span>Desliza / Instagram</span>
-      </div>
-
-      <div class="reel-strip">
-        {instagramReels.map((reel, i) => (
-          <a
-            class="reel-tile"
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener"
-            aria-label={reel.title ? `Ver reel: ${reel.title}` : "Ver el Instagram de Gargut"}
-          >
-            <span class="reel-tile__index">{String(i + 1).padStart(2, "0")}</span>
-            <span class="reel-tile__grid" aria-hidden="true"></span>
-            <span class="reel-tile__word">Reel</span>
-            <span class="reel-tile__title">{reel.title || "Ver en Instagram"}</span>
-          </a>
-        ))}
-      </div>
-    </section>
+                <span class="reel-tile__index">{String(i + 1).padStart(2, "0")}</span>
+                <span class="reel-tile__grid" aria-hidden="true"></span>
+                <span class="reel-tile__word">Reel</span>
+                <span class="reel-tile__title">{reel.title || "Ver en Instagram"}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
-
-  <PageFooter />
 </ArtistLayout>
 
 <script>
@@ -166,7 +125,7 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
   const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-video-id]"));
 
   if (player && nowTitle && buttons.length > 0) {
-    const activate = (button) => {
+    const activate = (button: HTMLButtonElement) => {
       const id = button.dataset.videoId;
       const title = button.dataset.videoTitle ?? "Video";
       if (!id) return;
@@ -187,57 +146,26 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
 </script>
 
 <style>
-  .videos-page { padding-top: clamp(0.75rem, 2.5vw, 1.25rem); }
-
-  .video-hero {
-    display: grid;
+  .video-board {
     grid-template-columns: 1fr;
-    gap: clamp(1.5rem, 4vw, 2.5rem);
-    align-items: end;
+    grid-template-rows: minmax(0, 1.35fr) minmax(0, 0.65fr);
   }
+  .console-panel { grid-row: 1; }
+  .reels-panel { grid-row: 2; }
 
-  .video-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.6rem;
-    margin: 0;
-  }
-  .video-stats div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    padding: 0.9rem 0.8rem;
-    border: 1px solid rgba(0, 0, 0, 0.35);
-  }
-  .video-stats dt {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    line-height: 1.3;
-    text-transform: uppercase;
-    color: #ffffff;
-  }
-  .video-stats dd {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.2rem, 2.4vw, 1.7rem);
-    line-height: 1;
-    color: #ffffff;
-  }
-
-  /* Consola */
+  .console-panel__body { display: flex; min-height: 0; }
   .video-console {
     display: grid;
     grid-template-columns: 1fr;
+    width: 100%;
+    min-height: 0;
     background: #000000;
-    border: 1px solid var(--accent);
-    box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.35);
   }
-  .video-console__screen { min-width: 0; }
+  .video-console__screen { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
   .video-console__frame {
     position: relative;
-    aspect-ratio: 16 / 9;
+    flex: 1;
+    min-height: 0;
     background: #050000;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
@@ -248,91 +176,74 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
     height: 100%;
     border: 0;
     display: block;
-    filter: grayscale(0.2) contrast(1.04);
-    transition: filter 0.3s ease;
   }
-  .video-console:hover .video-console__frame iframe { filter: grayscale(0) contrast(1.02); }
-
   .video-console__now {
+    flex: 0 0 auto;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 0.75rem 1rem;
-    padding: 1rem 1.1rem;
+    gap: 0.5rem 1rem;
+    padding: 0.6rem 0.8rem;
   }
   .video-console__label {
     display: block;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.2rem;
     font-family: var(--font-mono);
-    font-size: 0.58rem;
+    font-size: 0.5rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--accent);
   }
-  .video-console__now h3 {
+  .video-console__now h2 {
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 2.8vw, 1.8rem);
+    font-size: clamp(0.95rem, 2.2vw, 1.5rem);
     font-weight: 400;
     line-height: 1.1;
     text-transform: uppercase;
     color: #ffffff;
   }
   .video-console__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
     font-family: var(--font-mono);
-    font-size: 0.6rem;
+    font-size: 0.52rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #ffffff;
     text-decoration: underline;
-    text-underline-offset: 4px;
+    text-underline-offset: 3px;
     text-decoration-color: var(--accent);
     white-space: nowrap;
   }
-  .video-console__link:hover { color: var(--accent); }
 
-  .playlist {
-    display: flex;
-    flex-direction: column;
-    list-style: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  .playlist li { border-bottom: 1px solid rgba(255, 255, 255, 0.18); }
+  .playlist { display: flex; flex-direction: column; list-style: none; overflow: auto; min-height: 0; border-top: 1px solid rgba(255, 255, 255, 0.2); }
+  .playlist li { border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
   .playlist li:last-child { border-bottom: 0; }
   .playlist__item {
     display: grid;
-    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    grid-template-columns: 1.5rem minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.5rem;
     width: 100%;
-    padding: 0.8rem 0.9rem;
+    padding: 0.46rem 0.6rem;
     border: 0;
     background: transparent;
     color: #ffffff;
     text-align: left;
     cursor: pointer;
-    transition: background 0.18s ease, color 0.18s ease;
+    transition: background 0.16s ease, color 0.16s ease;
   }
-  .playlist__num {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    line-height: 1;
-    color: var(--accent);
-  }
+  .playlist__num { font-family: var(--font-display); font-size: 0.8rem; color: var(--accent); }
   .playlist__title {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-size: 0.48rem;
     font-weight: 700;
-    line-height: 1.5;
-    letter-spacing: 0.03em;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
   }
-  .playlist__arrow { font-size: 0.62rem; color: var(--accent); }
+  .playlist__arrow { font-size: 0.5rem; color: var(--accent); }
   .playlist__item:hover { background: #ffffff; color: #000000; }
   .playlist__item:hover .playlist__num,
   .playlist__item:hover .playlist__arrow { color: #000000; }
@@ -340,131 +251,116 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
   .playlist__item.is-active .playlist__num,
   .playlist__item.is-active .playlist__arrow { color: #ffffff; }
 
-  .ig-strip {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.6rem 1rem;
-    margin-top: 1rem;
-    padding: 1rem 1.1rem;
-    background: #000000;
-    border: 1px solid var(--accent);
-    border-left: 6px solid var(--accent);
-    text-decoration: none;
-    color: #ffffff;
-  }
-  .ig-strip__eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  .ig-strip strong {
-    font-family: var(--font-display);
-    font-size: clamp(1.1rem, 2.8vw, 1.7rem);
-    font-weight: 400;
-    line-height: 1;
-    text-transform: uppercase;
-    color: #ffffff;
-  }
-  .ig-strip__cta {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #ffffff;
-    white-space: nowrap;
-  }
-  .ig-strip:hover { background: var(--accent); }
-  .ig-strip:hover :is(.ig-strip__eyebrow, .ig-strip__cta) { color: #ffffff; }
-
-  /* Carrusel de reels */
+  .reels-panel__body { display: flex; min-height: 0; }
   .reel-strip {
     display: flex;
-    gap: 0.8rem;
+    gap: 0.6rem;
+    width: 100%;
+    min-height: 0;
     overflow-x: auto;
-    padding-bottom: 0.6rem;
+    padding: 0.6rem;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
     scrollbar-color: var(--accent) transparent;
   }
   .reel-tile {
     position: relative;
-    flex: 0 0 220px;
+    flex: 0 0 auto;
+    height: 100%;
     aspect-ratio: 4 / 5;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 0.9rem;
+    padding: 0.6rem;
     overflow: hidden;
     background:
-      radial-gradient(80% 70% at 50% 25%, rgba(255, 35, 56, 0.28), transparent 70%),
+      radial-gradient(80% 70% at 50% 25%, rgba(255, 35, 56, 0.25), transparent 70%),
       #000000;
     border: 1px solid var(--accent);
     text-decoration: none;
     color: #ffffff;
     scroll-snap-align: start;
-    transition: background 0.18s ease;
   }
   .reel-tile__index {
     position: absolute;
-    top: 0.7rem;
-    right: 0.7rem;
+    top: 0.45rem;
+    right: 0.45rem;
     font-family: var(--font-mono);
-    font-size: 0.58rem;
+    font-size: 0.46rem;
     font-weight: 700;
-    color: #ffffff;
   }
   .reel-tile__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-    background-size: 28px 28px;
+      linear-gradient(90deg, rgba(255, 255, 255, 0.11) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.11) 1px, transparent 1px);
+    background-size: 22px 22px;
     opacity: 0.4;
   }
-  .reel-tile__word {
-    position: relative;
-    font-family: var(--font-display);
-    font-size: 2rem;
-    line-height: 1;
-    text-transform: uppercase;
-    color: #ffffff;
-  }
+  .reel-tile__word,
+  .reel-tile__title { position: relative; }
+  .reel-tile__word { font-family: var(--font-display); font-size: 1.4rem; line-height: 1; text-transform: uppercase; }
   .reel-tile__title {
-    position: relative;
-    margin-top: 0.35rem;
+    margin-top: 0.2rem;
     font-family: var(--font-mono);
-    font-size: 0.58rem;
+    font-size: 0.46rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    line-height: 1.5;
+    line-height: 1.35;
     text-transform: uppercase;
-    color: #ffffff;
   }
   .reel-tile:hover { background: var(--accent); }
   .reel-tile:hover .reel-tile__grid { opacity: 0.15; }
 
-  @media (min-width: 640px) {
+  @media (min-width: 760px) {
     .video-console { grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.85fr); }
     .playlist { border-top: 0; border-left: 1px solid rgba(255, 255, 255, 0.2); }
-    .reel-strip { gap: 1rem; }
-    .reel-tile { flex-basis: 240px; }
   }
 
-  @media (min-width: 900px) {
-    .video-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); }
-    .video-stats { align-self: end; }
-  }
+  @media (max-width: 900px) {
+    .video-board {
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, 1.5fr) minmax(0, 0.5fr);
+      overflow: hidden;
+    }
+    .video-console {
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+    .video-console__frame { aspect-ratio: auto; flex: 1; }
+    .video-console__now { gap: 0.2rem 0.5rem; padding: 0.3rem 0.5rem; }
+    .video-console__label { margin-bottom: 0.1rem; font-size: 0.4rem; }
+    .video-console__now h2 { font-size: 0.85rem; }
+    .video-console__link { font-size: 0.42rem; }
+    .playlist {
+      flex: 0 0 auto;
+      overflow: hidden;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-left: 0;
+    }
+    .playlist__item { grid-template-columns: 1.1rem minmax(0, 1fr) auto; gap: 0.3rem; padding: 0.22rem 0.4rem; }
+    .playlist__num { font-size: 0.58rem; }
+    .playlist__title { font-size: 0.38rem; line-height: 1.25; }
+    .playlist__arrow { font-size: 0.4rem; }
 
-  @media (prefers-reduced-motion: reduce) {
-    .video-console__frame iframe,
-    .playlist__item,
-    .reel-tile { transition: none; }
+    .reels-panel__body { padding: 0; }
+    .reel-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 0.3rem;
+      padding: 0.35rem;
+      overflow: hidden;
+    }
+    .reel-tile {
+      flex: none;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      aspect-ratio: auto;
+      padding: 0.3rem;
+    }
+    .reel-tile__index { top: 0.25rem; right: 0.25rem; font-size: 0.36rem; }
+    .reel-tile__word { font-size: 0.78rem; }
+    .reel-tile__title { display: none; }
   }
 </style>

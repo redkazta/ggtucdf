@@ -1,21 +1,11 @@
 ---
 import ArtistLayout from "../layouts/ArtistLayout.astro";
 import DropRoomForm from "../components/DropRoomForm.astro";
-import PageFooter from "../components/PageFooter.astro";
 
 const benefits = [
-  {
-    title: "Acceso anticipado",
-    body: "Escucha y mira antes de que salga al público.",
-  },
-  {
-    title: "Contenido exclusivo",
-    body: "Material que no se publica en ningún otro lado.",
-  },
-  {
-    title: "Fechas de shows",
-    body: "Guadalajara, México y lo que venga después.",
-  },
+  { title: "Acceso anticipado", body: "Escucha y mira antes de que salga al público." },
+  { title: "Contenido exclusivo", body: "Material que no se publica en ningún otro lado." },
+  { title: "Fechas de shows", body: "Guadalajara, México y lo que venga después." },
 ];
 ---
 
@@ -23,304 +13,204 @@ const benefits = [
   title="Drop Room"
   description="Únete al Drop Room de Gargut y entérate antes que nadie del próximo lanzamiento y del contenido exclusivo."
   theme="red"
-  rail={{
-    number: "04",
-    label: "Drop Room",
-    links: [
-      { href: "#por-que", label: "Por qué entrar" },
-      { href: "#registro", label: "Registro" },
-    ],
-  }}
+  board
 >
-  <div class="internal-shell drop-page">
-    <header class="internal-hero">
-      <div class="internal-hero__top">
-        <span class="kicker">04 / Drop Room</span>
-        <span class="internal-hero__note">Acceso anticipado</span>
-        <span class="internal-hero__live"><i aria-hidden="true"></i> Registro abierto</span>
-      </div>
-
-      <div class="drop-hero">
-        <div>
-          <h1 class="internal-hero__title">Entra antes<br />que nadie<span aria-hidden="true">*</span></h1>
-          <p class="internal-hero__lead">
-            Regístrate para recibir el próximo drop, contenido exclusivo y fechas
-            de shows directamente en tu email.
-          </p>
-          <div class="internal-hero__chips">
-            <span class="chip chip--accent">Email</span>
-            <span class="chip">WhatsApp</span>
-            <span class="chip">Gratis</span>
-          </div>
-        </div>
-
-        <dl class="drop-facts">
-          <div>
-            <dt>Canal</dt>
-            <dd>Email + WhatsApp</dd>
-          </div>
-          <div>
-            <dt>Acceso</dt>
-            <dd>Anticipado</dd>
-          </div>
-          <div>
-            <dt>Costo</dt>
-            <dd>$0</dd>
-          </div>
-        </dl>
+  <div class="board-page">
+    <header class="board-head">
+      <h1 class="board-head__title">Drop Room<span aria-hidden="true">*</span></h1>
+      <div class="board-head__meta">
+        <span>Acceso <b>anticipado</b></span>
+        <span>Email + WhatsApp</span>
+        <span>Costo <b>$0</b></span>
       </div>
     </header>
 
-    <div class="drop-layout">
-      <section class="drop-pitch" id="por-que" aria-labelledby="dropBenefitsTitle">
-        <div class="drop-pitch__head">
-          <span class="kicker">Por qué entrar</span>
-          <h2 id="dropBenefitsTitle">Lo que recibes</h2>
+    <div class="board-grid drop-board">
+      <section class="board-panel pitch-panel">
+        <div class="board-panel__head">
+          <span>Por qué entrar</span>
+          <span>GGT / Drop</span>
         </div>
-
-        <ol class="benefits">
-          {benefits.map((benefit, i) => (
-            <li>
-              <span class="benefits__index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-              <div>
-                <strong>{benefit.title}</strong>
-                <p>{benefit.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-
-        <div class="privacy-card">
-          <span class="privacy-card__label">Privacidad</span>
-          <p>
-            Solo usamos tus datos para enviarte novedades de Gargut. No los vendemos
-            ni los compartimos con terceros. Puedes darte de baja cuando quieras.
+        <div class="board-panel__body pitch-panel__body">
+          <h2>Entra antes que nadie</h2>
+          <p class="pitch-lead">
+            Recibe el próximo drop, contenido exclusivo y fechas de shows
+            directamente en tu email.
           </p>
-          <a href="/privacidad" class="privacy-card__link">
-            Leer aviso de privacidad <span aria-hidden="true">↗</span>
-          </a>
-        </div>
 
-        <div class="drop-quote">
-          <span aria-hidden="true">«</span>
-          <p>El siguiente drop no se anuncia: se filtra primero aquí.</p>
+          <ol class="benefits">
+            {benefits.map((benefit, i) => (
+              <li>
+                <span class="benefits__index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <strong>{benefit.title}</strong>
+                  <p>{benefit.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <p class="drop-privacy">
+            Solo usamos tus datos para enviarte novedades de Gargut. No los vendemos
+            ni compartimos con terceros.
+            <a href="/privacidad">Aviso de privacidad ↗</a>
+          </p>
         </div>
       </section>
 
-      <div class="drop-form-col" id="registro">
-        <DropRoomForm />
-      </div>
+      <section class="board-panel form-panel">
+        <div class="board-panel__body board-panel__body--flush form-panel__body">
+          <DropRoomForm />
+        </div>
+      </section>
     </div>
   </div>
-
-  <PageFooter />
 </ArtistLayout>
 
 <style>
-  .drop-page { padding-top: clamp(0.75rem, 2.5vw, 1.25rem); }
-
-  .drop-hero {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(1.5rem, 4vw, 2.75rem);
-    align-items: end;
+  .drop-board {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-rows: minmax(0, 1fr);
   }
 
-  .drop-hero .internal-hero__title {
-    display: block;
-    line-height: 0.82;
-  }
-  .drop-hero .internal-hero__title span {
-    display: inline-block;
-    margin-top: 0;
-    vertical-align: top;
-  }
-
-  .drop-facts {
+  .pitch-panel__body {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    width: 100%;
-    margin: 0;
-    border-top: 2px solid var(--ink);
+    gap: 0.7rem;
   }
-  .drop-facts div {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.75rem 0.8rem;
-    border-bottom: 1px solid var(--line);
-  }
-  .drop-facts dt {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink);
-  }
-  .drop-facts dd {
-    margin: 0;
+  .pitch-panel__body h2 {
     font-family: var(--font-display);
-    font-size: clamp(1rem, 2.2vw, 1.35rem);
-    line-height: 1.05;
-    text-align: right;
-    white-space: nowrap;
-    color: var(--ink);
-  }
-
-  /* Layout principal */
-  .drop-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-    margin-top: 1.25rem;
-    align-items: start;
-  }
-
-  .drop-pitch {
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
-    padding: clamp(1.25rem, 3.5vw, 2rem);
-    border: 1px solid var(--line-strong);
-    border-radius: 22px;
-    background: linear-gradient(180deg, var(--bg-elevated), var(--bg-soft));
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
-  }
-
-  .drop-pitch__head h2 {
-    margin-top: 0.45rem;
-    font-family: var(--font-display);
-    font-size: clamp(1.9rem, 5vw, 2.7rem);
+    font-size: clamp(1.8rem, 3.6vw, 2.8rem);
     font-weight: 400;
-    line-height: 1;
+    line-height: 0.92;
     text-transform: uppercase;
-    color: var(--ink);
+    color: #ffffff;
+  }
+  .pitch-lead {
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: #ffffff;
   }
 
   .benefits {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
     list-style: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.28);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
   }
   .benefits li {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.9rem;
-    padding: 1rem 0;
-    border: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    background: transparent;
+    gap: 0.7rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
   }
   .benefits__index {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: var(--accent);
     color: #ffffff;
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-size: 0.5rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
     line-height: 1;
   }
   .benefits strong {
     display: block;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.1rem;
     font-family: var(--font-display);
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 400;
     line-height: 1;
     text-transform: uppercase;
-    color: var(--ink);
+    color: #ffffff;
   }
   .benefits p {
-    font-size: 0.82rem;
-    line-height: 1.6;
-    color: var(--ink);
+    font-size: 0.68rem;
+    line-height: 1.5;
+    color: #ffffff;
   }
-
-  .privacy-card {
-    padding: 1rem 0 0;
-    border: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    background: transparent;
-  }
-  .privacy-card__label {
-    display: block;
-    margin-bottom: 0.35rem;
+  .drop-privacy {
+    margin-top: auto;
     font-family: var(--font-mono);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  .privacy-card p {
-    font-size: 0.78rem;
+    font-size: 0.5rem;
     line-height: 1.65;
-    color: var(--ink);
+    color: #ffffff;
   }
-  .privacy-card__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.7rem;
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-color: var(--accent);
-  }
-  .privacy-card__link:hover { color: var(--accent); }
-
-  .drop-quote {
-    display: flex;
-    gap: 0.75rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--line);
-  }
-  .drop-quote span {
-    font-family: var(--font-serif);
-    font-size: 3rem;
-    line-height: 0.8;
+  .drop-privacy a {
+    display: inline-block;
+    margin-top: 0.3rem;
     color: var(--accent);
-  }
-  .drop-quote p {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: clamp(1.15rem, 3vw, 1.5rem);
-    line-height: 1.2;
-    color: var(--ink);
+    text-underline-offset: 3px;
   }
 
-  .drop-form-col { width: 100%; }
+  .form-panel__body {
+    display: flex;
+    min-height: 0;
+    overflow: auto;
+  }
+  .form-panel__body :global(.drop-room-form) { height: auto; }
 
-  @media (min-width: 900px) {
-    .drop-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 320px); }
-    .drop-facts { align-self: end; }
-    .drop-layout {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
-      gap: 1.5rem;
+  @media (min-width: 901px) and (max-height: 820px) {
+    .pitch-panel__body { gap: 0.45rem; }
+    .pitch-panel__body h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+    .benefits li { padding: 0.45rem 0; }
+    .form-panel__body :global(.form-head) { padding: 0.5rem 0.9rem; }
+    .form-panel__body :global(.form-body) { gap: 0.65rem; padding: 0.8rem 1rem; }
+    .form-panel__body :global(input) { padding: 0.6rem 0.8rem; }
+    .form-panel__body :global(.checkbox-label) { padding: 0.6rem 0.7rem; }
+    .form-panel__body :global(button) { padding: 0.75rem 0.9rem; }
+    .form-panel__body :global(.form-foot) { padding: 0.5rem 0.9rem; }
+  }
+
+  @media (max-width: 900px) {
+    .drop-board {
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, 0.72fr) minmax(0, 1.28fr);
+      overflow: hidden;
     }
-    .drop-form-col {
-      position: sticky;
-      top: calc(var(--header-h) + 1.25rem);
+
+    .pitch-panel__body { gap: 0.2rem; padding: 0.4rem 0.5rem; }
+    .pitch-panel__body h2 { font-size: clamp(1.05rem, 4.5vw, 1.25rem); line-height: 0.95; }
+    .pitch-lead { font-size: 0.6rem; line-height: 1.25; }
+    .benefits li { gap: 0.45rem; padding: 0.12rem 0; }
+    .benefits__index { width: 18px; height: 18px; font-size: 0.4rem; }
+    .benefits strong { font-size: 0.8rem; }
+    .benefits p { font-size: 0.54rem; line-height: 1.25; }
+    .drop-privacy { margin-top: auto; font-size: 0.38rem; line-height: 1.25; }
+    .drop-privacy a { margin-top: 0.1rem; }
+
+    .form-panel__body { overflow: hidden; }
+    .form-panel__body :global(.drop-room-form) { height: 100%; border-radius: 0; }
+    .form-panel__body :global(.form-head) { padding: 0.3rem 0.5rem; }
+    .form-panel__body :global(.form-head__label),
+    .form-panel__body :global(.form-head__status) { font-size: 0.46rem; }
+    .form-panel__body :global(.form-head__dot) { width: 5px; height: 5px; }
+    .form-panel__body :global(.form-body) { gap: 0.4rem; padding: 0.45rem 0.55rem; }
+    .form-panel__body :global(.field) { gap: 0.12rem; }
+    .form-panel__body :global(.field__num),
+    .form-panel__body :global(.field label) { font-size: 0.46rem; }
+    .form-panel__body :global(input) { padding: 0.4rem 0.55rem; font-size: 0.78rem; border-radius: 0; }
+    .form-panel__body :global(.checkbox-label) {
+      gap: 0.35rem;
+      padding: 0.3rem 0.45rem;
+      font-size: 0.46rem;
+      line-height: 1.4;
+      border-radius: 0;
     }
+    .form-panel__body :global(.checkbox-label input) { width: 13px; height: 13px; }
+    .form-panel__body :global(button) { padding: 0.45rem 0.6rem; font-size: 0.52rem; border-radius: 0; }
+    .form-panel__body :global(.error-message),
+    .form-panel__body :global(.success-message) { font-size: 0.5rem; line-height: 1.4; }
+    .form-panel__body :global(.form-foot) { padding: 0.3rem 0.5rem; font-size: 0.42rem; }
   }
 
-  @media (max-width: 420px) {
-    .drop-facts dd { font-size: 0.95rem; }
+  @media (max-width: 900px) and (max-height: 700px) {
+    .pitch-panel__body { gap: 0.15rem; padding: 0.3rem 0.45rem; }
+    .benefits li { padding-block: 0.08rem; }
+    .pitch-panel__body .kicker,
+    .drop-privacy { display: none; }
   }
 </style>
