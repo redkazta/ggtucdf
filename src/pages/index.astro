@@ -10,6 +10,7 @@ import {
   YOUTUBE_URL,
   SPOTIFY_URL,
   INSTAGRAM_URL,
+  TIKTOK_URL,
   SITE_URL,
   SITE_TITLE,
   SITE_DESCRIPTION,
@@ -18,6 +19,14 @@ import {
   SITE_THEME_COLOR,
   OG_IMAGE_URL,
 } from "../data/siteConfig";
+
+const navItems = [
+  { label: "Inicio", href: "/" },
+  { label: "Artista", href: "/artista" },
+  { label: "Música", href: "/musica" },
+  { label: "Videos", href: "/videos" },
+  { label: "Drop Room", href: "/drop-room" },
+];
 ---
 
 <html lang="es">
@@ -57,11 +66,7 @@ import {
       description: SITE_DESCRIPTION,
       url: SITE_URL,
       image: OG_IMAGE_URL,
-      sameAs: [
-        YOUTUBE_URL,
-        SPOTIFY_URL,
-        INSTAGRAM_URL,
-      ],
+      sameAs: [YOUTUBE_URL, SPOTIFY_URL, INSTAGRAM_URL],
     })} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -69,462 +74,466 @@ import {
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
     />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
     />
     <link rel="prefetch" href="/artista" as="document" />
 
     <style is:global>
+      :root {
+        --bg: #000000;
+        --bg-soft: #050506;
+        --ink: #ffffff;
+        --text: #ffffff;
+        --line: rgba(255, 255, 255, 0.22);
+        --line-strong: rgba(255, 255, 255, 0.52);
+        --surface: rgba(255, 255, 255, 0.04);
+        --accent: #ff2338;
+        --accent-bright: #ff5a68;
+        --accent-glow: rgba(255, 35, 56, 0.45);
+        --font-display: "Anton", "Arial Narrow", Impact, sans-serif;
+        --font-body: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --font-mono: "Space Mono", "Courier New", monospace;
+        --header-h: 76px;
+      }
+
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body {
-        background: #000000;
-        color: #ffffff;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-        overflow-x: hidden;
+
+      html { background: var(--bg); scroll-behavior: smooth; }
+
+      body {
         min-height: 100dvh;
-      }
-      .scanlines {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        pointer-events: none;
-        opacity: 0.03;
-        background: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-          rgba(0, 0, 0, 0.15) 2px,
-          rgba(0, 0, 0, 0.15) 4px
-        );
-      }
-    </style>
-
-    <style>
-      .cta-stack {
-        position: fixed;
-        left: 50%;
-        bottom: max(1.2rem, env(safe-area-inset-bottom, 0px));
-        z-index: 100;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.35rem;
-        width: max-content;
-        max-width: 96vw;
-        pointer-events: none;
-      }
-      .cta-stack > * { pointer-events: auto; }
-
-      .cta-icon {
-        display: block;
-        line-height: 0;
-        text-decoration: none;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        filter: drop-shadow(0 3px 12px rgba(0,0,0,0.55));
-        transition: transform 0.2s ease, filter 0.3s ease;
-        position: relative;
-      }
-      .cta-icon::after {
-        content: "";
-        position: absolute;
-        inset: -8px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-      }
-      .cta-icon:hover { filter: drop-shadow(0 4px 20px rgba(0,0,0,0.7)) brightness(1.15); transform: scale(1.12); }
-      .cta-icon:hover::after { opacity: 1; }
-      .cta-icon:active { transform: scale(0.94); }
-      .cta-icon__logo { display: block; width: 88px; height: 88px; object-fit: contain; }
-      @media (max-width: 767px) { .cta-icon__logo { width: 76px; height: 76px; } }
-      @media (min-width: 1200px) { .cta-icon__logo { width: 96px; height: 96px; } }
-
-      .cta-label {
-        font-family: "Archivo Black", sans-serif;
-        font-style: italic;
-        text-transform: uppercase;
-        color: #ffffff;
-        text-align: center;
-        line-height: 1.05;
-        letter-spacing: 0.04em;
-        text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 20px rgba(255,50,50,0.15);
-        pointer-events: none;
-        user-select: none;
-      }
-      .cta-label--big {
-        font-size: clamp(1.1rem, 3.2vmin, 1.6rem);
-      }
-      .cta-label--small {
-        font-size: clamp(0.78rem, 2.2vmin, 1.05rem);
-        color: #ffffff;
-      }
-      .cta-arrows {
-        font-size: clamp(1rem, 2.6vmin, 1.4rem);
-        letter-spacing: -0.1em;
-        line-height: 1;
-        animation: arrow-drift 2s ease-in-out infinite;
-      }
-      @keyframes arrow-drift {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(2px); }
-      }
-      .cta-label--outnow {
-        color: #ff3333;
-        animation: outnow-glow 2s ease-in-out infinite;
-      }
-      @keyframes outnow-glow {
-        0%, 100% { text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 10px rgba(255,50,50,0.3); }
-        50% { text-shadow: 0 4px 18px rgba(0,0,0,0.9), 0 0 30px rgba(255,50,50,0.6); }
+        overflow-x: hidden;
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.6;
+        background: var(--bg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
-      .cta-ig {
-        position: fixed;
-        right: max(0.6rem, env(safe-area-inset-right, 0px));
-        bottom: max(8.5rem, env(safe-area-inset-bottom, 0px));
-        z-index: 110; display: block;
-        text-decoration: none;
-        color: #ffffff; cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        filter: drop-shadow(0 2px 10px rgba(0,0,0,0.55));
-        transition: transform 0.15s ease, filter 0.2s;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.25);
-        border-radius: 8px;
-        padding: 0.35rem 0.5rem;
-        width: 120px !important;
-        min-height: 80px !important;
-      }
-      .cta-ig:hover { filter: drop-shadow(0 3px 14px rgba(0,0,0,0.7)); transform: scale(1.03); background: rgba(255,255,255,0.15); }
-      .cta-ig:active { transform: scale(0.98); }
-      .cta-ig__eyebrow { display: block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.04em; line-height: 1.1; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff; }
-      .cta-ig__logo-wrap {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100% !important;
-        height: 48px !important;
-        background: #000000 !important;
-        border-radius: 4px;
-        overflow: hidden;
-        border: 1px solid rgba(255,255,255,0.25);
-      }
-      .cta-ig__logo {
-        display: block;
-        width: 100% !important;
-        height: 48px !important;
-        object-fit: contain !important;
-        object-position: center !important;
-      }
-      .cta-ig__logo-text {
-        display: none;
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 0.78rem;
-        color: #ff6a00;
-        letter-spacing: 0.08em;
-        line-height: 1;
-        text-transform: uppercase;
-        text-align: center;
-        padding: 0 0.25rem;
-      }
-      @media (min-width: 768px) {
-        .cta-ig { bottom: max(6.5rem, env(safe-area-inset-bottom, 0px)); width: 150px !important; padding: 0.4rem 0.6rem; }
-        .cta-ig__logo-wrap { height: 60px !important; }
-        .cta-ig__logo { height: 60px !important; }
-        .cta-ig__logo-text { font-size: 0.95rem; }
-        .cta-ig__eyebrow { font-size: 0.7rem; }
-      }
+      a { color: inherit; }
+      ::selection { background: var(--accent); color: #ffffff; }
+      :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-      .cta-enter {
+      .btn {
         position: relative;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.8rem;
-        text-decoration: none;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        margin-top: 1.2rem;
-        padding: 1.4rem 4rem;
-        border: 2.5px solid rgba(255, 50, 50, 0.65);
-        border-radius: 999px;
-        background: linear-gradient(135deg, rgba(255, 50, 50, 0.18), rgba(150, 0, 0, 0.3));
-        backdrop-filter: blur(10px);
-        box-shadow: 0 0 28px rgba(255, 50, 50, 0.35), 0 6px 32px rgba(0,0,0,0.45);
-        transition: background 0.3s ease, border-color 0.3s ease, transform 0.15s ease, box-shadow 0.3s ease;
-        overflow: hidden;
-        animation: cta-glow-pulse 3s ease-in-out infinite;
-      }
-      .cta-enter:hover {
-        background: linear-gradient(135deg, rgba(255, 50, 50, 0.35), rgba(180, 0, 0, 0.45));
-        border-color: rgba(255, 90, 90, 0.95);
-        transform: scale(1.08);
-        box-shadow: 0 0 45px rgba(255, 50, 50, 0.6), 0 8px 40px rgba(0,0,0,0.55);
-      }
-      .cta-enter:active { transform: scale(0.95); }
-      .cta-enter__text {
-        position: relative;
-        z-index: 2;
-        font-family: "Archivo Black", sans-serif;
-        font-style: italic;
+        gap: 0.6rem;
+        padding: 1rem 1.5rem 0.9rem;
+        border-radius: 12px;
+        border: 1px solid var(--line-strong);
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        font-size: clamp(1.1rem, 3.6vmin, 1.7rem);
-        color: #ffffff;
-        letter-spacing: 0.12em;
-        line-height: 1;
+        text-decoration: none;
         white-space: nowrap;
-        user-select: none;
-        text-shadow: 0 2px 16px rgba(0,0,0,0.7), 0 0 14px rgba(255,50,50,0.5);
-        animation: text-zoom-pulse 3s ease-in-out infinite;
+        color: #ffffff;
+        cursor: pointer;
+        transition: transform 0.16s ease, background 0.2s ease, color 0.2s ease,
+          border-color 0.2s ease, box-shadow 0.16s ease;
       }
-      .cta-enter__arrow {
-        position: relative;
-        z-index: 2;
-        font-size: clamp(0.9rem, 2.4vmin, 1.3rem);
+      .btn:active { transform: translateY(1px); box-shadow: none; }
+      .btn--primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        box-shadow: 0 12px 32px rgba(255, 35, 56, 0.3);
+      }
+      .btn--primary:hover {
+        background: var(--accent-bright);
+        border-color: var(--accent-bright);
+        transform: translateY(-2px);
+      }
+      .btn--outline { background: transparent; }
+      .btn--outline:hover { background: #ffffff; border-color: #ffffff; color: #000000; transform: translateY(-2px); }
+      .btn--ghost { background: var(--surface); border-color: var(--line); }
+      .btn--ghost:hover { background: rgba(255,255,255,0.09); border-color: var(--line-strong); }
+
+      @media (prefers-reduced-motion: reduce) {
+        .btn, .btn:hover { transition: none; transform: none; }
+      }
+    </style>
+
+    <style>
+      /* ---------- TOP BAR ---------- */
+      .home-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 300;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        height: var(--header-h);
+        padding: 0 clamp(1rem, 4vw, 2.5rem);
+        background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0));
+      }
+
+      .home-logo {
+        display: inline-flex;
+        align-items: baseline;
+        text-decoration: none;
+        line-height: 1;
+      }
+      .home-logo span {
+        font-family: var(--font-display);
+        font-size: 1.55rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+      }
+      .home-logo .is-red { color: var(--accent); }
+      .home-logo .is-white { color: #ffffff; }
+
+      .home-nav {
+        display: none;
+        align-items: center;
+        gap: 0.2rem;
+      }
+      .home-nav a {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: #ffffff;
+        padding: 0.5rem 0.75rem;
+        border-radius: 10px;
+        transition: background 0.18s ease, color 0.18s ease;
+      }
+      .home-nav a:hover { background: #ffffff; color: #000000; }
+
+      .home-header__actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .home-sound,
+      .home-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        border: 1px solid var(--line-strong);
+        background: rgba(0,0,0,0.5);
+        color: #ffffff;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
+      }
+      .home-sound:hover,
+      .home-menu-btn:hover { background: #ffffff; color: #000000; }
+      .home-sound:active,
+      .home-menu-btn:active { transform: scale(0.96); }
+      .home-sound svg,
+      .home-menu-btn svg { width: 22px; height: 22px; fill: currentColor; }
+      .home-menu-btn { display: inline-flex; }
+
+      /* ---------- MOBILE MENU ---------- */
+      .home-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 280;
+        background: rgba(0,0,0,0.75);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+      }
+      .home-overlay.is-visible { opacity: 1; visibility: visible; }
+
+      .home-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 290;
+        width: min(340px, 88vw);
+        padding: 1.25rem;
+        background: #000000;
+        border-left: 1px solid var(--line-strong);
+        transform: translateX(105%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .home-drawer.is-open { transform: translateX(0); }
+
+      .home-drawer__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--line);
+      }
+      .home-drawer__title {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #ffffff;
+      }
+
+      .home-drawer__nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .home-drawer__nav a {
+        font-family: var(--font-display);
+        font-size: clamp(1.7rem, 8vw, 2.4rem);
+        text-transform: uppercase;
+        text-decoration: none;
         color: #ffffff;
         line-height: 1;
-        animation: enter-bounce 1.4s ease-in-out infinite;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+        padding: 0.8rem 0.7rem;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
       }
-      .cta-enter__glow {
-        position: absolute;
-        inset: 0;
-        border-radius: 999px;
-        background: radial-gradient(circle at 50% 120%, rgba(255,80,80,0.4), transparent 55%);
-        opacity: 0.5;
-        transition: opacity 0.4s ease;
-        pointer-events: none;
-        animation: glow-pulse 3s ease-in-out infinite;
-      }
-      .cta-enter:hover .cta-enter__glow { opacity: 1; }
-      @keyframes enter-bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(5px); }
-      }
-      @keyframes cta-glow-pulse {
-        0%, 100% { box-shadow: 0 0 28px rgba(255, 50, 50, 0.3), 0 6px 32px rgba(0,0,0,0.45); border-color: rgba(255, 50, 50, 0.55); }
-        50% { box-shadow: 0 0 48px rgba(255, 50, 50, 0.55), 0 6px 32px rgba(0,0,0,0.45); border-color: rgba(255, 80, 80, 0.85); }
-      }
-      @keyframes text-zoom-pulse {
-        0%, 100% { transform: scale(1); text-shadow: 0 2px 16px rgba(0,0,0,0.7), 0 0 14px rgba(255,50,50,0.5); }
-        50% { transform: scale(1.04); text-shadow: 0 2px 20px rgba(0,0,0,0.8), 0 0 28px rgba(255,60,60,0.75); }
-      }
-      @keyframes glow-pulse {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 0.75; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .cta-enter__arrow { animation: none; }
-        .cta-enter { animation: none; }
-        .cta-enter__text { animation: none; }
-        .cta-enter__glow { animation: none; }
-      }
-      @media (max-width: 767px) {
-        .cta-enter { padding: 1.2rem 2.8rem; margin-top: 1.2rem; }
-        .cta-enter__text { font-size: clamp(0.95rem, 3.2vmin, 1.3rem); letter-spacing: 0.1em; }
-        .cta-enter__arrow { font-size: clamp(0.75rem, 2vmin, 1rem); }
-      }
+      .home-drawer__nav a:hover { background: #ffffff; color: #000000; border-color: #ffffff; }
 
-      .sound-cluster {
-        position: fixed;
-        top: max(0.5rem, env(safe-area-inset-top, 0px));
-        left: max(0.5rem, env(safe-area-inset-left, 0px));
-        z-index: 100; display: flex; align-items: center; gap: 0.1rem;
+      .home-drawer__socials {
+        margin-top: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
       }
-      .sound-toggle {
-        width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 8px; background: rgba(10,10,10,0.85); color: #ffffff;
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-        transition: background 0.2s, transform 0.1s;
-      }
-      .sound-toggle:hover { background: rgba(255,255,255,0.08); }
-      .sound-toggle:active { transform: scale(0.95); }
-      .sound-toggle svg { width: 22px; height: 22px; fill: currentColor; }
-
-      .err-msg {
-        position: fixed; bottom: calc(50% - 8rem); left: 50%;
-        transform: translateX(-50%); z-index: 25; max-width: min(32rem, 92vw);
-        text-align: center; font-size: 0.95rem; color: #ffffff; pointer-events: none;
-      }
-
-      .sound-hint {
-        position: fixed; inset: 0; z-index: 99;
-        display: block; pointer-events: none;
-      }
-      .sound-hint.is-dismissed { display: none; }
-      @keyframes sound-hint-pulse {
-        0%, 100% { transform: translate(0, 0); }
-        50% { transform: translate(-4px, -3px); }
-      }
-      .sound-hint__inner {
-        width: 100%; height: 100%;
+      .home-drawer__socials a {
+        font-family: var(--font-mono);
+        font-size: 0.64rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-decoration: none;
         color: #ffffff;
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
-        animation: sound-hint-pulse 0.9s ease-in-out infinite;
-        will-change: transform;
-        overflow: visible;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.55rem 0.8rem;
       }
+      .home-drawer__socials a:hover { border-color: var(--accent); color: var(--accent); }
+
+      /* ---------- CREDIT ---------- */
+      .home-credit {
+        position: fixed;
+        left: clamp(1rem, 4vw, 2.5rem);
+        bottom: 1rem;
+        z-index: 200;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.5rem 0.7rem;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(0,0,0,0.6);
+        text-decoration: none;
+        backdrop-filter: blur(10px);
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+      .home-credit:hover { border-color: var(--line-strong); background: rgba(0,0,0,0.8); }
+      .home-credit__eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #ffffff;
+      }
+      .home-credit img { display: block; height: 24px; width: auto; object-fit: contain; }
+      .home-credit__fallback {
+        display: none;
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #ff6a00;
+        text-transform: uppercase;
+      }
+
+      /* ---------- RESPONSIVE ---------- */
+      @media (min-width: 900px) {
+        .home-nav { display: flex; }
+        .home-menu-btn { display: none; }
+      }
+
+      @media (max-width: 640px) {
+        .home-credit { bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
+        .btn { padding: 0.9rem 1rem; font-size: 0.68rem; }
+      }
+
       @media (prefers-reduced-motion: reduce) {
-        .sound-hint__inner { animation: none; }
+        .home-overlay,
+        .home-drawer { transition: none; }
+        .home-sound, .home-menu-btn { transition: none; }
       }
     </style>
   </head>
 
   <body>
-    <div class="scanlines" aria-hidden="true"></div>
     <Analytics />
     <RegisterSW />
-    <Hero videoUrl={HERO_VIDEO_URL} title={SITE_TITLE} />
 
-    <p class="err-msg" id="err-msg" role="status"></p>
-
-    <div class="sound-cluster">
-      <button class="sound-toggle" id="soundToggle" type="button" aria-label="Activar o desactivar sonido">
-        <svg id="soundOnIcon" viewBox="0 0 24 24" style="display:none" aria-hidden="true">
-          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path>
-        </svg>
-        <svg id="soundOffIcon" viewBox="0 0 24 24" style="display:block" aria-hidden="true">
-          <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path>
-        </svg>
-      </button>
-    </div>
-
-    <div class="sound-hint" id="soundHint" aria-hidden="true">
-      <svg class="sound-hint__inner" id="soundHintSvg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
-        <defs>
-          <marker id="soundHintArrowEnd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto">
-            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"></path>
-          </marker>
-        </defs>
-        <line id="soundHintLine" x1="0" y1="0" x2="0" y2="0" fill="none" stroke="currentColor" stroke-width="3.85" stroke-linecap="round" marker-end="url(#soundHintArrowEnd)"></line>
-      </svg>
-    </div>
-
-    <div class="cta-stack">
-      <a href={SPOTIFY_URL} target="_blank" rel="noopener" class="cta-icon" aria-label="Escuchar en Spotify">
-        <img class="cta-icon__logo" src="/brand/spotify.svg" width="88" height="88" alt="" decoding="async" />
+    <header class="home-header">
+      <a href="/" class="home-logo" aria-label="Inicio">
+        <span class="is-red">G</span><span class="is-white">ARGUT</span>
       </a>
 
-      <div class="cta-label cta-label--big">
-        <span class="cta-arrows">&#171;&#171;</span> YO TE KIERO SOLO <span class="cta-arrows">&#187;&#187;</span>
+      <nav class="home-nav" aria-label="Navegación principal">
+        {navItems.map((item) => (
+          <a href={item.href}>{item.label}</a>
+        ))}
+      </nav>
+
+      <div class="home-header__actions">
+        <button class="home-sound" id="soundToggle" type="button" aria-label="Activar o desactivar sonido" aria-pressed="false">
+          <svg id="soundOnIcon" viewBox="0 0 24 24" style="display:none" aria-hidden="true">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path>
+          </svg>
+          <svg id="soundOffIcon" viewBox="0 0 24 24" style="display:block" aria-hidden="true">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path>
+          </svg>
+        </button>
+
+        <button class="home-menu-btn" id="menuToggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="homeDrawer">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"></path>
+          </svg>
+        </button>
       </div>
-      <div class="cta-label cta-label--big cta-label--outnow">OUT NOW</div>
+    </header>
 
-      <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="cta-icon" aria-label="Gargut en YouTube">
-        <img class="cta-icon__logo" src="/brand/youtube.svg" width="88" height="88" alt="" decoding="async" />
-      </a>
-
-      <div class="cta-label cta-label--small">
-        <span class="cta-arrows">&#8593;&#8593;</span> VER VISUALIZER <span class="cta-arrows">&#8593;&#8593;</span>
+    <div class="home-overlay" id="homeOverlay" aria-hidden="true"></div>
+    <aside class="home-drawer" id="homeDrawer" aria-hidden="true" aria-label="Menú de navegación">
+      <div class="home-drawer__top">
+        <span class="home-drawer__title">Navegación</span>
+        <button class="home-sound" id="drawerClose" type="button" aria-label="Cerrar menú">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+          </svg>
+        </button>
       </div>
 
-      <a href="/artista" class="cta-enter" aria-label="Entrar a Experiencia Espiritual">
-        <span class="cta-enter__glow" aria-hidden="true"></span>
-        <span class="cta-enter__text">EXPERIENCIA ESPIRITUAL</span>
-        <span class="cta-enter__arrow" aria-hidden="true">&#9660;</span>
-      </a>
-    </div>
+      <nav class="home-drawer__nav" aria-label="Navegación móvil">
+        {navItems.map((item) => (
+          <a href={item.href}>{item.label}</a>
+        ))}
+      </nav>
 
-    <a href={WILDFORGE_URL} target="_blank" rel="noopener noreferrer" class="cta-ig" aria-label="Sitio hecho por WildForgeLabs">
-      <span class="cta-ig__eyebrow">Hecho por:</span>
-      <div class="cta-ig__logo-wrap">
-        <img class="cta-ig__logo" src={WILDFORGE_LOGO} alt="WildForgeLabs logo" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <span class="cta-ig__logo-text" style="display:none;">WILDFORGELABS</span>
+      <div class="home-drawer__socials">
+        <a href={SPOTIFY_URL} target="_blank" rel="noopener">Spotify</a>
+        <a href={YOUTUBE_URL} target="_blank" rel="noopener">YouTube</a>
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener">Instagram</a>
+        <a href={TIKTOK_URL} target="_blank" rel="noopener">TikTok</a>
       </div>
+    </aside>
+
+    <Hero
+      videoUrl={HERO_VIDEO_URL}
+      title="GARGUT"
+      subtitle="TIENE UN CHINGO DE FERIA"
+      tagline="Singles, colaboraciones y frecuencias bajas desde Guadalajara. Sin fórmula, sin permiso."
+    >
+      <a href={SPOTIFY_URL} target="_blank" rel="noopener" class="btn btn--primary">Escuchar ahora <span aria-hidden="true">↗</span></a>
+      <a href="/musica" class="btn btn--outline">Ver música <span aria-hidden="true">→</span></a>
+      <a href="/drop-room" class="btn btn--ghost">Drop Room <span aria-hidden="true">→</span></a>
+    </Hero>
+
+    <a href={WILDFORGE_URL} target="_blank" rel="noopener noreferrer" class="home-credit" aria-label="Sitio hecho por WildForgeLabs">
+      <span class="home-credit__eyebrow">Hecho por</span>
+      <img
+        src={WILDFORGE_LOGO}
+        alt="WildForgeLabs"
+        decoding="async"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+      />
+      <span class="home-credit__fallback" style="display:none;">WILDFORGELABS</span>
     </a>
 
     <audio id="track" preload="none" loop playsinline muted data-src={TRACK_SRC}></audio>
 
     <script>
-      (function() {
-        const audio = document.getElementById("track") as HTMLAudioElement | null;
-        const btn = document.getElementById("soundToggle");
-        const onIcon = document.getElementById("soundOnIcon") as HTMLElement | null;
-        const offIcon = document.getElementById("soundOffIcon") as HTMLElement | null;
-        if (!audio || !btn || !onIcon || !offIcon) return;
+      (() => {
+        // --- Menú móvil ---
+        const menuToggle = document.getElementById("menuToggle");
+        const drawer = document.getElementById("homeDrawer");
+        const overlay = document.getElementById("homeOverlay");
+        const drawerClose = document.getElementById("drawerClose");
 
-        let soundEnabled = false;
-        function update() {
-          onIcon.style.display = soundEnabled ? "block" : "none";
-          offIcon.style.display = soundEnabled ? "none" : "block";
+        if (menuToggle && drawer && overlay && drawerClose) {
+          const openMenu = () => {
+            drawer.classList.add("is-open");
+            overlay.classList.add("is-visible");
+            drawer.setAttribute("aria-hidden", "false");
+            overlay.setAttribute("aria-hidden", "false");
+            menuToggle.setAttribute("aria-expanded", "true");
+            document.body.style.overflow = "hidden";
+          };
+
+          const closeMenu = () => {
+            drawer.classList.remove("is-open");
+            overlay.classList.remove("is-visible");
+            drawer.setAttribute("aria-hidden", "true");
+            overlay.setAttribute("aria-hidden", "true");
+            menuToggle.setAttribute("aria-expanded", "false");
+            document.body.style.overflow = "";
+          };
+
+          menuToggle.addEventListener("click", openMenu);
+          drawerClose.addEventListener("click", closeMenu);
+          overlay.addEventListener("click", closeMenu);
+          drawer.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+          document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") closeMenu();
+          });
         }
 
-        btn.addEventListener("click", () => {
-          if (!soundEnabled) {
-            if (!audio.src) {
-              audio.src = (audio.dataset.src as string) || "";
-              audio.load();
-            }
-            soundEnabled = true;
-            audio.muted = false;
-            update();
-            audio.play().catch(() => {});
-          } else {
-            soundEnabled = false;
-            audio.muted = true;
-            update();
-          }
-        });
+        // --- Sonido ---
+        const audio = document.getElementById("track");
+        const soundBtn = document.getElementById("soundToggle");
+        const onIcon = document.getElementById("soundOnIcon");
+        const offIcon = document.getElementById("soundOffIcon");
 
-        // Sound hint arrow geometry
-        const soundHint = document.getElementById("soundHint");
-        const soundHintSvg = document.getElementById("soundHintSvg");
-        const soundHintLine = document.getElementById("soundHintLine");
-        if (soundHint && soundHintSvg && soundHintLine && btn) {
-          function dismissSoundHint() {
-            soundHint.classList.add("is-dismissed");
-          }
-          function updateSoundHintGeometry() {
-            if (soundHint.classList.contains("is-dismissed")) return;
-            const hR = soundHint.getBoundingClientRect();
-            const w = hR.width;
-            const h = hR.height;
-            if (w < 2 || h < 2) return;
-            const bR = btn.getBoundingClientRect();
-            const cx = bR.left - hR.left + bR.width * 0.5;
-            const cy = bR.top - hR.top + bR.height * 0.5;
-            let kx = w * 0.76;
-            let ky = h * 0.66;
-            let dxk = cx - kx;
-            let dyk = cy - ky;
-            let L = Math.hypot(dxk, dyk);
-            if (L < 20) { kx = w * 0.72; ky = h * 0.7; dxk = cx - kx; dyk = cy - ky; L = Math.hypot(dxk, dyk); }
-            if (L < 12) return;
-            const ux = dxk / L;
-            const uy = dyk / L;
-            const gap = 44;
-            const tail = 58;
-            const bx = cx - ux * gap;
-            const by = cy - uy * gap;
-            const ax = bx - ux * tail;
-            const ay = by - uy * tail;
-            soundHintSvg.setAttribute("viewBox", `0 0 ${w} ${h}`);
-            soundHintLine.setAttribute("x1", String(ax));
-            soundHintLine.setAttribute("y1", String(ay));
-            soundHintLine.setAttribute("x2", String(bx));
-            soundHintLine.setAttribute("y2", String(by));
-            soundHintLine.setAttribute("stroke-width", String(3.85));
-          }
-          function scheduleUpdate() {
-            requestAnimationFrame(() => updateSoundHintGeometry());
-          }
-          scheduleUpdate();
-          window.addEventListener("resize", scheduleUpdate, { passive: true });
-          if (typeof ResizeObserver !== "undefined") {
-            new ResizeObserver(() => scheduleUpdate()).observe(soundHint);
-          }
-          window.addEventListener("orientationchange", scheduleUpdate, { passive: true });
-          if (window.visualViewport) {
-            window.visualViewport.addEventListener("resize", scheduleUpdate, { passive: true });
-          }
-          document.addEventListener("click", dismissSoundHint, { once: true });
-          btn.addEventListener("click", dismissSoundHint, { once: true });
+        if (audio && soundBtn && onIcon && offIcon) {
+          let enabled = false;
+
+          const update = () => {
+            onIcon.style.display = enabled ? "block" : "none";
+            offIcon.style.display = enabled ? "none" : "block";
+            soundBtn.setAttribute("aria-pressed", enabled ? "true" : "false");
+          };
+
+          soundBtn.addEventListener("click", () => {
+            if (!enabled) {
+              if (!audio.src) {
+                audio.src = audio.dataset.src || "";
+                audio.load();
+              }
+              enabled = true;
+              audio.muted = false;
+              update();
+              audio.play().catch(() => {});
+            } else {
+              enabled = false;
+              audio.muted = true;
+              update();
+            }
+          });
+
+          update();
         }
       })();
     </script>
