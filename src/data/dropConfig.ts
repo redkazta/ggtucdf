@@ -10,8 +10,8 @@ export const dropConfig = {
   latestReleaseUrl: "https://open.spotify.com/track/4KvIxXUbDzMicaBr2opF9e",
   /** Nombre del próximo drop */
   nextDropName: "FENTATRIP",
-  /** Fecha del próximo drop (ISO 8601). Si es pasada o null, no se muestra contador. */
-  nextDropDate: "2026-11-15T00:00:00",
+  /** Fecha del próximo drop (ISO 8601 con zona horaria). Si es pasada o null, no se muestra contador. */
+  nextDropDate: "2026-11-15T00:00:00-06:00",
   /** Si es true, se muestra el contador regresivo */
   showCountdown: false,
 };

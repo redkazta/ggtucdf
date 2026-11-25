@@ -1,44 +1,62 @@
 ---
-import { SPOTIFY_TRACK_ID } from '../data/siteConfig';
+import { SPOTIFY_TRACK_ID } from "../data/siteConfig";
 ---
 
-<div class="spotify-player" id="spotifyPlayer">
+<div class="spotify-player" id="spotifyPlayer" data-fallback-id={SPOTIFY_TRACK_ID}>
   <div class="spotify-skeleton" data-skeleton aria-hidden="true">
     <div class="skeleton-bar"></div>
     <div class="skeleton-bar"></div>
   </div>
 </div>
 
-<script client:load>
-  const container = document.getElementById('spotifyPlayer');
-  const fallbackId = SPOTIFY_TRACK_ID;
+<script>
+  const container = document.getElementById("spotifyPlayer");
+  const fallbackId = container?.dataset.fallbackId ?? "";
+
+  function isTrackId(value) {
+    return typeof value === "string" && /^[A-Za-z0-9]{22}$/.test(value);
+  }
+
+  function renderIframe(trackId) {
+    if (!container || !isTrackId(trackId)) return;
+
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://open.spotify.com/embed/track/${trackId}`;
+    iframe.className = "spotify-iframe";
+    iframe.loading = "eager";
+    iframe.allow = "encrypted-media; clipboard-write";
+    iframe.title = "Último lanzamiento en Spotify";
+
+    container.replaceChildren(iframe);
+  }
 
   async function loadLatestTrack() {
+    if (!container) return;
+
     try {
-      const res = await fetch('/api/latest-spotify');
-      if (!res.ok) throw new Error('API error');
-      const { id } = await res.json();
-      renderIframe(id);
-    } catch (err) {
-      console.warn('[SpotifyLatestPlayer] Fallback to static track:', err);
+      const response = await fetch("/api/latest-spotify", {
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!isTrackId(data?.id)) {
+        throw new Error("Spotify returned an invalid track id");
+      }
+
+      renderIframe(data.id);
+    } catch (error) {
+      console.warn("[SpotifyLatestPlayer] Usando track de respaldo:", error);
       renderIframe(fallbackId);
     }
   }
 
-  function renderIframe(trackId: string) {
-    const src = `https://open.spotify.com/embed/track/${trackId}`;
-    container.innerHTML = `
-      <iframe
-        src="${src}"
-        class="spotify-iframe"
-        loading="eager"
-        allow="encrypted-media"
-        title="Último lanzamiento en Spotify"
-      ></iframe>
-    `;
+  if (container) {
+    void loadLatestTrack();
   }
-
-  loadLatestTrack();
 </script>
 
 <style>
@@ -69,12 +87,26 @@ import { SPOTIFY_TRACK_ID } from '../data/siteConfig';
   .skeleton-bar {
     height: 12px;
     border-radius: 4px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 100%);
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.6s ease-in-out infinite;
   }
   @keyframes skeleton-shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-bar {
+      animation: none;
+    }
   }
 </style>

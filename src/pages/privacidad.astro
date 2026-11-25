@@ -1,0 +1,106 @@
+---
+import ArtistLayout from "../layouts/ArtistLayout.astro";
+import PageFooter from "../components/PageFooter.astro";
+import { INSTAGRAM_URL, SITE_TITLE } from "../data/siteConfig";
+---
+
+<ArtistLayout
+  title="Aviso de privacidad"
+  description="Aviso de privacidad de Gargut: qué datos recopilamos en el Drop Room, para qué los usamos y cómo ejercer tus derechos."
+>
+  <section class="privacy-page" aria-labelledby="privacy-title">
+    <span class="eyebrow">Legal</span>
+    <h1 id="privacy-title" class="page-title">Aviso de privacidad</h1>
+    <p class="updated">Última actualización: 28 de octubre de 2026</p>
+
+    <h2>Responsable</h2>
+    <p>
+      {SITE_TITLE} es el responsable del tratamiento de los datos personales que
+      proporcionas a través del Drop Room.
+    </p>
+
+    <h2>Datos que recopilamos</h2>
+    <p>
+      Nombre, correo electrónico y número de WhatsApp. También registramos la
+      fecha en que aceptaste este aviso y tu consentimiento para recibir
+      comunicaciones.
+    </p>
+
+    <h2>Finalidad</h2>
+    <p>
+      Usamos tus datos para enviarte novedades sobre lanzamientos, contenido
+      exclusivo, fechas de shows y promociones relacionadas con Gargut. No
+      vendemos ni compartimos tus datos con terceros para fines publicitarios.
+    </p>
+
+    <h2>Conservación y baja</h2>
+    <p>
+      Conservamos tus datos mientras mantengas tu suscripción al Drop Room.
+      Puedes solicitar la baja o la eliminación de tus datos en cualquier momento
+      escribiéndonos por Instagram.
+    </p>
+
+    <h2>Derechos ARCO</h2>
+    <p>
+      Puedes solicitar el acceso, rectificación, cancelación u oposición al
+      tratamiento de tus datos personales contactándonos por
+      <a href={INSTAGRAM_URL} target="_blank" rel="noopener">Instagram</a>.
+    </p>
+
+    <h2>Cambios a este aviso</h2>
+    <p>
+      Podemos actualizar este aviso para reflejar cambios en nuestras prácticas.
+      La versión vigente estará siempre publicada en esta página.
+    </p>
+
+    <PageFooter />
+  </section>
+</ArtistLayout>
+
+<style>
+  .privacy-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 2rem;
+  }
+  .eyebrow {
+    display: block;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: rgba(255, 50, 50, 0.75);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .page-title {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .updated {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  h2 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #ff5a5a;
+    margin: 1.75rem 0 0.5rem;
+  }
+  p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  a {
+    color: #ff6b6b;
+    text-underline-offset: 2px;
+  }
+</style>
