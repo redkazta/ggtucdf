@@ -24,9 +24,22 @@ const navItems = [
   </div>
 
   <nav class="drawer__nav" aria-label="Navegación móvil">
-    {navItems.map((item) => (
-      <a href={item.href} class="drawer__link">{item.label}</a>
-    ))}
+    {navItems.map((item) => {
+      const isActive =
+        item.href === "/"
+          ? Astro.url.pathname === "/"
+          : Astro.url.pathname.startsWith(item.href);
+
+      return (
+        <a
+          href={item.href}
+          class:list={["drawer__link", { "is-active": isActive }]}
+          aria-current={isActive ? "page" : undefined}
+        >
+          {item.label}
+        </a>
+      );
+    })}
   </nav>
 </aside>
 
@@ -152,6 +165,11 @@ const navItems = [
     color: #000000;
     background: #ffffff;
     border-color: #ffffff;
+  }
+  .drawer__link.is-active {
+    color: #ffffff;
+    background: var(--accent);
+    border-color: var(--accent);
   }
 
   @media (min-width: 768px) {

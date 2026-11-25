@@ -205,20 +205,22 @@ const hasCountdown =
 <style>
   .drop-countdown {
     position: relative;
-    margin: 0 0 1.25rem;
+    margin: 1.1rem 0 0;
     padding: 1rem;
     border: 1px solid var(--line);
-    border-left: 3px solid var(--accent);
-    background: var(--bg-soft);
+    border-radius: 16px;
+    background:
+      radial-gradient(120% 140% at 0% 0%, rgba(255, 35, 56, 0.14), transparent 60%),
+      var(--surface);
   }
   .drop-countdown [hidden] { display: none !important; }
 
   .countdown-label {
     display: block;
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--accent);
     margin-bottom: 0.35rem;
@@ -238,11 +240,11 @@ const hasCountdown =
     align-items: center;
     gap: 0.5rem;
     font-family: var(--font-display);
-    font-size: clamp(1.7rem, 7vw, 2.8rem);
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
     line-height: 1;
     text-transform: uppercase;
     letter-spacing: 0.01em;
-    color: var(--ink);
+    color: #ffffff;
     text-decoration: none;
     transition: color 0.2s ease;
   }
@@ -251,11 +253,11 @@ const hasCountdown =
   .latest-drop-link:hover svg { transform: translate(2px, -2px); }
   .latest-drop__meta {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 0.58rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: #ffffff;
   }
 
   /* Estado: contador */
@@ -270,57 +272,57 @@ const hasCountdown =
   }
   .countdown-title {
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    font-size: clamp(1.4rem, 4.5vw, 2rem);
     font-weight: 400;
     line-height: 0.95;
     text-transform: uppercase;
-    color: var(--ink);
+    color: #ffffff;
   }
   .countdown-zone {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-size: 0.56rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: #ffffff;
     white-space: nowrap;
   }
 
   .countdown-timer {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    border: 1px solid var(--line);
-    background: var(--bg);
+    gap: 0.45rem;
   }
   .countdown-unit {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.15rem;
-    padding: 0.7rem 0.3rem 0.55rem;
-    border-right: 1px solid var(--line);
+    gap: 0.2rem;
+    padding: 0.7rem 0.3rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #000000;
   }
-  .countdown-unit:last-of-type { border-right: 0; }
   .countdown-value {
     font-family: var(--font-display);
-    font-size: clamp(1.9rem, 9vw, 3.4rem);
+    font-size: clamp(1.7rem, 8vw, 2.9rem);
     line-height: 0.9;
-    color: var(--ink);
+    color: #ffffff;
     font-variant-numeric: tabular-nums;
   }
   .countdown-unit-label {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-size: 0.56rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: #ffffff;
   }
   .countdown-separator { display: none; }
 
   @media (min-width: 768px) {
-    .drop-countdown { padding: 1.25rem 1.35rem; }
-    .countdown-unit { padding: 0.9rem 0.5rem 0.75rem; }
+    .drop-countdown { padding: 1.25rem; }
+    .countdown-timer { gap: 0.6rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -3,57 +3,92 @@ import { SPOTIFY_ARTIST_URL, YOUTUBE_URL } from "../data/siteConfig";
 ---
 
 <footer class="page-footer">
-  <div class="page-footer__divider" aria-hidden="true"></div>
-  <div class="page-footer__links">
-    <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="footer-link footer-link--spotify">
-      <span class="footer-link__icon" aria-hidden="true">&#9836;</span>
-      <span class="footer-link__text">Spotify</span>
-    </a>
-    <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="footer-link footer-link--youtube">
-      <span class="footer-link__icon" aria-hidden="true">&#9654;</span>
-      <span class="footer-link__text">YouTube</span>
-    </a>
+  <div class="page-footer__inner">
+    <div class="page-footer__brand">
+      <span class="page-footer__word">GGT<span aria-hidden="true">*</span></span>
+      <p class="page-footer__copy">Gargut &mdash; Guadalajara, México</p>
+    </div>
+
+    <div class="page-footer__links">
+      <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="footer-link footer-link--spotify">
+        <span class="footer-link__icon" aria-hidden="true">&#9836;</span>
+        <span class="footer-link__text">Spotify</span>
+      </a>
+      <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="footer-link footer-link--youtube">
+        <span class="footer-link__icon" aria-hidden="true">&#9654;</span>
+        <span class="footer-link__text">YouTube</span>
+      </a>
+    </div>
   </div>
-  <p class="page-footer__copy">Gargut &mdash; Guadalajara, México</p>
 </footer>
 
 <style>
   .page-footer {
-    padding: 2.5rem 1.25rem 2rem;
-    text-align: center;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 2.5rem) clamp(2rem, 5vw, 3rem);
   }
 
-  .page-footer__divider {
-    width: 40px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(255,50,50,0.6), transparent);
-    margin: 0 auto 1.5rem;
-    border-radius: 2px;
+  .page-footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-top: clamp(1.5rem, 4vw, 2.25rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .page-footer__word {
+    display: inline-flex;
+    align-items: flex-start;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 9vw, 4.5rem);
+    line-height: 0.8;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .page-footer__word span {
+    margin-top: 0.12em;
+    margin-left: 0.06em;
+    font-family: var(--font-mono);
+    font-size: 0.16em;
+    color: var(--accent);
+  }
+
+  .page-footer__copy {
+    margin-top: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ffffff;
   }
 
   .page-footer__links {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.6rem;
   }
 
   .footer-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.65rem 1.1rem;
-    border-radius: 12px;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-radius: 999px;
     text-decoration: none;
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
     -webkit-tap-highlight-color: transparent;
     border: 1px solid var(--line-strong);
     background: transparent;
+    color: #ffffff;
   }
   .footer-link:hover {
     background: #ffffff;
@@ -62,23 +97,18 @@ import { SPOTIFY_ARTIST_URL, YOUTUBE_URL } from "../data/siteConfig";
   }
   .footer-link:active { transform: scale(0.98); }
 
-  .footer-link--spotify { color: #1ed760; border-color: rgba(30, 215, 96, 0.55); }
-  .footer-link--youtube { color: #ff4a4a; border-color: rgba(255, 74, 74, 0.55); }
+  .footer-link--spotify { border-color: rgba(30, 215, 96, 0.55); }
+  .footer-link--youtube { border-color: rgba(255, 74, 74, 0.55); }
 
   .footer-link__icon { font-size: 0.9rem; line-height: 1; }
 
-  .page-footer__copy {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #ffffff;
-  }
-
   @media (min-width: 768px) {
-    .page-footer { padding: 3rem 2.5rem 2rem; }
-    .footer-link { font-size: 0.78rem; padding: 0.7rem 1.3rem; }
-    .page-footer__copy { font-size: 0.7rem; }
+    .page-footer__inner {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .page-footer__links { padding-bottom: 0.35rem; }
+    .footer-link { font-size: 0.68rem; padding: 0.7rem 1.15rem; }
   }
 </style>

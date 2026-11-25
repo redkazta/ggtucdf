@@ -37,7 +37,7 @@ const trackId = /^[A-Za-z0-9]{22}$/.test(LATEST_RELEASE.id) ? LATEST_RELEASE.id 
         if (typeof id !== "string" || !/^[A-Za-z0-9]{22}$/.test(id)) return;
         if (id === iframe.dataset.currentId) return;
 
-        iframe.src = `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=0`;
+        iframe.src = `https://open.spotify.com/embed/track/${id}?theme=0`;
         iframe.dataset.currentId = id;
         iframe.title = data.name
           ? `${data.name} en Spotify`
@@ -51,19 +51,17 @@ const trackId = /^[A-Za-z0-9]{22}$/.test(LATEST_RELEASE.id) ? LATEST_RELEASE.id 
   .spotify-player {
     position: relative;
     width: 100%;
-    padding: 0;
-    border-radius: 0;
+    border-radius: 14px;
     overflow: hidden;
     border: 1px solid var(--line);
-    border-left: 3px solid var(--accent);
-    background: var(--bg);
+    background: #000000;
   }
   :global(.spotify-iframe) {
     width: 100%;
     height: 80px;
     border: none;
-    border-radius: 0;
+    border-radius: 14px;
     display: block;
-    background: var(--bg);
+    background: #000000;
   }
 </style>
