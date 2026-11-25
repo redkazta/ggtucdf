@@ -1,63 +1,25 @@
 ---
 import { SPOTIFY_TRACK_ID } from "../data/siteConfig";
+
+const trackId = /^[A-Za-z0-9]{22}$/.test(SPOTIFY_TRACK_ID) ? SPOTIFY_TRACK_ID : "";
 ---
 
-<div class="spotify-player" id="spotifyPlayer" data-fallback-id={SPOTIFY_TRACK_ID}>
-  <div class="spotify-skeleton" data-skeleton aria-hidden="true">
-    <div class="skeleton-bar"></div>
-    <div class="skeleton-bar"></div>
-  </div>
+<div class="spotify-player" id="spotifyPlayer">
+  {
+    trackId ? (
+      <iframe
+        src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`}
+        class="spotify-iframe"
+        width="100%"
+        height="80"
+        style="border:0;"
+        loading="lazy"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        title="Último lanzamiento en Spotify"
+      />
+    ) : null
+  }
 </div>
-
-<script>
-  const container = document.getElementById("spotifyPlayer");
-  const fallbackId = container?.dataset.fallbackId ?? "";
-
-  function isTrackId(value) {
-    return typeof value === "string" && /^[A-Za-z0-9]{22}$/.test(value);
-  }
-
-  function renderIframe(trackId) {
-    if (!container || !isTrackId(trackId)) return;
-
-    const iframe = document.createElement("iframe");
-    iframe.src = `https://open.spotify.com/embed/track/${trackId}`;
-    iframe.className = "spotify-iframe";
-    iframe.loading = "eager";
-    iframe.allow = "encrypted-media; clipboard-write";
-    iframe.title = "Último lanzamiento en Spotify";
-
-    container.replaceChildren(iframe);
-  }
-
-  async function loadLatestTrack() {
-    if (!container) return;
-
-    try {
-      const response = await fetch("/api/latest-spotify", {
-        headers: { Accept: "application/json" },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (!isTrackId(data?.id)) {
-        throw new Error("Spotify returned an invalid track id");
-      }
-
-      renderIframe(data.id);
-    } catch (error) {
-      console.warn("[SpotifyLatestPlayer] Usando track de respaldo:", error);
-      renderIframe(fallbackId);
-    }
-  }
-
-  if (container) {
-    void loadLatestTrack();
-  }
-</script>
 
 <style>
   .spotify-player {
@@ -77,35 +39,5 @@ import { SPOTIFY_TRACK_ID } from "../data/siteConfig";
     border-radius: 0;
     display: block;
     background: var(--bg);
-  }
-  .spotify-skeleton {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.9rem;
-    background: var(--bg);
-  }
-  .skeleton-bar {
-    height: 10px;
-    border-radius: 0;
-    background: linear-gradient(
-      90deg,
-      var(--line-soft) 0%,
-      var(--line-strong) 50%,
-      var(--line-soft) 100%
-    );
-    background-size: 200% 100%;
-    animation: skeleton-shimmer 1.6s ease-in-out infinite;
-  }
-  .skeleton-bar:last-child { width: 62%; }
-  @keyframes skeleton-shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .skeleton-bar { animation: none; }
   }
 </style>

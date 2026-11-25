@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { SPOTIFY_ARTIST_ID } from "../../data/siteConfig";
+import { LATEST_RELEASE, SPOTIFY_ARTIST_ID } from "../../data/siteConfig";
 import { getServerEnv } from "../../lib/env";
 import { jsonResponse } from "../../lib/http";
 
@@ -24,8 +24,13 @@ interface TokenCache {
 
 let tokenCache: TokenCache | undefined;
 
-/** Raised when the server credentials are missing or rejected by Spotify. */
-class SpotifyCredentialsError extends Error {}
+/**
+ * Spotify dejó de dar acceso al catálogo de un artista (álbumes, top tracks,
+ * búsqueda) a las apps nuevas: esos endpoints responden 403 aunque el token
+ * sea válido. Cuando eso pasa devolvemos el lanzamiento configurado en lugar
+ * de romper el endpoint.
+ */
+class SpotifyCatalogUnavailableError extends Error {}
 
 function releaseDateScore(date: string | undefined): number {
   if (!date) return 0;
@@ -58,7 +63,7 @@ async function getAccessToken(): Promise<string | null> {
   });
 
   if (!response.ok) {
-    throw new SpotifyCredentialsError(
+    throw new SpotifyCatalogUnavailableError(
       `Spotify token request failed with ${response.status}`
     );
   }
@@ -69,7 +74,9 @@ async function getAccessToken(): Promise<string | null> {
   };
 
   if (!data.access_token) {
-    throw new Error("Spotify token response did not include an access token");
+    throw new SpotifyCatalogUnavailableError(
+      "Spotify token response did not include an access token"
+    );
   }
 
   const lifetimeSeconds = Math.max(60, (data.expires_in ?? 3600) - 60);
@@ -87,97 +94,79 @@ async function fetchJson(url: string, accessToken: string): Promise<Response> {
   });
 }
 
-export const GET: APIRoute = async () => {
-  try {
-    const accessToken = await getAccessToken();
-    if (!accessToken) {
-      return jsonResponse(
-        {
-          error: "Spotify no está configurado en el servidor.",
-          code: "SPOTIFY_NOT_CONFIGURED",
-        },
-        503,
-        { "Cache-Control": "no-store" }
-      );
-    }
+async function findLatestRelease(): Promise<{
+  id: string;
+  name: string;
+  album: string;
+  releaseDate: string | null;
+} | null> {
+  const accessToken = await getAccessToken();
+  if (!accessToken) return null;
 
-    const artistId =
-      getServerEnv("SPOTIFY_ARTIST_ID", import.meta.env.SPOTIFY_ARTIST_ID) ??
-      SPOTIFY_ARTIST_ID;
+  const artistId =
+    getServerEnv("SPOTIFY_ARTIST_ID", import.meta.env.SPOTIFY_ARTIST_ID) ??
+    SPOTIFY_ARTIST_ID;
 
-    const albumsResponse = await fetchJson(
-      `https://api.spotify.com/v1/artists/${encodeURIComponent(artistId)}/albums?include_groups=album,single&limit=10&market=MX`,
+  const albumsResponse = await fetchJson(
+    `https://api.spotify.com/v1/artists/${encodeURIComponent(artistId)}/albums?include_groups=album,single&limit=10&market=MX`,
+    accessToken
+  );
+
+  if (!albumsResponse.ok) {
+    throw new SpotifyCatalogUnavailableError(
+      `Spotify albums request failed with ${albumsResponse.status}`
+    );
+  }
+
+  const albumsData = (await albumsResponse.json()) as { items?: SpotifyAlbum[] };
+  const albums = (albumsData.items ?? [])
+    .filter((album): album is SpotifyAlbum => Boolean(album?.id))
+    .sort(
+      (left, right) =>
+        releaseDateScore(right.release_date) - releaseDateScore(left.release_date)
+    );
+
+  // The albums endpoint returns simplified albums without tracks, so fetch
+  // the tracks of the newest releases until a playable track is found.
+  for (const album of albums.slice(0, 5)) {
+    const tracksResponse = await fetchJson(
+      `https://api.spotify.com/v1/albums/${encodeURIComponent(album.id)}/tracks?limit=10&market=MX`,
       accessToken
     );
 
-    if (!albumsResponse.ok) {
-      throw new Error(`Spotify albums request failed with ${albumsResponse.status}`);
+    if (!tracksResponse.ok) continue;
+
+    const tracksData = (await tracksResponse.json()) as { items?: SpotifyTrack[] };
+    const track = (tracksData.items ?? []).find((item) => item?.id);
+
+    if (track?.id) {
+      return {
+        id: track.id,
+        name: track.name,
+        album: album.name,
+        releaseDate: album.release_date ?? null,
+      };
     }
-
-    const albumsData = (await albumsResponse.json()) as { items?: SpotifyAlbum[] };
-    const albums = (albumsData.items ?? [])
-      .filter((album): album is SpotifyAlbum => Boolean(album?.id))
-      .sort(
-        (left, right) =>
-          releaseDateScore(right.release_date) - releaseDateScore(left.release_date)
-      );
-
-    if (albums.length === 0) {
-      throw new Error("Spotify returned no releases for this artist");
-    }
-
-    // The albums endpoint returns simplified albums without tracks, so fetch
-    // the tracks of the newest releases until a playable track is found.
-    for (const album of albums.slice(0, 5)) {
-      const tracksResponse = await fetchJson(
-        `https://api.spotify.com/v1/albums/${encodeURIComponent(album.id)}/tracks?limit=10&market=MX`,
-        accessToken
-      );
-
-      if (!tracksResponse.ok) continue;
-
-      const tracksData = (await tracksResponse.json()) as { items?: SpotifyTrack[] };
-      const track = (tracksData.items ?? []).find((item) => item?.id);
-
-      if (track?.id) {
-        return jsonResponse(
-          {
-            id: track.id,
-            name: track.name,
-            album: album.name,
-            releaseDate: album.release_date ?? null,
-          },
-          200,
-          {
-            "Cache-Control": "public, s-maxage=600, stale-while-revalidate=3600",
-          }
-        );
-      }
-    }
-
-    throw new Error("No playable Spotify track found");
-  } catch (error) {
-    console.error("[api/latest-spotify]", error);
-
-    if (error instanceof SpotifyCredentialsError) {
-      return jsonResponse(
-        {
-          error:
-            "Spotify rechazó las credenciales. Revisa SPOTIFY_CLIENT_ID y SPOTIFY_CLIENT_SECRET en Vercel.",
-          code: "SPOTIFY_AUTH_FAILED",
-        },
-        503,
-        { "Cache-Control": "no-store" }
-      );
-    }
-
-    return jsonResponse(
-      {
-        error: "No se pudo consultar el último lanzamiento.",
-        code: "SPOTIFY_UPSTREAM_ERROR",
-      },
-      502,
-      { "Cache-Control": "no-store" }
-    );
   }
+
+  return null;
+}
+
+export const GET: APIRoute = async () => {
+  const cacheHeaders = {
+    "Cache-Control": "public, s-maxage=600, stale-while-revalidate=3600",
+  };
+
+  try {
+    const release = await findLatestRelease();
+
+    if (release) {
+      return jsonResponse({ ...release, source: "spotify" }, 200, cacheHeaders);
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn("[api/latest-spotify] Se usa el lanzamiento configurado:", message);
+  }
+
+  return jsonResponse({ ...LATEST_RELEASE, source: "config" }, 200, cacheHeaders);
 };
