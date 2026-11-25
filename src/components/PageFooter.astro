@@ -41,42 +41,44 @@ import { SPOTIFY_ARTIST_URL, YOUTUBE_URL } from "../data/siteConfig";
   .footer-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.5rem 1rem;
-    border-radius: 999px;
+    gap: 0.45rem;
+    padding: 0.65rem 1.1rem;
+    border-radius: 0;
     text-decoration: none;
-    font-family: "Bebas Neue", sans-serif;
-    font-size: 0.85rem;
-    letter-spacing: 0.06em;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    transition: transform 0.15s ease, box-shadow 0.25s ease;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
     -webkit-tap-highlight-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--line-strong);
+    background: transparent;
   }
   .footer-link:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 16px rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #000000 !important;
   }
-  .footer-link:active { transform: scale(0.97); }
+  .footer-link:active { transform: scale(0.98); }
 
-  .footer-link--spotify { color: #1db954; border-color: rgba(29, 185, 84, 0.25); }
-  .footer-link--spotify:hover { box-shadow: 0 0 16px rgba(29, 185, 84, 0.2); border-color: rgba(29, 185, 84, 0.5); }
+  .footer-link--spotify { color: #1ed760; border-color: rgba(30, 215, 96, 0.55); }
+  .footer-link--youtube { color: #ff4a4a; border-color: rgba(255, 74, 74, 0.55); }
 
-  .footer-link--youtube { color: #ff3333; border-color: rgba(255, 50, 50, 0.25); }
-  .footer-link--youtube:hover { box-shadow: 0 0 16px rgba(255, 50, 50, 0.2); border-color: rgba(255, 50, 50, 0.5); }
-
-  .footer-link__icon { font-size: 0.75rem; line-height: 1; }
+  .footer-link__icon { font-size: 0.9rem; line-height: 1; }
 
   .page-footer__copy {
-    font-family: "Inter", sans-serif;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.25);
-    letter-spacing: 0.04em;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #ffffff;
   }
 
   @media (min-width: 768px) {
     .page-footer { padding: 3rem 2.5rem 2rem; }
-    .footer-link { font-size: 0.95rem; padding: 0.55rem 1.2rem; }
+    .footer-link { font-size: 0.78rem; padding: 0.7rem 1.3rem; }
+    .page-footer__copy { font-size: 0.7rem; }
   }
 </style>

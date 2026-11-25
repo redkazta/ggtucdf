@@ -23,7 +23,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={pageDesc} />
-    <meta name="theme-color" content="#070708" />
+    <meta name="theme-color" content="#000000" />
     <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
     <title>{pageTitle}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -59,24 +59,24 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     <style is:global>
       :root {
         /* Base industrial */
-        --bg: #070708;
-        --bg-soft: #0b0b0d;
-        --bg-elevated: #111113;
+        --bg: #000000;
+        --bg-soft: #050506;
+        --bg-elevated: #0b0b0d;
 
-        /* Tinta / texto */
-        --ink: #f4f1e8;
-        --text: #f4f1e8;
-        --text-soft: #d8d4ca;
-        --text-muted: #99958c;
-        --text-dim: #6a675f;
+        /* Tinta / texto: alto contraste total */
+        --ink: #ffffff;
+        --text: #ffffff;
+        --text-soft: #ffffff;
+        --text-muted: #ffffff;
+        --text-dim: #ffffff;
 
-        /* Líneas */
-        --line: rgba(244, 241, 232, 0.12);
-        --line-soft: rgba(244, 241, 232, 0.06);
-        --line-strong: rgba(244, 241, 232, 0.32);
-        --surface: rgba(244, 241, 232, 0.03);
-        --surface-2: rgba(244, 241, 232, 0.05);
-        --surface-3: rgba(244, 241, 232, 0.08);
+        /* Líneas visibles sobre negro */
+        --line: rgba(255, 255, 255, 0.24);
+        --line-soft: rgba(255, 255, 255, 0.14);
+        --line-strong: rgba(255, 255, 255, 0.52);
+        --surface: rgba(255, 255, 255, 0.04);
+        --surface-2: rgba(255, 255, 255, 0.07);
+        --surface-3: rgba(255, 255, 255, 0.11);
         --border: var(--line);
         --border-strong: var(--line-strong);
 
@@ -84,9 +84,9 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         --accent: #ff2338;
         --accent-bright: #ff5a68;
         --accent-deep: #ad0012;
-        --accent-soft: rgba(255, 35, 56, 0.1);
-        --accent-line: rgba(255, 35, 56, 0.55);
-        --accent-glow: rgba(255, 35, 56, 0.35);
+        --accent-soft: rgba(255, 35, 56, 0.16);
+        --accent-line: rgba(255, 35, 56, 0.7);
+        --accent-glow: rgba(255, 35, 56, 0.45);
 
         /* Geometría dura */
         --radius-sm: 0px;
@@ -117,13 +117,15 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
       body {
         min-height: 100dvh;
         overflow-x: hidden;
-        color: var(--text-soft);
+        color: var(--text);
         font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.6;
         background-color: var(--bg);
         background-image:
-          linear-gradient(rgba(244, 241, 232, 0.032) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(244, 241, 232, 0.032) 1px, transparent 1px),
-          radial-gradient(1000px 620px at 50% -12%, rgba(255, 35, 56, 0.09), transparent 64%);
+          linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+          radial-gradient(1000px 620px at 50% -12%, rgba(255, 35, 56, 0.16), transparent 64%);
         background-size: 80px 80px, 80px 80px, 100% 100%;
         background-attachment: fixed;
         -webkit-font-smoothing: antialiased;
@@ -176,7 +178,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         align-items: center;
         gap: 0.5rem;
         font-family: var(--font-mono);
-        font-size: 0.66rem;
+        font-size: 0.7rem;
         font-weight: 700;
         letter-spacing: 0.22em;
         text-transform: uppercase;
@@ -197,6 +199,89 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         font-size: clamp(3.2rem, 12vw, 7.5rem);
         line-height: 0.82;
         letter-spacing: -0.015em;
+        text-shadow: 0 0 42px rgba(255, 35, 56, 0.22);
+      }
+
+      /* Etiquetas y metadatos legibles incluso en pantallas pequeñas. */
+      body :is(
+        .page-head__count,
+        .page-head__meta,
+        .section-bar__meta,
+        .section-eyebrow,
+        .field-label,
+        .field__num,
+        .form-head__label,
+        .form-head__status,
+        .form-foot,
+        .benefits__index,
+        .benefits p,
+        .privacy-note,
+        .admin-header__clock,
+        .admin-header__code,
+        .panel-bar,
+        .auth-panel__label,
+        .auth-panel__foot,
+        .admin-toolbar__status,
+        .logout-btn,
+        .table-count,
+        .cell-index,
+        .copy-btn,
+        .copy-all-btn,
+        .countdown-label,
+        .latest-drop__meta,
+        .countdown-zone,
+        .countdown-unit-label,
+        .footer-link,
+        .page-footer__copy,
+        .connect__base,
+        .portrait__cap,
+        .signal__chrome,
+        .release__meta,
+        .release__plays,
+        .city__rank,
+        .metric__label,
+        .numbers__note,
+        .catalog__note,
+        .tabs__num,
+        .ig-feature__eyebrow,
+        .ig-feature__cta,
+        .featured-card__tag,
+        .featured-card__index,
+        .video-card__index,
+        .reel-card__index,
+        .hero__tag,
+        .portrait__tag,
+        .track-card__index,
+        .track-card__badge,
+        .track-card__meta,
+        .track-card__collabs,
+        .admin-header__clock,
+        .admin-header__code,
+        .panel-bar__flag,
+        .auth-error,
+        .state,
+        .state__hint,
+        .drop-settings-updated,
+        .drop-settings-message,
+        .privacy-meta span,
+        .privacy-contact,
+        .legal-item__index,
+        .privacy-end,
+        .city__count,
+        .cta-label--small,
+        .hero__top,
+        .hero__eyebrow,
+        .ficha__item dt,
+        .marquee__label,
+        .sec-head__num,
+        .sec-head__meta,
+        .error-message,
+        .success-message,
+        .drop-settings-warning__hint,
+        .drop-settings-warning code,
+        .drop-settings-actions a
+      ) {
+        font-size: max(0.66rem, 0.78em) !important;
       }
 
       .rule {

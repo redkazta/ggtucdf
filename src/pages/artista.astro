@@ -664,7 +664,7 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
     }
     .tabs__num {
       color: var(--accent);
-      opacity: 0.65;
+      opacity: 1;
       font-size: 0.5rem;
     }
 
@@ -794,8 +794,8 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
       left: -14px;
       width: 104px;
       height: 24px;
-      background: #f4f1e8;
-      opacity: 0.82;
+      background: var(--accent);
+      opacity: 1;
       transform: rotate(-6deg);
     }
     .portrait__tag {
@@ -858,7 +858,7 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
     .marquee {
       overflow: hidden;
       background: var(--accent);
-      color: #0a0a0b;
+      color: #ffffff;
       border-bottom: 1px solid var(--line-strong);
     }
     .marquee__track {
@@ -881,7 +881,7 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
       font-weight: 700;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      opacity: 0.72;
+      opacity: 1;
     }
     .marquee__num {
       font-family: var(--font-display);
@@ -891,7 +891,7 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
     }
     .marquee__star {
       font-size: 0.9rem;
-      opacity: 0.75;
+      opacity: 1;
     }
     @keyframes marquee {
       to { transform: translateX(-50%); }
@@ -1004,9 +1004,12 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
 
     /* MANIFIESTO */
     .manifesto {
-      background: #f4f1e8;
-      color: #0b0b0c;
+      background:
+        radial-gradient(120% 150% at 0% 0%, rgba(255, 35, 56, 0.16), transparent 60%),
+        var(--bg-elevated);
+      color: #ffffff;
       padding: clamp(3rem, 8vw, 7rem) 0;
+      border-top: 2px solid var(--accent);
       border-bottom: 1px solid var(--line-strong);
     }
     .manifesto__inner {
@@ -1016,11 +1019,11 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
     }
     .manifesto__label {
       font-family: var(--font-mono);
-      font-size: 0.58rem;
+      font-size: 0.62rem;
       font-weight: 700;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--accent-deep);
+      color: var(--accent);
     }
     .manifesto__quote {
       margin: 1.1rem 0 1.9rem;
@@ -1031,26 +1034,29 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
       font-size: clamp(2.4rem, 7.5vw, 6rem);
       line-height: 0.94;
       letter-spacing: -0.015em;
-      color: #0b0b0c;
+      color: #ffffff;
     }
     .manifesto__text {
       max-width: 62ch;
-      font-size: clamp(0.92rem, 1.15vw, 1.02rem);
+      font-size: clamp(0.95rem, 1.15vw, 1.05rem);
       line-height: 1.75;
-      color: #2c2c2c;
+      color: #ffffff;
     }
     .manifesto__text strong {
-      color: #0b0b0c;
+      color: #ffffff;
       font-weight: 700;
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-underline-offset: 3px;
     }
     .manifesto__sign {
       margin-top: 1.6rem;
       font-family: var(--font-mono);
-      font-size: 0.56rem;
+      font-size: 0.62rem;
       font-weight: 700;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #6a675f;
+      color: #ffffff;
     }
 
     /* CIUDADES */
@@ -1300,7 +1306,7 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
     }
     .connect__link:hover {
       background: var(--accent);
-      color: #0a0a0b;
+      color: #ffffff;
     }
     .connect__base {
       display: flex;
@@ -1412,18 +1418,17 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
       }
       .release__link:hover {
         background: var(--accent);
-        color: #0a0a0b;
+        color: #ffffff;
         padding-left: 0.9rem;
       }
       .release__link:hover .release__title,
-      .release__link:hover .release__plays {
-        color: #0a0a0b;
-      }
+      .release__link:hover .release__plays,
       .release__link:hover .release__meta,
       .release__link:hover .release__index,
       .release__link:hover .release__arrow {
-        color: rgba(10, 10, 11, 0.66);
+        color: #ffffff;
       }
+
       .release__link:hover .release__cover img {
         filter: grayscale(0);
         transform: scale(1.06);
@@ -1495,5 +1500,26 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
         transition: none;
       }
     }
+
+    /* Legibilidad: ninguna etiqueta por debajo de 0.6rem */
+    .hero__top,
+    .ficha__item dt,
+    .marquee__label,
+    .sec-head__num,
+    .sec-head__meta,
+    .metric__label,
+    .numbers__note,
+    .catalog__note,
+    .city__rank,
+    .release__index,
+    .release__meta,
+    .release__plays,
+    .signal__chrome,
+    .portrait__cap,
+    .connect__base,
+    .tabs__num {
+      font-size: 0.62rem;
+    }
+    .city__count { font-size: 0.72rem; }
   </style>
 </ArtistLayout>
