@@ -2,6 +2,14 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install",
   "buildCommand": "npm run build",
+  "redirects": [
+    { "source": "/musica", "destination": "/artista#catalogo", "permanent": false },
+    { "source": "/musica/", "destination": "/artista#catalogo", "permanent": false },
+    { "source": "/videos", "destination": "/artista#videos", "permanent": false },
+    { "source": "/videos/", "destination": "/artista#videos", "permanent": false },
+    { "source": "/drop-room", "destination": "/artista#drop", "permanent": false },
+    { "source": "/drop-room/", "destination": "/artista#drop", "permanent": false }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -33,15 +41,7 @@
         }
       ]
     },
-    {
-      "source": "/videos/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
-        }
-      ]
-    },
+
     {
       "source": "/audio/(.*)",
       "headers": [

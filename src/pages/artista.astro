@@ -1,5 +1,9 @@
 ---
 import ArtistLayout from "../layouts/ArtistLayout.astro";
+import PageFooter from "../components/PageFooter.astro";
+import DropRoomForm from "../components/DropRoomForm.astro";
+import DropCountdown from "../components/DropCountdown.astro";
+import SpotifyLatestPlayer from "../components/SpotifyLatestPlayer.astro";
 import {
   DISCOGRAPHY,
   SPOTIFY_ARTIST_URL,
@@ -23,7 +27,11 @@ const releases = [...DISCOGRAPHY].sort((a, b) => {
   return a.title.localeCompare(b.title);
 });
 
+const half = Math.ceil(releases.length / 2);
+const releasesA = releases.slice(0, half);
+const releasesB = releases.slice(half);
 const firstYear = Math.min(...DISCOGRAPHY.map((track) => track.year));
+const lastYear = Math.max(...DISCOGRAPHY.map((track) => track.year));
 
 const formatPlays = (value?: number) =>
   typeof value === "number" && value > 0 ? value.toLocaleString("es-MX") : "—";
@@ -37,47 +45,85 @@ const cityFallback = [
 ];
 
 const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
+
+const youtubeVideos = [
+  { title: "FENTATRIP", id: "txWFWxLmix0" },
+  { title: "Gargut - Experiencia Espiritual X @zacklyvibes", id: "NdQbpB4QggQ" },
+  { title: "Gargut - Yo te kiero solo X @buzk09", id: "lVGN_fBoaOU" },
+  { title: "Gargut - El Primer Artista", id: "IpWeeG1wiBE" },
+  { title: "Gargut - Soy Artista o Eso Parece ft @zacklyvibes & @skydemongoat", id: "n0C4dFKB-Ks" },
+  { title: "Artesania", id: "C5DVwAUr2Go" },
+];
+
+const instagramReels = [
+  { title: "Primera experiencia espiritual", id: "DYfkaP8SFNK" },
+  { title: "Fentatrip llega a Tijuana", id: "DZdTgeEyP-O" },
+  { title: "", id: "DWuDsQukspP" },
+  { title: "", id: "DZvgoINyut4" },
+  { title: "", id: "DZdAZEUqNRb" },
+  { title: "", id: "DZaiV0GKylR" },
+];
+
+const benefits = [
+  { title: "Acceso anticipado", body: "Escucha y mira antes de que salga al público." },
+  { title: "Contenido exclusivo", body: "Material que no se publica en ningún otro lado." },
+  { title: "Fechas de shows", body: "Guadalajara, México y lo que venga después." },
+];
+
+const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
 ---
 
 <ArtistLayout
   title="Artista"
-  description="Gargut — expediente del artista: oyentes, catálogo y señal desde Guadalajara, México."
+  description="Gargut — catálogo, números, videos y Drop Room en una sola página."
   theme="red"
-  rail={{ number: "02", label: "Artista" }}
 >
-  <div class="artist-page">
-    <div class="progress" aria-hidden="true"><span data-progress></span></div>
+  <nav class="page-command" aria-label="Secciones de la página">
+    <div class="page-command__inner">
+      <a class="page-command__brand" href="#artista">GARGUT / 2026</a>
+      <div class="page-command__links">
+        <a href="#artista">Artista</a>
+        <a href="#catalogo">Catálogo</a>
+        <a href="#numeros">Números</a>
+        <a href="#videos">Videos</a>
+        <a href="#drop">Drop Room</a>
+        <a href="#conecta">Conecta</a>
+      </div>
+    </div>
+  </nav>
 
-    <header class="hero">
-      <div class="hero__meta">
-        <span>Expediente / 003</span>
+  <div class="one-page">
+    <header id="artista" class="one-hero">
+      <div class="one-hero__meta">
+        <span>Expediente / 002</span>
         <span>GDL · MX</span>
-        <span class="hero__live"><i aria-hidden="true"></i> Spotify en vivo</span>
+        <span>Activo desde {firstYear}</span>
+        <span class="one-hero__live"><i aria-hidden="true"></i> Spotify en vivo</span>
       </div>
 
-      <div class="hero__main">
-        <div class="hero__copy">
-          <p class="eyebrow">Rap · Trap · Ruido propio</p>
-          <h1 class="hero__title">
+      <div class="one-hero__main">
+        <div class="one-hero__copy">
+          <span class="kicker">Rap · Trap · Ruido propio</span>
+          <h1 class="one-hero__title">
             <span>GAR</span>
             <span class="outline">GUT</span>
           </h1>
-          <p class="hero__lead">
-            Singles, colaboraciones y frecuencias bajas desde Guadalajara. Sin
-            disquera grande, sin fórmula y sin pedir permiso.
+          <p class="one-hero__lead">
+            Singles, colaboraciones y frecuencias bajas desde Guadalajara.
+            Sin disquera grande y sin pedir permiso.
           </p>
-          <div class="hero__actions">
+          <div class="one-hero__actions">
             <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="btn btn--primary">
               Escuchar en Spotify <span aria-hidden="true">↗</span>
             </a>
-            <a href="#catalogo" class="btn btn--outline" data-tab-link="catalogo">
+            <a href="#catalogo" class="btn btn--outline">
               Ver catálogo <span aria-hidden="true">↓</span>
             </a>
           </div>
         </div>
 
-        <figure class="portrait">
-          <div class="portrait__frame">
+        <figure class="one-portrait">
+          <div class="one-portrait__frame">
             <img
               src={ARTIST_PORTRAIT}
               alt="Gargut — retrato oficial de Spotify"
@@ -86,71 +132,100 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
               loading="eager"
               decoding="async"
             />
-            <span class="portrait__tag">FIG. 01</span>
+            <span class="one-portrait__tag">FIG. 01</span>
           </div>
           <figcaption>Retrato oficial · Spotify for Artists</figcaption>
         </figure>
       </div>
 
-      <div class="quick-stats" data-reveal>
-        <article>
-          <span class="quick-stats__label">Oyentes mensuales</span>
-          <strong data-stat="listeners">{ARTIST_MONTHLY_LISTENERS.toLocaleString("es-MX")}</strong>
-        </article>
-        <article>
-          <span class="quick-stats__label">Seguidores</span>
-          <strong data-stat="followers">{ARTIST_FOLLOWERS.toLocaleString("es-MX")}</strong>
-        </article>
-        <article>
-          <span class="quick-stats__label">Top track</span>
-          <strong data-stat="top">{ARTIST_TOP_TRACK}</strong>
-        </article>
+      <div class="one-hero__strip">
+        <span><b>{releases.length}</b> releases</span>
+        <span><b>{firstYear}—{String(lastYear).slice(-2)}</b> periodo</span>
+        <span><b>dxf prod</b> sello</span>
+        <span><b>GDL</b> base</span>
       </div>
     </header>
 
-    <nav class="tabs" role="tablist" aria-label="Secciones del artista">
-      <button type="button" class="tabs__btn is-active" role="tab" aria-selected="true" aria-controls="panel-perfil" data-tab="perfil">
-        <span>01</span> Perfil
-      </button>
-      <button type="button" class="tabs__btn" role="tab" aria-selected="false" aria-controls="panel-numeros" data-tab="numeros" tabindex="-1">
-        <span>02</span> Números
-      </button>
-      <button type="button" class="tabs__btn" role="tab" aria-selected="false" aria-controls="panel-catalogo" data-tab="catalogo" tabindex="-1">
-        <span>03</span> Catálogo
-      </button>
-      <button type="button" class="tabs__btn" role="tab" aria-selected="false" aria-controls="panel-conecta" data-tab="conecta" tabindex="-1">
-        <span>04</span> Conecta
-      </button>
-    </nav>
+    <section id="catalogo" class="one-section">
+      <div class="one-band">
+        <h2>Catálogo</h2>
+        <span>{releases.length} releases · {firstYear}—{lastYear}</span>
+      </div>
 
-    <section class="tab-panel is-active" id="panel-perfil" role="tabpanel" aria-labelledby="tab-perfil" data-panel="perfil">
-      <div class="card bio" data-reveal>
-        <span class="eyebrow">Bio / Spotify</span>
-        <blockquote>“me sobra el Mojo y soy el Matusalén”</blockquote>
-        <p>
-          Gargut construye su catálogo a golpe de singles: colaboraciones,
-          freestyles y un sello propio, <strong>dxf prod</strong>. Este expediente
-          reúne lo que Spotify sabe de él: cuántos lo escuchan, desde dónde suena
-          y qué track pega más fuerte. El resto se resuelve dándole play.
-        </p>
-        <div class="bio__facts">
-          <span>Origen · Guadalajara, MX</span>
-          <span>Activo desde · {firstYear}</span>
-          <span>Sello · dxf prod</span>
-          <span>Género · Rap / Trap</span>
+      <div class="catalog">
+        <div class="catalog__player">
+          <div>
+            <span class="kicker">Último lanzamiento</span>
+            <strong>Dale play. El siguiente drop ya viene en camino.</strong>
+          </div>
+          <SpotifyLatestPlayer />
+        </div>
+
+        <div class="catalog__cols">
+          <ol class="catalog__col">
+            {releasesA.map((track, i) => (
+              <li class="release" data-track-title={track.title}>
+                <a href={track.spotifyUrl} target="_blank" rel="noopener" aria-label={`Escuchar ${track.title} en Spotify`}>
+                  <span class="release__index">{String(i + 1).padStart(2, "0")}</span>
+                  <span class="release__cover">
+                    {track.coverUrl ? (
+                      <img src={track.coverUrl} alt="" width="56" height="56" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="release__fallback" aria-hidden="true">{track.title.charAt(0)}</span>
+                    )}
+                  </span>
+                  <span class="release__info">
+                    <strong>{track.title}</strong>
+                    <span class="release__meta">
+                      {track.year} · {track.type === "solo" ? "Solo" : "Colab"}
+                      {track.collaborators?.length ? ` · ${track.collaborators.join(" / ")}` : ""}
+                    </span>
+                  </span>
+                  <span class="release__plays">{formatPlays(track.streams)}</span>
+                  <span class="release__arrow" aria-hidden="true">↗</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+
+          <ol class="catalog__col">
+            {releasesB.map((track, i) => (
+              <li class="release" data-track-title={track.title}>
+                <a href={track.spotifyUrl} target="_blank" rel="noopener" aria-label={`Escuchar ${track.title} en Spotify`}>
+                  <span class="release__index">{String(i + half + 1).padStart(2, "0")}</span>
+                  <span class="release__cover">
+                    {track.coverUrl ? (
+                      <img src={track.coverUrl} alt="" width="56" height="56" loading="lazy" decoding="async" />
+                    ) : (
+                      <span class="release__fallback" aria-hidden="true">{track.title.charAt(0)}</span>
+                    )}
+                  </span>
+                  <span class="release__info">
+                    <strong>{track.title}</strong>
+                    <span class="release__meta">
+                      {track.year} · {track.type === "solo" ? "Solo" : "Colab"}
+                      {track.collaborators?.length ? ` · ${track.collaborators.join(" / ")}` : ""}
+                    </span>
+                  </span>
+                  <span class="release__plays">{formatPlays(track.streams)}</span>
+                  <span class="release__arrow" aria-hidden="true">↗</span>
+                </a>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
 
-    <section class="tab-panel" id="panel-numeros" role="tabpanel" aria-labelledby="tab-numeros" data-panel="numeros" hidden>
-      <div class="card">
-        <div class="section-head">
-          <h2>En números</h2>
-          <span>Spotify / cada 30 min</span>
-        </div>
+    <section id="numeros" class="one-section">
+      <div class="one-band">
+        <h2>Números</h2>
+        <span>Spotify / cada 30 min</span>
+      </div>
 
-        <div class="metrics" data-reveal>
-          <article class="metric metric--big">
+      <div class="numbers-grid">
+        <div class="metrics">
+          <article class="metric">
             <strong data-stat="listeners">{ARTIST_MONTHLY_LISTENERS.toLocaleString("es-MX")}</strong>
             <span>Oyentes mensuales</span>
           </article>
@@ -159,874 +234,1127 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
             <span>Seguidores</span>
           </article>
           <article class="metric">
-            <strong>{DISCOGRAPHY.length}</strong>
+            <strong>{releases.length}</strong>
             <span>Lanzamientos</span>
           </article>
           <article class="metric metric--wide">
             <strong data-stat="top">{ARTIST_TOP_TRACK}</strong>
             <span>Track más escuchado</span>
           </article>
+          <p class="data-note" data-stats-note>
+            Datos públicos de Spotify · respaldo local si la API no responde.
+          </p>
         </div>
 
-        <p class="data-note" data-stats-note>Datos públicos de Spotify · respaldo local si la API no responde</p>
-      </div>
-
-      <div class="card cities-card" data-reveal>
-        <div class="section-head">
-          <h2>Dónde suena</h2>
-          <span>Oyentes por ciudad</span>
+        <div class="cities-card">
+          <div class="cities-card__head">
+            <h3>Dónde suena</h3>
+            <span>Top ciudades</span>
+          </div>
+          <ul class="cities" data-cities>
+            {cityFallback.map((city, index) => (
+              <li class="city">
+                <span class="city__rank">{String(index + 1).padStart(2, "0")}</span>
+                <span class="city__name">{city.city}</span>
+                <span class="city__bar" aria-hidden="true">
+                  <span style={`width:${Math.round((city.listeners / cityMax) * 100)}%`}></span>
+                </span>
+                <span class="city__count">{city.listeners.toLocaleString("es-MX")}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul class="cities" data-cities>
-          {cityFallback.map((city, index) => (
-            <li class="city">
-              <span class="city__rank">{String(index + 1).padStart(2, "0")}</span>
-              <span class="city__name">{city.city}</span>
-              <span class="city__bar" aria-hidden="true">
-                <span style={`width:${Math.round((city.listeners / cityMax) * 100)}%`}></span>
-              </span>
-              <span class="city__count">{city.listeners.toLocaleString("es-MX")}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
 
-    <section class="tab-panel" id="panel-catalogo" role="tabpanel" aria-labelledby="tab-catalogo" data-panel="catalogo" hidden>
-      <div class="card">
-        <div class="section-head">
-          <h2>Catálogo</h2>
-          <span>{releases.length} releases · 2025—2026</span>
+    <section id="videos" class="one-section">
+      <div class="one-band">
+        <h2>Videos</h2>
+        <span>YouTube · Instagram</span>
+      </div>
+
+      <div class="video-console">
+        <div class="video-console__screen">
+          <div class="video-console__frame">
+            <iframe
+              id="videoMain"
+              src={youtubeEmbed(youtubeVideos[0].id)}
+              title={youtubeVideos[0].title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            />
+          </div>
+          <div class="video-console__now">
+            <div>
+              <span class="video-console__label">Ahora suena</span>
+              <h3 id="videoNow">{youtubeVideos[0].title}</h3>
+            </div>
+            <a href={YOUTUBE_URL} target="_blank" rel="noopener" class="video-console__link">
+              YouTube <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
 
-        <ol class="releases" data-reveal>
-          {releases.map((track, index) => (
-            <li class="release" data-track-title={track.title}>
-              <a href={track.spotifyUrl} target="_blank" rel="noopener" aria-label={`Escuchar ${track.title} en Spotify`}>
-                <span class="release__index">{String(index + 1).padStart(2, "0")}</span>
-                <span class="release__cover">
-                  {track.coverUrl ? (
-                    <img src={track.coverUrl} alt="" width="120" height="120" loading="lazy" decoding="async" />
-                  ) : (
-                    <span class="release__fallback" aria-hidden="true">{track.title.charAt(0)}</span>
-                  )}
-                </span>
-                <span class="release__info">
-                  <strong>{track.title}</strong>
-                  <span class="release__meta">
-                    {track.year} · {track.type === "solo" ? "Solo" : "Colab"}
-                    {track.collaborators?.length ? ` · ${track.collaborators.join(" / ")}` : ""}
-                  </span>
-                </span>
-                <span class="release__plays">{formatPlays(track.streams)}</span>
-                <span class="release__arrow" aria-hidden="true">↗</span>
-              </a>
+        <ol class="playlist">
+          {youtubeVideos.map((video, i) => (
+            <li>
+              <button
+                type="button"
+                class:list={["playlist__item", { "is-active": i === 0 }]}
+                data-video-id={video.id}
+                data-video-title={video.title}
+                aria-label={`Reproducir ${video.title}`}
+              >
+                <span class="playlist__num">{String(i + 1).padStart(2, "0")}</span>
+                <span class="playlist__title">{video.title}</span>
+                <span class="playlist__arrow" aria-hidden="true">▶</span>
+              </button>
             </li>
           ))}
         </ol>
-        <p class="data-note">Reproducciones reales de Spotify · se actualizan automáticamente.</p>
+      </div>
+
+      <a href={INSTAGRAM_URL} target="_blank" rel="noopener" class="ig-strip">
+        <span class="ig-strip__eyebrow">Instagram / El contexto</span>
+        <strong>¿Qué es el FENTATRIP?</strong>
+        <span class="ig-strip__cta">Ver visuales <span aria-hidden="true">↗</span></span>
+      </a>
+
+      <div class="reel-strip" aria-label="Reels de Instagram">
+        {instagramReels.map((reel, i) => (
+          <a
+            class="reel-tile"
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener"
+            aria-label={reel.title ? `Ver reel: ${reel.title}` : "Ver el Instagram de Gargut"}
+          >
+            <span class="reel-tile__index">{String(i + 1).padStart(2, "0")}</span>
+            <span class="reel-tile__grid" aria-hidden="true"></span>
+            <span class="reel-tile__word">Reel</span>
+            <span class="reel-tile__title">{reel.title || "Ver en Instagram"}</span>
+          </a>
+        ))}
       </div>
     </section>
 
-    <section class="tab-panel" id="panel-conecta" role="tabpanel" aria-labelledby="tab-conecta" data-panel="conecta" hidden>
-      <div class="card connect-card">
-        <div class="section-head">
-          <h2>Señal directa</h2>
-          <span>Spotify / redes</span>
+    <section id="drop" class="one-section">
+      <div class="one-band">
+        <h2>Drop Room</h2>
+        <span>Acceso anticipado</span>
+      </div>
+
+      <div class="drop-grid">
+        <div class="drop-pitch">
+          <span class="kicker">Por qué entrar</span>
+          <h3>Entra antes que nadie</h3>
+          <ol class="benefits">
+            {benefits.map((benefit, i) => (
+              <li>
+                <span class="benefits__index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <strong>{benefit.title}</strong>
+                  <p>{benefit.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <DropCountdown />
+
+          <p class="drop-privacy">
+            Solo usamos tus datos para enviarte novedades de Gargut. No los vendemos
+            ni los compartimos con terceros. Puedes darte de baja cuando quieras.
+            <a href="/privacidad">Leer aviso de privacidad ↗</a>
+          </p>
         </div>
 
-        <div class="connect-grid" data-reveal>
-          <div class="connect-copy">
-            <h3>Todo el catálogo, sin intermediarios.</h3>
-            <p>Dale play desde aquí mismo y sígueme en las plataformas donde suena Gargut.</p>
-            <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="btn btn--primary">
-              Abrir perfil de artista <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-
-          <div class="embed-frame">
-            <div class="embed-frame__bar">
-              <span>SPOTIFY / ARTIST</span>
-              <span>GUT—003</span>
-            </div>
-            <iframe
-              src={SPOTIFY_EMBED_ARTIST}
-              width="100%"
-              height="352"
-              style="border:0;"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy"
-              title="Gargut en Spotify"
-            />
-          </div>
+        <div class="drop-form">
+          <DropRoomForm />
         </div>
+      </div>
+    </section>
 
-        <div class="social-grid">
-          <a href={INSTAGRAM_URL} target="_blank" rel="noopener">Instagram <span aria-hidden="true">↗</span></a>
+    <section id="conecta" class="one-section">
+      <div class="one-band">
+        <h2>Conecta</h2>
+        <span>Spotify / redes</span>
+      </div>
+
+      <div class="connect-grid">
+        <div class="connect-links">
           <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener">Spotify <span aria-hidden="true">↗</span></a>
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener">Instagram <span aria-hidden="true">↗</span></a>
           <a href={YOUTUBE_URL} target="_blank" rel="noopener">YouTube <span aria-hidden="true">↗</span></a>
           <a href={TIKTOK_URL} target="_blank" rel="noopener">TikTok <span aria-hidden="true">↗</span></a>
+          <a href="/privacidad">Privacidad <span aria-hidden="true">↗</span></a>
+        </div>
+
+        <div class="connect-embed">
+          <div class="connect-embed__bar">
+            <span>Spotify / Artista</span>
+            <span>GUT—002</span>
+          </div>
+          <iframe
+            src={SPOTIFY_EMBED_ARTIST}
+            width="100%"
+            height="352"
+            style="border:0;"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            title="Gargut en Spotify"
+          />
         </div>
       </div>
     </section>
   </div>
 
-  <script is:inline>
-    (() => {
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      const tabs = Array.from(document.querySelectorAll("[data-tab]"));
-      const panels = Array.from(document.querySelectorAll("[data-panel]"));
-      const tablist = document.querySelector(".tabs");
-
-      const activateTab = (name, options = {}) => {
-        const target = panels.some((panel) => panel.dataset.panel === name) ? name : "perfil";
-
-        tabs.forEach((tab) => {
-          const active = tab.dataset.tab === target;
-          tab.classList.toggle("is-active", active);
-          tab.setAttribute("aria-selected", active ? "true" : "false");
-          tab.tabIndex = active ? 0 : -1;
-        });
-
-        panels.forEach((panel) => {
-          const active = panel.dataset.panel === target;
-          panel.hidden = !active;
-          panel.classList.toggle("is-active", active);
-        });
-
-        const panel = panels.find((item) => item.dataset.panel === target);
-        panel?.querySelectorAll("[data-reveal]").forEach((element) => {
-          element.classList.add("is-visible");
-        });
-
-        if (options.updateHash !== false) {
-          history.replaceState(null, "", `#${target}`);
-        }
-
-        if (options.scroll) {
-          window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-        }
-      };
-
-      tabs.forEach((tab) => {
-        tab.addEventListener("click", () => activateTab(tab.dataset.tab, { scroll: true }));
-      });
-
-      document.querySelectorAll("[data-tab-link]").forEach((link) => {
-        link.addEventListener("click", (event) => {
-          event.preventDefault();
-          activateTab(link.dataset.tabLink, { scroll: true });
-        });
-      });
-
-      if (tablist) {
-        tablist.addEventListener("keydown", (event) => {
-          if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
-
-          const currentIndex = tabs.findIndex((tab) => tab.classList.contains("is-active"));
-          let nextIndex = currentIndex;
-
-          if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
-          if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-          if (event.key === "Home") nextIndex = 0;
-          if (event.key === "End") nextIndex = tabs.length - 1;
-
-          event.preventDefault();
-          tabs[nextIndex].focus();
-          activateTab(tabs[nextIndex].dataset.tab);
-        });
-      }
-
-      const initialTab = (window.location.hash || "").replace("#", "");
-      activateTab(initialTab || "perfil", { updateHash: false });
-
-      const progress = document.querySelector("[data-progress]");
-      if (progress) {
-        const updateProgress = () => {
-          const root = document.documentElement;
-          const max = root.scrollHeight - root.clientHeight;
-          progress.style.width = `${max > 0 ? (root.scrollTop / max) * 100 : 0}%`;
-        };
-        window.addEventListener("scroll", updateProgress, { passive: true });
-        window.addEventListener("resize", updateProgress);
-        updateProgress();
-      }
-
-      const revealables = document.querySelectorAll("[data-reveal]");
-      if (reduceMotion || !("IntersectionObserver" in window)) {
-        revealables.forEach((element) => element.classList.add("is-visible"));
-      } else {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (!entry.isIntersecting) return;
-              entry.target.classList.add("is-visible");
-              observer.unobserve(entry.target);
-            });
-          },
-          { threshold: 0.1 }
-        );
-        revealables.forEach((element) => observer.observe(element));
-      }
-
-      const setText = (key, value) => {
-        if (value === null || value === undefined || value === "") return;
-        document.querySelectorAll(`[data-stat="${key}"]`).forEach((node) => {
-          node.textContent = value;
-        });
-      };
-
-      const formatNumber = (value) =>
-        typeof value === "number" ? value.toLocaleString("es-MX") : null;
-
-      const CITY_NAMES = {
-        "Mexico City": "Ciudad de México",
-        "Mexico city": "Ciudad de México",
-        Bogota: "Bogotá",
-        "Bogotá": "Bogotá",
-      };
-
-      const renderCities = (cities) => {
-        const list = document.querySelector("[data-cities]");
-        if (!list || !Array.isArray(cities) || cities.length === 0) return;
-
-        const top = cities.slice(0, 5);
-        const max = Math.max(...top.map((city) => Number(city.listeners) || 0), 1);
-        const items = Array.from(list.querySelectorAll(".city"));
-
-        items.forEach((item, index) => {
-          const city = top[index];
-          if (!city) {
-            item.hidden = true;
-            return;
-          }
-
-          item.hidden = false;
-          const name = CITY_NAMES[city.city] || city.city;
-          const rank = item.querySelector(".city__rank");
-          const label = item.querySelector(".city__name");
-          const fill = item.querySelector(".city__bar span");
-          const count = item.querySelector(".city__count");
-
-          if (rank) rank.textContent = String(index + 1).padStart(2, "0");
-          if (label) label.textContent = name;
-          if (fill) fill.style.width = `${Math.round(((Number(city.listeners) || 0) / max) * 100)}%`;
-          if (count) count.textContent = (Number(city.listeners) || 0).toLocaleString("es-MX");
-        });
-      };
-
-      const normalize = (value) => String(value || "").trim().toLowerCase();
-
-      const applyPlays = (entries, key) => {
-        if (!Array.isArray(entries) || entries.length === 0) return;
-
-        const stats = new Map(
-          entries
-            .filter((entry) => entry && entry[key])
-            .map((entry) => [normalize(entry[key]), entry.playcount])
-        );
-
-        document.querySelectorAll(".release[data-track-title]").forEach((item) => {
-          const playcount = stats.get(normalize(item.dataset.trackTitle));
-          if (typeof playcount !== "number") return;
-
-          const plays = item.querySelector(".release__plays");
-          if (plays) plays.textContent = playcount.toLocaleString("es-MX");
-        });
-      };
-
-      fetch("/api/discography-stats", { headers: { Accept: "application/json" } })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((data) => {
-          if (!data || data.source !== "spotify") return;
-          applyPlays(data.tracks, "title");
-        })
-        .catch(() => {});
-
-      fetch("/api/artist-stats", { headers: { Accept: "application/json" } })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((data) => {
-          if (!data || data.source !== "spotify") return;
-
-          setText("listeners", formatNumber(data.monthlyListeners));
-          setText("followers", formatNumber(data.followers));
-          setText("top", data.topTrack);
-          renderCities(data.topCities);
-          applyPlays(data.topTracks, "name");
-
-          const note = document.querySelector("[data-stats-note]");
-          if (note) {
-            note.textContent = data.stale
-              ? "Datos de Spotify · copia más reciente guardada, reintentando en vivo"
-              : "Datos en vivo de Spotify · se actualizan cada 30 min";
-          }
-        })
-        .catch(() => {});
-    })();
-  </script>
-
-  <style>
-    .artist-page {
-      width: 100%;
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 4vw, 2.5rem) 4rem;
-    }
-
-    .progress {
-      position: fixed;
-      top: var(--header-h);
-      left: 0;
-      right: 0;
-      z-index: 260;
-      height: 2px;
-      background: var(--line-soft);
-      pointer-events: none;
-    }
-    .progress span {
-      display: block;
-      height: 100%;
-      width: 0;
-      background: var(--accent);
-      transition: width 0.12s linear;
-    }
-
-    .hero {
-      position: relative;
-      padding: clamp(1.25rem, 4vw, 3rem);
-      border: 1px solid var(--line-strong);
-      border-radius: 24px;
-      background:
-        radial-gradient(120% 140% at 100% 0%, rgba(255, 35, 56, 0.2), transparent 60%),
-        linear-gradient(180deg, var(--bg-elevated), var(--bg-soft));
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-      overflow: hidden;
-    }
-
-    .hero__meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem 1.5rem;
-      padding-bottom: 1rem;
-      margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
-      border-bottom: 1px solid var(--line);
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-    .hero__live {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-left: auto;
-      color: var(--accent);
-    }
-    .hero__live i {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 12px var(--accent-glow);
-    }
-
-    .hero__main {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: clamp(1.5rem, 4vw, 3rem);
-      align-items: end;
-    }
-
-    .hero__title {
-      display: flex;
-      flex-direction: column;
-      font-family: var(--font-display);
-      font-size: clamp(4rem, 18vw, 9.5rem);
-      line-height: 0.82;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      text-transform: uppercase;
-      text-shadow: 0 16px 60px rgba(0, 0, 0, 0.7);
-    }
-    .hero__title .outline {
-      color: transparent;
-      -webkit-text-stroke: 2px var(--ink);
-    }
-
-    .hero__lead {
-      max-width: 48ch;
-      margin-top: 1.3rem;
-      color: var(--ink);
-      font-size: clamp(0.92rem, 1.4vw, 1.05rem);
-      line-height: 1.7;
-    }
-
-    .hero__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-      margin-top: 2rem;
-    }
-
-    .portrait {
-      margin: 0;
-      width: min(100%, 340px);
-      justify-self: start;
-    }
-    .portrait__frame {
-      position: relative;
-      aspect-ratio: 4 / 5;
-      overflow: hidden;
-      border: 1px solid var(--line-strong);
-      border-radius: 18px;
-      background: var(--bg-elevated);
-      box-shadow: 10px 10px 0 var(--accent);
-    }
-    .portrait__frame img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: grayscale(1) contrast(1.05);
-      transition: filter 0.35s ease, transform 0.5s ease;
-    }
-    .portrait:hover img { filter: grayscale(0); transform: scale(1.03); }
-    .portrait__tag {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      padding: 0.35rem 0.5rem;
-      background: var(--accent);
-      color: #ffffff;
-      font-family: var(--font-mono);
-      font-size: 0.58rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-    }
-    .portrait figcaption {
-      margin-top: 1rem;
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-
-    .quick-stats {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.6rem;
-      margin-top: clamp(1.5rem, 4vw, 2.5rem);
-    }
-    .quick-stats article {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      padding: 1rem;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--surface);
-    }
-    .quick-stats__label {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-    .quick-stats strong {
-      font-family: var(--font-display);
-      font-size: clamp(1.4rem, 4vw, 2.3rem);
-      font-weight: 400;
-      line-height: 1;
-      color: var(--ink);
-      overflow-wrap: anywhere;
-    }
-
-    .tabs {
-      position: sticky;
-      top: calc(var(--header-h) + 0.6rem);
-      z-index: 250;
-      display: flex;
-      gap: 0.3rem;
-      overflow-x: auto;
-      margin: 1.25rem 0 1.5rem;
-      padding: 0.35rem;
-      border: 1px solid var(--line-strong);
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.9);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(12px);
-      scrollbar-width: none;
-    }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tabs__btn {
-      flex: 1 0 auto;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      padding: 0.7rem 0.9rem;
-      border: 0;
-      border-radius: 999px;
-      background: transparent;
-      color: #ffffff;
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: background 0.18s ease, color 0.18s ease;
-    }
-    .tabs__btn span { color: var(--accent); }
-    .tabs__btn:hover { background: var(--surface-2); }
-    .tabs__btn.is-active { background: var(--accent); color: #ffffff; }
-    .tabs__btn.is-active span { color: #ffffff; }
-
-    .tab-panel[hidden] { display: none; }
-    .tab-panel.is-active { animation: panel-in 0.35s ease both; }
-    @keyframes panel-in {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: none; }
-    }
-
-    [data-reveal] {
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    [data-reveal].is-visible { opacity: 1; transform: none; }
-
-    .card {
-      padding: clamp(1.25rem, 4vw, 2.5rem);
-      border: 1px solid var(--line-strong);
-      border-radius: 24px;
-      background:
-        radial-gradient(120% 140% at 100% 0%, rgba(255, 35, 56, 0.12), transparent 62%),
-        linear-gradient(180deg, var(--bg-elevated), var(--bg-soft));
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
-    }
-    .card + .card { margin-top: 1.25rem; }
-
-    .section-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 1rem;
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--line-strong);
-    }
-    .section-head h2 {
-      font-family: var(--font-display);
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
-      font-weight: 400;
-      line-height: 1;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-    .section-head span {
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent);
-      white-space: nowrap;
-    }
-
-    .bio blockquote {
-      max-width: 20ch;
-      margin: 1.25rem 0;
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: clamp(2.2rem, 7vw, 4.5rem);
-      line-height: 0.95;
-      color: var(--ink);
-    }
-    .bio p {
-      max-width: 62ch;
-      color: var(--ink);
-      font-size: 1rem;
-      line-height: 1.75;
-    }
-    .bio strong { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
-    .bio__facts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 2rem;
-    }
-    .bio__facts span {
-      padding: 0.5rem 0.7rem;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      font-family: var(--font-mono);
-      font-size: 0.64rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.7rem;
-    }
-    .metric {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 1.5rem;
-      min-height: 150px;
-      padding: 1.1rem;
-      border: 1px solid var(--line-strong);
-      border-radius: 16px;
-      background: var(--bg-soft);
-    }
-    .metric--big,
-    .metric--wide { grid-column: 1 / -1; }
-    .metric--big {
-      background:
-        radial-gradient(120% 140% at 0% 0%, rgba(255, 35, 56, 0.18), transparent 62%),
-        var(--bg-elevated);
-    }
-    .metric strong {
-      font-family: var(--font-display);
-      font-size: clamp(2.2rem, 7vw, 4rem);
-      font-weight: 400;
-      line-height: 0.9;
-      color: var(--ink);
-      overflow-wrap: anywhere;
-    }
-    .metric--big strong { color: var(--accent); font-size: clamp(3.5rem, 12vw, 7rem); }
-    .metric span {
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-    .data-note {
-      margin-top: 1rem;
-      font-family: var(--font-mono);
-      font-size: 0.64rem;
-      letter-spacing: 0.06em;
-      color: var(--ink);
-    }
-
-    .cities { list-style: none; border-top: 1px solid var(--line-strong); }
-    .city {
-      display: grid;
-      grid-template-columns: 2rem 1fr 5rem;
-      grid-template-areas: "rank name count" "rank bar bar";
-      align-items: center;
-      gap: 0.4rem 0.7rem;
-      padding: 0.85rem 0;
-      border-bottom: 1px solid var(--line);
-    }
-    .city[hidden] { display: none; }
-    .city__rank {
-      grid-area: rank;
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    .city__name {
-      grid-area: name;
-      font-family: var(--font-display);
-      font-size: clamp(1.1rem, 3vw, 1.6rem);
-      text-transform: uppercase;
-      color: var(--ink);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .city__bar {
-      grid-area: bar;
-      display: block;
-      height: 8px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--surface);
-      overflow: hidden;
-    }
-    .city__bar span { display: block; height: 100%; background: var(--accent); }
-    .city__count {
-      grid-area: count;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-align: right;
-      color: var(--ink);
-    }
-
-    .releases {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .release {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--bg-soft);
-      overflow: hidden;
-      transition: border-color 0.18s ease, transform 0.18s ease;
-    }
-    .release:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .release a {
-      display: grid;
-      grid-template-columns: 1.6rem 48px minmax(0, 1fr) auto 1rem;
-      align-items: center;
-      gap: 0.7rem;
-      padding: 0.65rem 0.8rem;
-      text-decoration: none;
-    }
-    .release__index {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    .release__cover {
-      display: block;
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-      overflow: hidden;
-      background: var(--bg-elevated);
-      border: 1px solid var(--line);
-    }
-    .release__cover img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
-    .release__fallback {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      color: var(--ink);
-    }
-    .release__info { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
-    .release__info strong {
-      font-family: var(--font-display);
-      font-size: clamp(1rem, 2.6vw, 1.4rem);
-      font-weight: 400;
-      text-transform: uppercase;
-      color: var(--ink);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .release__meta {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      color: var(--ink);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .release__plays {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--ink);
-      white-space: nowrap;
-    }
-    .release__arrow { color: var(--accent); }
-
-    .connect-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-    .connect-copy h3 {
-      font-family: var(--font-display);
-      font-size: clamp(1.8rem, 5vw, 3rem);
-      font-weight: 400;
-      line-height: 1;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-    .connect-copy p { max-width: 42ch; margin: 1rem 0 1.5rem; color: var(--ink); }
-    .embed-frame {
-      border: 1px solid var(--line-strong);
-      border-left: 3px solid var(--accent);
-      border-radius: 16px;
-      background: var(--bg-soft);
-      padding: 0.6rem;
-      overflow: hidden;
-    }
-    .embed-frame__bar {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 0 0.15rem 0.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.58rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-    .social-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.6rem;
-      margin-top: 1.5rem;
-    }
-    .social-grid a {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 0.9rem 1rem;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--bg-soft);
-      color: var(--ink);
-      font-family: var(--font-display);
-      font-size: clamp(1rem, 2.6vw, 1.35rem);
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
-    }
-    .social-grid a:hover { background: var(--accent); border-color: var(--accent); color: #ffffff; }
-
-    @media (max-width: 520px) {
-      .tabs { gap: 0.18rem; padding: 0.3rem; }
-      .tabs__btn {
-        padding: 0.6rem 0.45rem;
-        font-size: 0.55rem;
-        letter-spacing: 0.05em;
-      }
-    }
-
-    @media (min-width: 640px) {
-      .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .metric--big, .metric--wide { grid-column: auto; }
-      .city {
-        grid-template-columns: 3rem minmax(0, 1fr) minmax(140px, 2fr) 5rem;
-        grid-template-areas: "rank name bar count";
-      }
-      .social-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    }
-
-    @media (min-width: 900px) {
-      .hero__main { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); align-items: end; }
-      .portrait { justify-self: end; }
-      .connect-grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: start; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .progress span, [data-reveal], .hero__live i { transition: none; animation: none; }
-      .tab-panel.is-active { animation: none; }
-    }
-  </style>
+  <PageFooter />
 </ArtistLayout>
+
+<script is:inline>
+  (() => {
+    const setText = (key, value) => {
+      if (value === null || value === undefined || value === "") return;
+      document.querySelectorAll(`[data-stat="${key}"]`).forEach((node) => {
+        node.textContent = value;
+      });
+    };
+
+    const formatNumber = (value) =>
+      typeof value === "number" ? value.toLocaleString("es-MX") : null;
+
+    const CITY_NAMES = {
+      "Mexico City": "Ciudad de México",
+      "Mexico city": "Ciudad de México",
+      Bogota: "Bogotá",
+      "Bogotá": "Bogotá",
+    };
+
+    const renderCities = (cities) => {
+      const list = document.querySelector("[data-cities]");
+      if (!list || !Array.isArray(cities) || cities.length === 0) return;
+
+      const top = cities.slice(0, 5);
+      const max = Math.max(...top.map((city) => Number(city.listeners) || 0), 1);
+      const items = Array.from(list.querySelectorAll(".city"));
+
+      items.forEach((item, index) => {
+        const city = top[index];
+        if (!city) {
+          item.hidden = true;
+          return;
+        }
+
+        item.hidden = false;
+        const name = CITY_NAMES[city.city] || city.city;
+        const rank = item.querySelector(".city__rank");
+        const label = item.querySelector(".city__name");
+        const fill = item.querySelector(".city__bar span");
+        const count = item.querySelector(".city__count");
+
+        if (rank) rank.textContent = String(index + 1).padStart(2, "0");
+        if (label) label.textContent = name;
+        if (fill) fill.style.width = `${Math.round(((Number(city.listeners) || 0) / max) * 100)}%`;
+        if (count) count.textContent = (Number(city.listeners) || 0).toLocaleString("es-MX");
+      });
+    };
+
+    const normalize = (value) => String(value || "").trim().toLowerCase();
+
+    const applyPlays = (entries, key) => {
+      if (!Array.isArray(entries) || entries.length === 0) return;
+
+      const stats = new Map(
+        entries
+          .filter((entry) => entry && entry[key])
+          .map((entry) => [normalize(entry[key]), entry.playcount])
+      );
+
+      document.querySelectorAll(".release[data-track-title]").forEach((item) => {
+        const playcount = stats.get(normalize(item.dataset.trackTitle));
+        if (typeof playcount !== "number") return;
+
+        const plays = item.querySelector(".release__plays");
+        if (plays) plays.textContent = playcount.toLocaleString("es-MX");
+      });
+    };
+
+    fetch("/api/discography-stats", { headers: { Accept: "application/json" } })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!data || data.source !== "spotify") return;
+        applyPlays(data.tracks, "title");
+      })
+      .catch(() => {});
+
+    fetch("/api/artist-stats", { headers: { Accept: "application/json" } })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!data || data.source !== "spotify") return;
+
+        setText("listeners", formatNumber(data.monthlyListeners));
+        setText("followers", formatNumber(data.followers));
+        setText("top", data.topTrack);
+        renderCities(data.topCities);
+        applyPlays(data.topTracks, "name");
+
+        const note = document.querySelector("[data-stats-note]");
+        if (note) {
+          note.textContent = data.stale
+            ? "Datos de Spotify · copia más reciente guardada, reintentando en vivo"
+            : "Datos en vivo de Spotify · se actualizan cada 30 min";
+        }
+      })
+      .catch(() => {});
+  })();
+</script>
+
+<script>
+  const player = document.getElementById("videoMain") as HTMLIFrameElement | null;
+  const nowTitle = document.getElementById("videoNow");
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-video-id]"));
+
+  if (player && nowTitle && buttons.length > 0) {
+    const activate = (button: HTMLButtonElement) => {
+      const id = button.dataset.videoId;
+      const title = button.dataset.videoTitle ?? "Video";
+      if (!id) return;
+
+      player.src = `https://www.youtube.com/embed/${id}`;
+      player.title = title;
+      nowTitle.textContent = title;
+
+      buttons.forEach((item) => {
+        item.classList.toggle("is-active", item === button);
+      });
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => activate(button));
+    });
+  }
+</script>
+
+<style>
+  :global(main.artist-main.theme-red) {
+    --font-display: "Anton", "Arial Narrow", Impact, sans-serif;
+    background-color: #050000;
+    background-image:
+      radial-gradient(1000px 600px at 50% -12%, rgba(255, 35, 56, 0.2), transparent 64%),
+      linear-gradient(rgba(255, 35, 56, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 35, 56, 0.055) 1px, transparent 1px);
+    background-size: 100% 100%, 72px 72px, 72px 72px;
+  }
+
+  /* Barra de comando */
+  .page-command {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 150;
+    background: var(--accent);
+    color: #0a0002;
+    border-bottom: 2px solid #ffffff;
+  }
+  .page-command__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0.6rem clamp(1rem, 4vw, 2.5rem);
+  }
+  .page-command__brand {
+    flex: 0 0 auto;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #0a0002;
+    text-decoration: none;
+  }
+  .page-command__links {
+    display: flex;
+    gap: 0.2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .page-command__links::-webkit-scrollbar { display: none; }
+  .page-command__links a {
+    flex: 0 0 auto;
+    padding: 0.4rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: #0a0002;
+    text-decoration: none;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .page-command__links a:hover { background: #0a0002; color: #ffffff; }
+
+  .one-page {
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 2.5rem) clamp(3rem, 6vw, 4.5rem);
+  }
+
+  .one-section {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    scroll-margin-top: calc(var(--header-h) + 3.5rem);
+  }
+  .one-hero { scroll-margin-top: calc(var(--header-h) + 3.5rem); }
+
+  /* Bandas de sección */
+  .one-band {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem clamp(1rem, 3vw, 1.4rem);
+    background: var(--accent);
+    border-top: 2px solid #ffffff;
+    border-bottom: 2px solid #000000;
+  }
+  .one-band h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 4.5vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #0a0002;
+  }
+  .one-band span {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0a0002;
+    white-space: nowrap;
+  }
+
+  /* Héroe */
+  .one-hero {
+    margin-top: clamp(1rem, 2.5vw, 1.5rem);
+    padding: clamp(1.1rem, 3vw, 2rem);
+    border: 1px solid var(--accent);
+    border-top: 6px solid #ffffff;
+    background:
+      radial-gradient(110% 130% at 100% 0%, rgba(255, 35, 56, 0.16), transparent 58%),
+      #050000;
+    box-shadow: 14px 14px 0 rgba(255, 35, 56, 0.25);
+  }
+  .one-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    padding-bottom: 0.9rem;
+    margin-bottom: clamp(1rem, 3vw, 1.8rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .one-hero__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: auto;
+    color: var(--accent);
+  }
+  .one-hero__live i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  .one-hero__main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1.2rem, 4vw, 2.5rem);
+    align-items: end;
+  }
+  .one-hero__title {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 17vw, 9rem);
+    line-height: 0.8;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .one-hero__title .outline {
+    color: transparent;
+    -webkit-text-stroke: 2px #ffffff;
+  }
+  .one-hero__lead {
+    max-width: 48ch;
+    margin-top: 1rem;
+    font-size: clamp(0.92rem, 1.4vw, 1.05rem);
+    line-height: 1.7;
+    color: #ffffff;
+  }
+  .one-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+  }
+
+  .one-portrait { margin: 0; width: min(100%, 320px); justify-self: start; }
+  .one-portrait__frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: #000;
+    box-shadow: 10px 10px 0 #ff2338;
+  }
+  .one-portrait__frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.06);
+    transition: filter 0.35s ease, transform 0.5s ease;
+  }
+  .one-portrait:hover img { filter: grayscale(0); transform: scale(1.03); }
+  .one-portrait__tag {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 0.35rem 0.5rem;
+    background: #000;
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .one-portrait figcaption {
+    margin-top: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+
+  .one-hero__strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: clamp(1.2rem, 3vw, 2rem);
+  }
+  .one-hero__strip span {
+    padding: 0.65rem 0.75rem;
+    background: var(--accent);
+    border: 1px solid #000000;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .one-hero__strip b {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 0.15rem;
+  }
+
+  /* Catálogo */
+  .catalog {
+    background: #000000;
+    border: 1px solid var(--accent);
+    box-shadow: 12px 12px 0 rgba(255, 35, 56, 0.18);
+  }
+  .catalog__player {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  .catalog__player .kicker { display: block; margin-bottom: 0.35rem; }
+  .catalog__player strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-weight: 400;
+    line-height: 1.05;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .catalog__cols { display: grid; grid-template-columns: 1fr; }
+
+  .release { list-style: none; border-bottom: 1px solid rgba(255, 255, 255, 0.18); }
+  .release:last-child { border-bottom: 0; }
+  .release a {
+    display: grid;
+    grid-template-columns: 1.8rem 3.2rem minmax(0, 1fr) auto 1rem;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 0.8rem;
+    color: #ffffff;
+    text-decoration: none;
+    transition: background 0.18s ease;
+  }
+  .release__index {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .release__cover {
+    display: block;
+    width: 3.2rem;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: #100000;
+  }
+  .release__cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.8) contrast(1.05);
+    transition: filter 0.25s ease, transform 0.35s ease;
+  }
+  .release__fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: #ffffff;
+  }
+  .release__info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+  .release__info strong {
+    font-family: var(--font-display);
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #ffffff;
+  }
+  .release__meta {
+    font-family: var(--font-mono);
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #ffffff;
+  }
+  .release__plays {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    color: #ffffff;
+  }
+  .release__arrow { color: var(--accent); }
+  .release:hover a,
+  .release:focus-within a { background: var(--accent); }
+  .release:hover .release__index,
+  .release:hover .release__arrow,
+  .release:focus-within .release__index,
+  .release:focus-within .release__arrow { color: #ffffff; }
+  .release:hover .release__cover img { filter: grayscale(0) contrast(1.04); transform: scale(1.05); }
+
+  /* Números */
+  .numbers-grid { display: grid; grid-template-columns: 1fr; gap: 0.9rem; }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+  .metric {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem;
+    border: 1px solid var(--accent);
+    background: #000000;
+  }
+  .metric--wide { grid-column: 1 / -1; }
+  .metric strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 5vw, 3rem);
+    font-weight: 400;
+    line-height: 0.9;
+    color: var(--accent);
+    overflow-wrap: anywhere;
+  }
+  .metric span {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .data-note {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    line-height: 1.6;
+    color: #ffffff;
+  }
+
+  .cities-card {
+    padding: 0.9rem;
+    border: 1px solid var(--accent);
+    background: #000000;
+  }
+  .cities-card__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.7rem;
+    margin-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  }
+  .cities-card__head h3 {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .cities-card__head span {
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .cities { list-style: none; }
+  .city {
+    display: grid;
+    grid-template-columns: 1.8rem minmax(0, 1fr) auto;
+    grid-template-areas: "rank name count" "rank bar bar";
+    align-items: center;
+    gap: 0.3rem 0.6rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .city:last-child { border-bottom: 0; }
+  .city[hidden] { display: none; }
+  .city__rank {
+    grid-area: rank;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .city__name {
+    grid-area: name;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    text-transform: uppercase;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .city__bar {
+    grid-area: bar;
+    display: block;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+  }
+  .city__bar span { display: block; height: 100%; background: var(--accent); }
+  .city__count {
+    grid-area: count;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  /* Videos */
+  .video-console {
+    display: grid;
+    grid-template-columns: 1fr;
+    background: #000000;
+    border: 1px solid var(--accent);
+    box-shadow: 12px 12px 0 rgba(255, 35, 56, 0.18);
+  }
+  .video-console__screen { min-width: 0; }
+  .video-console__frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #050000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .video-console__frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+  .video-console__now {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+    padding: 0.85rem 1rem;
+  }
+  .video-console__label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .video-console__now h3 {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 2.6vw, 1.6rem);
+    font-weight: 400;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .video-console__link {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--accent);
+    white-space: nowrap;
+  }
+  .video-console__link:hover { color: var(--accent); }
+
+  .playlist { display: flex; flex-direction: column; list-style: none; border-top: 1px solid rgba(255, 255, 255, 0.2); }
+  .playlist li { border-bottom: 1px solid rgba(255, 255, 255, 0.16); }
+  .playlist li:last-child { border-bottom: 0; }
+  .playlist__item {
+    display: grid;
+    grid-template-columns: 1.8rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .playlist__num { font-family: var(--font-display); font-size: 1rem; line-height: 1; color: var(--accent); }
+  .playlist__title {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  .playlist__arrow { font-size: 0.56rem; color: var(--accent); }
+  .playlist__item:hover { background: #ffffff; color: #000000; }
+  .playlist__item:hover .playlist__num,
+  .playlist__item:hover .playlist__arrow { color: #000000; }
+  .playlist__item.is-active { background: var(--accent); color: #ffffff; }
+  .playlist__item.is-active .playlist__num,
+  .playlist__item.is-active .playlist__arrow { color: #ffffff; }
+
+  .ig-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-top: 0.8rem;
+    padding: 0.85rem 1rem;
+    background: #000000;
+    border: 1px solid var(--accent);
+    border-left: 6px solid var(--accent);
+    text-decoration: none;
+    color: #ffffff;
+  }
+  .ig-strip__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .ig-strip strong {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 2.6vw, 1.5rem);
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .ig-strip__cta {
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+  .ig-strip:hover { background: var(--accent); }
+
+  .reel-strip {
+    display: flex;
+    gap: 0.7rem;
+    overflow-x: auto;
+    margin-top: 0.8rem;
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
+  }
+  .reel-tile {
+    position: relative;
+    flex: 0 0 190px;
+    aspect-ratio: 4 / 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.8rem;
+    overflow: hidden;
+    background:
+      radial-gradient(80% 70% at 50% 25%, rgba(255, 35, 56, 0.25), transparent 70%),
+      #000000;
+    border: 1px solid var(--accent);
+    text-decoration: none;
+    color: #ffffff;
+    scroll-snap-align: start;
+  }
+  .reel-tile__index {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.54rem;
+    font-weight: 700;
+  }
+  .reel-tile__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.11) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.11) 1px, transparent 1px);
+    background-size: 26px 26px;
+    opacity: 0.4;
+  }
+  .reel-tile__word,
+  .reel-tile__title { position: relative; }
+  .reel-tile__word {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .reel-tile__title {
+    margin-top: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.45;
+    text-transform: uppercase;
+  }
+  .reel-tile:hover { background: var(--accent); }
+  .reel-tile:hover .reel-tile__grid { opacity: 0.15; }
+
+  /* Drop Room */
+  .drop-grid { display: grid; grid-template-columns: 1fr; gap: 0.9rem; align-items: start; }
+  .drop-pitch {
+    padding: 1rem;
+    background: #000000;
+    border: 1px solid var(--accent);
+  }
+  .drop-pitch h3 {
+    margin: 0.5rem 0 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 400;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .benefits { list-style: none; border-top: 1px solid rgba(255, 255, 255, 0.25); }
+  .benefits li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.8rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  .benefits__index {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .benefits strong {
+    display: block;
+    margin-bottom: 0.15rem;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .benefits p { font-size: 0.8rem; line-height: 1.6; color: #ffffff; }
+  .drop-privacy {
+    margin-top: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    line-height: 1.7;
+    color: #ffffff;
+  }
+  .drop-privacy a {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: var(--accent);
+    text-underline-offset: 3px;
+  }
+  .drop-form { min-width: 0; }
+
+  /* Conecta */
+  .connect-grid { display: grid; grid-template-columns: 1fr; gap: 0.9rem; }
+  .connect-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  .connect-links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.8rem;
+    background: #000000;
+    border: 1px solid var(--accent);
+    color: #ffffff;
+    font-family: var(--font-display);
+    font-size: clamp(0.95rem, 2.4vw, 1.3rem);
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.18s ease;
+  }
+  .connect-links a:hover { background: var(--accent); }
+  .connect-embed {
+    overflow: hidden;
+    background: #000000;
+    border: 1px solid var(--accent);
+  }
+  .connect-embed__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--accent);
+    color: #0a0002;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .connect-embed iframe { display: block; width: 100%; }
+
+  @media (min-width: 640px) {
+    .catalog__player { grid-template-columns: 1fr minmax(260px, 0.9fr); align-items: center; }
+    .catalog__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .catalog__col + .catalog__col { border-left: 1px solid rgba(255, 255, 255, 0.2); }
+    .video-console { grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.85fr); }
+    .playlist { border-top: 0; border-left: 1px solid rgba(255, 255, 255, 0.2); }
+    .numbers-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
+    .drop-grid { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); }
+    .connect-grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
+    .one-hero__strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+
+  @media (min-width: 900px) {
+    .one-hero__main { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
+    .one-portrait { justify-self: end; }
+    .one-band h2 { font-size: clamp(2rem, 3vw, 2.8rem); }
+  }
+
+  @media (max-width: 620px) {
+    .page-command__inner { gap: 0.6rem; padding: 0.5rem 1rem; }
+    .page-command__brand { font-size: 0.9rem; }
+    .page-command__links a { font-size: 0.54rem; padding: 0.35rem 0.45rem; }
+    .one-band { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+    .one-band span { white-space: normal; }
+
+    .video-console__now h3 { font-size: 0.95rem; }
+    .reel-tile { flex-basis: 160px; }
+    .connect-links { grid-template-columns: 1fr; }
+    .metric strong { font-size: 1.6rem; }
+    .release a { grid-template-columns: 1.5rem 2.8rem minmax(0, 1fr) auto; }
+    .release__cover { width: 2.8rem; }
+    .release__arrow { display: none; }
+    .release__info strong { white-space: normal; }
+    .release__meta { white-space: normal; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .one-portrait img,
+    .release a,
+    .release__cover img,
+    .playlist__item,
+    .reel-tile { transition: none; }
+    .one-portrait:hover img { transform: none; }
+  }
+</style>
