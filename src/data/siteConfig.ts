@@ -3,8 +3,13 @@ export const HERO_VIDEO_URL =
 
 export const TRACK_SRC = "/audio/track.mp3";
 
-export const KAZTA_IG_LOGO = "/brand/kazta-logo.png";
-export const KAZTA_INSTAGRAM_URL = "https://www.instagram.com/young_kazta/";
+/** Marca del estudio que desarrolló el sitio. */
+export const WILDFORGE_LOGO = "/brand/wildforge-labs.png";
+export const WILDFORGE_URL = "https://wildforge.dev";
+
+/** Retrato oficial del artista (usado en /artista y como imagen OG). */
+export const ARTIST_PORTRAIT_URL =
+  "https://image-cdn-ak.spotifycdn.com/image/ab676161000051746acea7d61302e68f4f1320f8";
 
 export const YOUTUBE_URL = "https://www.youtube.com/@Garguttt";
 export const YOUTUBE_CHANNEL_ID = "@Garguttt";
@@ -50,7 +55,7 @@ export const SITE_KEYWORDS = [
 ];
 export const SITE_AUTHOR = "Gargut";
 export const SITE_THEME_COLOR = "#000000";
-export const OG_IMAGE_URL = new URL(KAZTA_IG_LOGO, SITE_URL).href;
+export const OG_IMAGE_URL = ARTIST_PORTRAIT_URL;
 
 export const ARTIST_ORIGIN = "Guadalajara, México";
 /** Respaldo si Spotify no responde. Los valores reales se leen en vivo. */

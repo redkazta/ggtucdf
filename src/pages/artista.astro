@@ -10,10 +10,10 @@ import {
   ARTIST_MONTHLY_LISTENERS,
   ARTIST_FOLLOWERS,
   ARTIST_TOP_TRACK,
+  ARTIST_PORTRAIT_URL,
 } from "../data/siteConfig";
 
-const ARTIST_PORTRAIT =
-  "https://image-cdn-ak.spotifycdn.com/image/ab676161000051746acea7d61302e68f4f1320f8";
+const ARTIST_PORTRAIT = ARTIST_PORTRAIT_URL;
 
 const releases = [...DISCOGRAPHY].sort((a, b) => {
   if (b.year !== a.year) return b.year - a.year;
@@ -47,6 +47,26 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
     <div class="progress" aria-hidden="true"><span data-progress></span></div>
     <div class="rail" aria-hidden="true">EXPEDIENTE 003 — GARGUT — GUADALAJARA, MX</div>
 
+    <nav class="tabs" role="tablist" aria-label="Secciones del expediente">
+      <button type="button" class="tabs__btn is-active" id="tab-perfil" role="tab" aria-selected="true" aria-controls="panel-perfil" data-tab="perfil">
+        <span class="tabs__num">01</span> Perfil
+      </button>
+      <button type="button" class="tabs__btn" id="tab-numeros" role="tab" aria-selected="false" aria-controls="panel-numeros" data-tab="numeros" tabindex="-1">
+        <span class="tabs__num">02</span> Números
+      </button>
+      <button type="button" class="tabs__btn" id="tab-catalogo" role="tab" aria-selected="false" aria-controls="panel-catalogo" data-tab="catalogo" tabindex="-1">
+        <span class="tabs__num">03</span> Catálogo
+      </button>
+      <button type="button" class="tabs__btn" id="tab-senal" role="tab" aria-selected="false" aria-controls="panel-senal" data-tab="senal" tabindex="-1">
+        <span class="tabs__num">04</span> Señal
+      </button>
+      <button type="button" class="tabs__btn" id="tab-conecta" role="tab" aria-selected="false" aria-controls="panel-conecta" data-tab="conecta" tabindex="-1">
+        <span class="tabs__num">05</span> Conecta
+      </button>
+    </nav>
+
+    <section class="tab-panel is-active" id="panel-perfil" role="tabpanel" aria-labelledby="tab-perfil" data-panel="perfil">
+
     <!-- HERO -->
     <header class="hero" id="perfil">
       <div class="wrap">
@@ -71,7 +91,7 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
               <a href={SPOTIFY_ARTIST_URL} target="_blank" rel="noopener" class="btn btn--primary">
                 Escuchar en Spotify <span aria-hidden="true">↗</span>
               </a>
-              <a href="#catalogo" class="btn btn--outline">
+              <a href="#catalogo" class="btn btn--outline" data-tab-link="catalogo">
                 Ver catálogo <span aria-hidden="true">↓</span>
               </a>
             </div>
@@ -118,6 +138,24 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
         </dl>
       </div>
     </header>
+
+    <!-- 02 MANIFIESTO -->
+    <section class="manifesto" aria-label="Bio del artista">
+      <div class="manifesto__inner" data-reveal>
+        <span class="manifesto__label">BIO / SPOTIFY</span>
+        <blockquote class="manifesto__quote">“me sobra el Mojo y soy el Matusalén”</blockquote>
+        <p class="manifesto__text">
+          Gargut construye su catálogo a golpe de singles: colaboraciones, freestyles
+          y un sello propio, <strong>dxf prod</strong>. Este expediente reúne lo que
+          Spotify sabe de él: cuántos lo escuchan, desde dónde suena y qué track pega
+          más fuerte. El resto se resuelve dándole play.
+        </p>
+        <p class="manifesto__sign">— GARGUT / GDL</p>
+      </div>
+    </section>
+  </section>
+
+  <section class="tab-panel" id="panel-numeros" role="tabpanel" aria-labelledby="tab-numeros" data-panel="numeros" hidden>
 
     <!-- MARQUEE -->
     <div class="marquee" aria-hidden="true">
@@ -176,21 +214,6 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
       </div>
     </section>
 
-    <!-- 02 MANIFIESTO -->
-    <section class="manifesto" aria-label="Bio del artista">
-      <div class="manifesto__inner" data-reveal>
-        <span class="manifesto__label">BIO / SPOTIFY</span>
-        <blockquote class="manifesto__quote">“me sobra el Mojo y soy el Matusalén”</blockquote>
-        <p class="manifesto__text">
-          Gargut construye su catálogo a golpe de singles: colaboraciones, freestyles
-          y un sello propio, <strong>dxf prod</strong>. Este expediente reúne lo que
-          Spotify sabe de él: cuántos lo escuchan, desde dónde suena y qué track pega
-          más fuerte. El resto se resuelve dándole play.
-        </p>
-        <p class="manifesto__sign">— GARGUT / GDL</p>
-      </div>
-    </section>
-
     <!-- 03 CIUDADES -->
     <section class="section cities" id="ciudades" aria-labelledby="ciudades-title">
       <div class="wrap">
@@ -214,6 +237,9 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
         </ul>
       </div>
     </section>
+  </section>
+
+  <section class="tab-panel" id="panel-catalogo" role="tabpanel" aria-labelledby="tab-catalogo" data-panel="catalogo" hidden>
 
     <!-- 04 CATÁLOGO -->
     <section class="section catalog" id="catalogo" aria-labelledby="catalogo-title">
@@ -226,7 +252,7 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
 
         <ol class="releases" data-reveal>
           {releases.map((track, index) => (
-            <li class="release">
+            <li class="release" data-track-title={track.title}>
               <a
                 class="release__link"
                 href={track.spotifyUrl}
@@ -255,9 +281,12 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
             </li>
           ))}
         </ol>
-        <p class="catalog__note">Reproducciones reales de Spotify al momento de actualizar el catálogo.</p>
+        <p class="catalog__note">Reproducciones reales de Spotify · se actualizan automáticamente desde el perfil público.</p>
       </div>
     </section>
+  </section>
+
+  <section class="tab-panel" id="panel-senal" role="tabpanel" aria-labelledby="tab-senal" data-panel="senal" hidden>
 
     <!-- 05 SEÑAL -->
     <section class="section signal" id="senal" aria-labelledby="senal-title">
@@ -298,6 +327,9 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
         </div>
       </div>
     </section>
+  </section>
+
+  <section class="tab-panel" id="panel-conecta" role="tabpanel" aria-labelledby="tab-conecta" data-panel="conecta" hidden>
 
     <!-- 05 CONEXIÓN -->
     <section class="connect" id="conecta" aria-labelledby="conecta-title">
@@ -323,11 +355,79 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
         </div>
       </div>
     </section>
+  </section>
   </div>
 
   <script is:inline>
     (() => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /* Pestañas del expediente */
+      const tabs = Array.from(document.querySelectorAll("[data-tab]"));
+      const panels = Array.from(document.querySelectorAll("[data-panel]"));
+      const tablist = document.querySelector(".tabs");
+
+      const activateTab = (name, options = {}) => {
+        const target = panels.some((panel) => panel.dataset.panel === name) ? name : "perfil";
+
+        tabs.forEach((tab) => {
+          const active = tab.dataset.tab === target;
+          tab.classList.toggle("is-active", active);
+          tab.setAttribute("aria-selected", active ? "true" : "false");
+          tab.tabIndex = active ? 0 : -1;
+        });
+
+        panels.forEach((panel) => {
+          const active = panel.dataset.panel === target;
+          panel.classList.toggle("is-active", active);
+          panel.hidden = !active;
+        });
+
+        const panel = panels.find((item) => item.dataset.panel === target);
+        panel?.querySelectorAll("[data-reveal]").forEach((element) => {
+          element.classList.add("is-visible");
+        });
+
+        if (options.updateHash !== false) {
+          history.replaceState(null, "", `#${target}`);
+        }
+
+        if (options.scroll) {
+          window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+        }
+      };
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => activateTab(tab.dataset.tab, { scroll: true }));
+      });
+
+      document.querySelectorAll("[data-tab-link]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          activateTab(link.dataset.tabLink, { scroll: true });
+        });
+      });
+
+      if (tablist) {
+        tablist.addEventListener("keydown", (event) => {
+          if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+
+          const currentIndex = tabs.findIndex((tab) => tab.classList.contains("is-active"));
+          let nextIndex = currentIndex;
+
+          if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
+          if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+          if (event.key === "Home") nextIndex = 0;
+          if (event.key === "End") nextIndex = tabs.length - 1;
+
+          event.preventDefault();
+          tabs[nextIndex].focus();
+          activateTab(tabs[nextIndex].dataset.tab);
+        });
+      }
+
+      const initialTab = (window.location.hash || "").replace("#", "");
+      activateTab(initialTab || "perfil", { updateHash: false });
 
       /* Barra de progreso */
       const progress = document.querySelector("[data-progress]");
@@ -407,6 +507,52 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
         });
       };
 
+      const normalize = (value) => String(value || "").trim().toLowerCase();
+
+      const applyTrackStats = (topTracks) => {
+        if (!Array.isArray(topTracks) || topTracks.length === 0) return;
+
+        const stats = new Map(
+          topTracks
+            .filter((track) => track && track.name)
+            .map((track) => [normalize(track.name), track.playcount])
+        );
+
+        document.querySelectorAll(".release[data-track-title]").forEach((item) => {
+          const playcount = stats.get(normalize(item.dataset.trackTitle));
+          if (typeof playcount !== "number") return;
+
+          const plays = item.querySelector(".release__plays");
+          if (plays) plays.textContent = playcount.toLocaleString("es-MX");
+        });
+      };
+
+      const applyReleasePlaycounts = (tracks) => {
+        if (!Array.isArray(tracks) || tracks.length === 0) return;
+
+        const stats = new Map(
+          tracks
+            .filter((track) => track && track.title)
+            .map((track) => [normalize(track.title), track.playcount])
+        );
+
+        document.querySelectorAll(".release[data-track-title]").forEach((item) => {
+          const playcount = stats.get(normalize(item.dataset.trackTitle));
+          if (typeof playcount !== "number") return;
+
+          const plays = item.querySelector(".release__plays");
+          if (plays) plays.textContent = playcount.toLocaleString("es-MX");
+        });
+      };
+
+      fetch("/api/discography-stats", { headers: { Accept: "application/json" } })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data) => {
+          if (!data || data.source !== "spotify") return;
+          applyReleasePlaycounts(data.tracks);
+        })
+        .catch(() => {});
+
       fetch("/api/artist-stats", { headers: { Accept: "application/json" } })
         .then((response) => (response.ok ? response.json() : null))
         .then((data) => {
@@ -416,9 +562,14 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
           setText("followers", formatNumber(data.followers));
           setText("top", data.topTrack);
           renderCities(data.topCities);
+          applyTrackStats(data.topTracks);
 
           const note = document.querySelector("[data-stats-note]");
-          if (note) note.textContent = "Datos en vivo de Spotify · se actualizan cada 30 min";
+          if (note) {
+            note.textContent = data.stale
+              ? "Datos de Spotify · copia más reciente guardada, reintentando en vivo"
+              : "Datos en vivo de Spotify · se actualizan cada 30 min";
+          }
         })
         .catch(() => {});
     })();
@@ -457,6 +608,72 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
     }
     .rail {
       display: none;
+    }
+
+    /* PESTAÑAS */
+    .tabs {
+      position: sticky;
+      top: var(--header-h);
+      z-index: 250;
+      display: flex;
+      overflow-x: auto;
+      background: rgba(7, 7, 8, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line-strong);
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tabs__btn {
+      flex: 1 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 1rem 0.9rem 0.85rem;
+      border: 0;
+      border-right: 1px solid var(--line);
+      background: transparent;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.18s ease, background 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tabs__btn:last-child { border-right: 0; }
+    .tabs__btn:hover { color: var(--ink); background: var(--surface-2); }
+    .tabs__btn.is-active {
+      color: var(--accent);
+      background: var(--surface);
+    }
+    .tabs__btn.is-active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+    .tabs__num {
+      color: var(--accent);
+      opacity: 0.65;
+      font-size: 0.5rem;
+    }
+
+    .tab-panel { position: relative; }
+    .tab-panel[hidden] { display: none !important; }
+    .tab-panel.is-active { animation: tab-in 0.35s ease both; }
+    @keyframes tab-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
     }
 
     /* HERO */
@@ -1112,6 +1329,10 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
 
     /* TABLET */
     @media (min-width: 640px) {
+      .tabs__btn {
+        padding: 1.15rem 1.4rem 0.95rem;
+        font-size: 0.62rem;
+      }
       .hero__main {
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
         gap: 2rem;
@@ -1258,6 +1479,7 @@ const cityMax = Math.max(...cityFallback.map((city) => city.listeners));
       .city__bar span {
         animation: none;
       }
+      .tab-panel.is-active { animation: none; }
       [data-reveal] {
         opacity: 1;
         transform: none;

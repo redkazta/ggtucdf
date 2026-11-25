@@ -68,6 +68,7 @@ function formatStreams(n?: number) {
           target="_blank"
           rel="noopener"
           class="track-card"
+          data-track-title={track.title}
           aria-label={`Escuchar ${track.title} en Spotify`}
         >
           <div class="track-card__cover-wrap">
@@ -103,7 +104,7 @@ function formatStreams(n?: number) {
             <h2 class="track-card__title">{track.title}</h2>
             <div class="track-card__meta">
               <span>{track.year}</span>
-              {track.streams ? <span>{formatStreams(track.streams)} reprod.</span> : null}
+              <span data-track-streams>{track.streams ? `${formatStreams(track.streams)} reprod.` : ""}</span>
             </div>
             {track.collaborators && track.collaborators.length > 0 && (
               <p class="track-card__collabs">{track.collaborators.join(" / ")}</p>
@@ -122,6 +123,54 @@ function formatStreams(n?: number) {
 
   <PageFooter />
 </ArtistLayout>
+
+<script is:inline>
+  (() => {
+    const normalize = (value) => String(value || "").trim().toLowerCase();
+    const compact = (value) => {
+      if (typeof value !== "number" || Number.isNaN(value)) return "";
+      if (value >= 10_000) return `${(value / 1000).toFixed(0)}K`;
+      if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+      return String(value);
+    };
+
+    const applyStats = (entries, key) => {
+      if (!Array.isArray(entries) || entries.length === 0) return;
+
+      const stats = new Map(
+        entries
+          .filter((entry) => entry && entry[key])
+          .map((entry) => [normalize(entry[key]), entry.playcount])
+      );
+
+      document.querySelectorAll(".track-card[data-track-title]").forEach((card) => {
+        const playcount = stats.get(normalize(card.dataset.trackTitle));
+        if (typeof playcount !== "number") return;
+
+        const target = card.querySelector("[data-track-streams]");
+        if (target) target.textContent = `${compact(playcount)} reprod.`;
+      });
+    };
+
+    // Primero los playcounts por lanzamiento (más completos).
+    fetch("/api/discography-stats", { headers: { Accept: "application/json" } })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!data || data.source !== "spotify") return;
+        applyStats(data.tracks, "title");
+      })
+      .catch(() => {});
+
+    // Refuerzo con el top de Spotify por si algún release no tiene álbum.
+    fetch("/api/artist-stats", { headers: { Accept: "application/json" } })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!data || data.source !== "spotify") return;
+        applyStats(data.topTracks, "name");
+      })
+      .catch(() => {});
+  })();
+</script>
 
 <style>
   .music-page {

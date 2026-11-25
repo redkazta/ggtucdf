@@ -1,0 +1,683 @@
+================================================================================
+                    PROYECTO GGTUCDF - GARGUT ("GARGUTTIENEUNCHINGODEFERIA")
+                         DOCUMENTACIÓN COMPLETA DEL PROYECTO
+================================================================================
+
+================================================================================
+1. ¿QUÉ ES ESTE PROYECTO?
+================================================================================
+
+`ggtucdf` es el sitio web oficial del artista musical "Gargut" (nombre artístico
+completo: "Garguttieneunchingodeferia"), un artista de música urbana, trap y rap
+mexicano originario de Guadalajara, México.
+
+El sitio funciona como:
+  - Portafolio y carta de presentación del artista.
+  - Hub de fans ("Fan Hub") donde los seguidores se registran para recibir
+    contenido exclusivo y el enlace al canal de difusión de WhatsApp.
+  - Escaparate de la discografía completa (11 lanzamientos entre 2025 y 2026).
+  - Centro de videos (YouTube, Instagram Reels, TikTok).
+  - Sistema de "drops" (lanzamientos) con contador regresivo configurable.
+  - Punto de entrada para el reproductor dinámico de Spotify que siempre muestra
+    el último lanzamiento del artista.
+  - Herramienta de administración para que el artista (o su equipo) gestione la
+    lista de fans registrados y pueda copiar sus números de WhatsApp para el
+    canal de difusión.
+
+El proyecto fue construido por WildForgeLabs (estudio de desarrollo) para el
+artista. La marca WildForgeLabs aparece discretamente en el footer de todas las
+páginas como crédito de desarrollo.
+
+Dominio de producción: https://garguttieneunchingodeferia.com
+Repositorio: https://github.com/redkazta/ggtucdf
+Proyecto Supabase: https://coilzxaisyuvcsdbywrk.supabase.co (región us-east-2)
+
+================================================================================
+2. STACK TECNOLÓGICO COMPLETO
+================================================================================
+
+FRONTEND:
+  - Astro 6.1.5+ (framework principal, output: "hybrid" para permitir API
+    routes server-side).
+  - TypeScript (tipado en todo el proyecto).
+  - CSS puro (sin Tailwind instalado actualmente, aunque el prompt maestro
+    original lo mencionaba; el diseño se hace con CSS scoped de Astro).
+  - Fuentes: "Archivo Black" (para el hero del index), "Bebas Neue" (para
+    títulos, navegación y botones), "Inter" (para texto general). Cargadas
+    desde Google Fonts.
+  - JavaScript vanilla para interactividad (scripts inline y client:load).
+
+BACKEND / SERVICIOS:
+  - Supabase (PostgreSQL) para la base de datos de fans.
+  - Resend para el envío de emails automáticos de bienvenida.
+  - Spotify Web API (Client Credentials flow) para obtener el último
+    lanzamiento del artista.
+  - Vercel como plataforma de deploy (adapter @astrojs/vercel).
+  - @vercel/analytics para métricas de tráfico.
+
+INFRAESTRUCTURA:
+  - GitHub (repo: redkazta/ggtucdf).
+  - Vercel (deploy automático desde main).
+  - Supabase (base de datos + storage del video del hero).
+  - Video del hero alojado en Supabase Storage:
+    https://krntknduwbqqecvhkurt.supabase.co/storage/v1/object/public/ggt/ggtfinal_wild_48mb.mp4
+
+DEPENDENCIAS (package.json):
+  dependencies:
+    - @supabase/supabase-js ^2.45.0
+    - @vercel/analytics ^2.0.1
+    - astro ^6.1.5
+    - resend ^4.0.0
+  devDependencies:
+    - @astrojs/sitemap ^3.7.2
+    - @astrojs/vercel ^8.0.0
+    - vercel ^52.0.0
+
+SCRIPTS:
+    - npm run dev       → Servidor local en localhost:4321
+    - npm run build     → Build de producción
+    - npm run preview   → Preview del build
+    - npm run astro     → CLI de Astro
+    - npm run vercel:login  → Login en Vercel
+    - npm run vercel:deploy → Deploy a producción (vercel --prod)
+
+================================================================================
+3. ARQUITECTURA Y ESTRUCTURA DE ARCHIVOS
+================================================================================
+
+```
+ggtucdf/
+├── .env.example                    # Ejemplo de variables de entorno
+├── .gitignore
+├── .nvmrc                          # Node 22
+├── README.md                       # README original de Astro (no actualizado)
+├── README_MVP.md                   # Resumen del MVP implementado
+├── astro.config.mjs                # Configuración de Astro
+├── package.json
+├── package-lock.json
+├── tsconfig.json
+├── vercel.json                     # Configuración de deploy, headers y caché
+├── supabase/
+│   └── fans_gargut.sql             # Script SQL de la tabla de fans
+│
+├── public/
+│   ├── favicon.svg
+│   ├── favicon.ico
+│   ├── manifest.json              # PWA manifest
+│   ├── robots.txt
+│   ├── brand/
+│   │   └── kazta-logo.png         # Logo usado como OG image
+│   ├── audio/
+│   │   └── track.mp3              # Track de audio (referenciado en config)
+│   └── videos/                    # (cache headers configurados)
+│
+└── src/
+    ├── components/
+    │   ├── Header.astro           # Header fijo con logo y nav
+    │   ├── MobileDrawer.astro     # Menú móvil deslizante
+    │   ├── PageFooter.astro       # Footer con links a Spotify/YouTube
+    │   ├── Hero.astro             # Hero con video de fondo y título animado
+    │   ├── Skeleton.astro         # Componente de carga shimmer
+    │   ├── RegisterSW.astro       # Registro del Service Worker
+    │   ├── DropRoomForm.astro     # Formulario de registro de fans
+    │   ├── SpotifyLatestPlayer.astro  # Reproductor dinámico de Spotify
+    │   ├── DropCountdown.astro    # Contador de drops / último drop
+    │   └── AdminTable.astro       # Tabla de fans para el admin
+    │
+    ├── data/
+    │   ├── siteConfig.ts          # Configuración central del sitio
+    │   └── dropConfig.ts          # Configuración del último/próximo drop
+    │
+    ├── layouts/
+    │   └── ArtistLayout.astro     # Layout base de todas las páginas internas
+    │
+    ├── lib/
+    │   ├── supabase.ts            # Cliente Supabase (service_role)
+    │   └── toast.ts               # Notificaciones toast
+    │
+    └── pages/
+        ├── index.astro            # Landing page (hero + CTA)
+        ├── artista.astro          # Perfil del artista
+        ├── musica.astro           # Discografía + Spotify dinámico + drop
+        ├── videos.astro           # Videos (YouTube, Instagram, TikTok)
+        ├── admin.astro            # Panel de administración protegido
+        └── api/
+            ├── register-fan.ts    # POST: registrar fan + email Resend
+            ├── fans.ts            # GET: listar fans para admin
+            └── latest-spotify.ts  # GET: último lanzamiento de Spotify
+```
+
+================================================================================
+4. PÁGINAS Y RUTAS
+================================================================================
+
+▶ / (index.astro)
+  - Hero a pantalla completa (100vh/100dvh) con video de fondo alojado en
+    Supabase Storage.
+  - Título "GARGUTTIENEUNCHINGODEFERIA" con tipografía Archivo Black,
+    itálica, mayúsculas, con stroke y glow rojo (#990000 / #ff3333).
+  - Animación probabilística del título (escala aleatoria cada ~200-580ms).
+  - Placeholder negro con fade-in del video cuando está listo.
+  - Overlay radial oscuro.
+  - Botones CTA flotantes (logo circular Kazta → Instagram de young_kazta).
+  - Scanlines sutiles (opacidad 0.03) para efecto "under".
+  - Metadata completa: description, keywords, author, theme-color, robots,
+    OG tags, Twitter cards, canonical, JSON-LD (MusicGroup schema).
+  - PWA: manifest.json, favicon.svg, apple-touch-icon.
+  - Preconnect a Google Fonts, prefetch de /artista.
+  - Analytics de Vercel.
+  - Service Worker registration.
+  - NO incluye el Header global (página independiente con su propio diseño).
+
+▶ /artista (artista.astro)
+  - Layout: ArtistLayout (incluye Header + MobileDrawer + footer branding).
+  - Secciones (scroller): Perfil, Música, Escena, Conecta.
+  - Datos:
+    - Origen: Guadalajara, México.
+    - Oyentes mensuales: 1.7K.
+    - Seguidores: 272.
+    - Streams totales calculados de DISCOGRAPHY.
+    - Cover destacada: "Yo te kiero solo".
+    - Top 6 tracks por streams.
+  - Embed de Spotify del artista (SPOTIFY_EMBED_ARTIST).
+  - Links a Instagram, YouTube, Spotify.
+  - Footer con PageFooter.
+
+▶ /musica (musica.astro)
+  - Layout: ArtistLayout.
+  - Título "Música".
+  - DropCountdown (muestra "Último Drop" o contador según dropConfig).
+  - SpotifyLatestPlayer (iframe dinámico del último lanzamiento via API).
+  - Discografía completa (11 tracks) ordenada por año (desc) y streams (desc).
+  - Cada track muestra:
+    - Cover (con skeleton de carga y fallback con inicial).
+    - Título.
+    - Año.
+    - Badge "Solo" o "Colab".
+    - Streams formateados (ej. "14.6K reprod.").
+    - Colaboradores.
+    - Link directo a Spotify.
+  - Botón "Ver todo en Spotify".
+  - PageFooter.
+
+▶ /videos (videos.astro)
+  - Layout: ArtistLayout.
+  - Sección 01 / Destacados:
+    - FENTATRIP (YouTube, tag "La Rola Main").
+    - ¿Qué es el FENTATRIP? (Instagram Reel, tag "El Contexto").
+  - Sección 02 / YouTube:
+    - Experiencia Espiritual X @zacklyvibes.
+    - Yo te kiero solo X @buzk09.
+    - El Primer Artista.
+    - Soy Artista o Eso Parece ft @zacklyvibes & @skydemongoat.
+    - Artesania.
+  - Sección 03 / Instagram Reels:
+    - Primera experiencia espiritual.
+    - Fentatrip llega a Tijuana.
+    - 4 reels sin título.
+  - Grids responsive: 1 col mobile, 2 col tablet, 3-4 col desktop.
+  - PageFooter.
+
+▶ /admin (admin.astro)
+  - Página protegida con contraseña simple (PRIVATE_ADMIN_TOKEN en .env, por
+    defecto "gargut123").
+  - Login: input de contraseña + botón "Entrar".
+  - Al autenticarse, muestra AdminTable.
+  - AdminTable:
+    - Fetch a /api/fans.
+    - Tabla responsive: Nombre, Email, WhatsApp, Fecha, Acción.
+    - Botón "Copiar" por fila (copia el WhatsApp al portapapeles).
+    - Botón "Copiar todos los números (coma-separados)".
+    - Toasts de confirmación.
+    - Estados: loading, error, empty.
+  - NOTA: Usa autenticación simple por contraseña, no Supabase Auth (MVP).
+
+▶ /api/register-fan (POST)
+  - Recibe JSON: { nombre, email, whatsapp, acepto_privacidad }.
+  - Valida en frontend antes de enviar (email regex, WhatsApp regex, checkbox).
+  - Inserta en tabla `fans_gargut` de Supabase (service_role key).
+  - Envía email de bienvenida vía Resend con enlace al canal de WhatsApp.
+  - Retorna { success: true } o error 500.
+
+▶ /api/fans (GET)
+  - Lista todos los fans de `fans_gargut` ordenados por created_at DESC.
+  - Retorna { fans: [...] }.
+  - Usado por el AdminTable.
+
+▶ /api/latest-spotify (GET)
+  - Obtiene token de Spotify (Client Credentials flow).
+  - Consulta GET /v1/artists/{id}/albums?include_groups=album,single&limit=1&sort=release_date_desc.
+  - Retorna { id: "trackId" } del último lanzamiento.
+  - Si falla, el frontend usa fallback (SPOTIFY_TRACK_ID estático).
+  - Las 3 API routes tienen `export const prerender = false` para que no se
+    prerendericen en build time (evita errores de credenciales).
+
+================================================================================
+5. COMPONENTES EN DETALLE
+================================================================================
+
+▶ Header.astro
+  - Fijo en top, z-index 200.
+  - Fondo negro translúcido con backdrop-filter blur(16px).
+  - Borde inferior rojo sutil.
+  - Logo: "G" en rojo (#ff3333) + "ARGUT" en blanco (Bebas Neue).
+  - Nav: Inicio, Artista, Música, Videos.
+  - Link activo: rojo con fondo sutil y glow.
+  - Botón hamburguesa en móvil (<768px).
+  - Script inline para marcar el link activo según el pathname.
+
+▶ MobileDrawer.astro
+  - Drawer lateral derecho (280px max, 80vw).
+  - Overlay negro con click para cerrar.
+  - Botón X para cerrar.
+  - Cierra con Escape.
+  - Cierra al hacer click en un link.
+  - Bloquea el scroll del body cuando está abierto.
+  - Transición de transform (translateX).
+  - Oculta en desktop (>=768px).
+
+▶ Hero.astro
+  - Video de fondo con loop, muted, autoplay, playsinline.
+  - Placeholder negro que se desvanece.
+  - Múltiples eventos para revelar el video (loadedmetadata, loadeddata,
+    canplay, canplaythrough) + intervalo de 300ms + timeout de 2s.
+  - Intenta autoplay agresivamente.
+  - Overlay radial oscuro.
+  - Título con animación probabilística de escala (diferente para móvil y
+    desktop) usando cubic-bezier.
+  - Efecto hero-pulse en el wrapper del video (scale + translate cada 10s).
+
+▶ PageFooter.astro
+  - Divider con gradiente rojo.
+  - Links a Spotify (verde #1db954) y YouTube (rojo #ff3333) con hover glow.
+  - Texto "Gargut — Guadalajara, México".
+
+▶ Skeleton.astro
+  - Span con fondo gradiente animado (shimmer).
+  - Props: width, height, borderRadius, class.
+  - Respeta prefers-reduced-motion.
+
+▶ DropRoomForm.astro
+  - Campos: Nombre, Email, WhatsApp, checkbox de privacidad.
+  - Validación en cliente:
+    - Email: regex estándar.
+    - WhatsApp: /^\+?\d{7,15}$/.
+    - Checkbox: requerido.
+  - POST a /api/register-fan.
+  - Muestra errores y mensaje de éxito.
+  - Estilos oscuros con botón rojo.
+  - NOTA: Actualmente no está montado en ninguna página. Debe insertarse en
+    /artista (sección "Conecta") o en /musica.
+
+▶ SpotifyLatestPlayer.astro
+  - Contenedor con skeleton inicial.
+  - Script client:load que hace fetch a /api/latest-spotify.
+  - Si obtiene el ID, genera iframe:
+    https://open.spotify.com/embed/track/{id}
+  - Si falla, usa SPOTIFY_TRACK_ID de siteConfig como fallback.
+  - Altura: 80px, border-radius 8px.
+
+▶ DropCountdown.astro
+  - Importa dropConfig y extrae variables en frontmatter.
+  - Si showCountdown === true:
+    - Muestra "PRÓXIMO DROP" + nombre + contador (días/horas/min/seg).
+    - Script client:load actualiza cada segundo.
+    - Al llegar a cero, recarga la página.
+  - Si showCountdown === false:
+    - Muestra "ÚLTIMO DROP" + nombre + link a Spotify.
+  - Usa sintaxis de ternario JS (no {#if} de Svelte).
+
+▶ AdminTable.astro
+  - Contenedor con tabla oculta inicialmente.
+  - Script client:load:
+    - Fetch a /api/fans.
+    - Renderiza filas con innerHTML.
+    - Botones Copiar por fila.
+    - Botón Copiar todos.
+    - Toasts.
+    - Estados loading/error/empty.
+  - Estilos oscuros con header rojo.
+
+▶ RegisterSW.astro
+  - Registra /sw.js si el navegador soporta service workers.
+  - (El archivo /sw.js no está en el repo; el registro fallará silenciosamente
+    si no existe).
+
+================================================================================
+6. DATOS Y CONFIGURACIÓN
+================================================================================
+
+▶ src/data/siteConfig.ts
+  Constantes exportadas:
+
+  HERO_VIDEO_URL = URL del video en Supabase Storage.
+  TRACK_SRC = "/audio/track.mp3".
+
+  KAZTA_IG_LOGO = "/brand/kazta-logo.png".
+  KAZTA_INSTAGRAM_URL = "https://www.instagram.com/young_kazta/".
+
+  YOUTUBE_URL = "https://www.youtube.com/@Garguttt".
+  YOUTUBE_CHANNEL_ID = "@Garguttt".
+  SPOTIFY_URL = link de track con si.
+  SPOTIFY_ARTIST_URL = "https://open.spotify.com/artist/3IWeUxh0WKXHNXJ6ahJUtX".
+  SPOTIFY_TRACK_ID = "4KvIxXUbDzMicaBr2opF9e".
+  SPOTIFY_ARTIST_ID = "3IWeUxh0WKXHNXJ6ahJUtX".
+  SPOTIFY_EMBED_ARTIST = "https://open.spotify.com/embed/artist/3IWeUxh0WKXHNXJ6ahJUtX".
+  SPOTIFY_EMBED_TRACK = `https://open.spotify.com/embed/track/${SPOTIFY_TRACK_ID}`.
+  INSTAGRAM_URL = "https://www.instagram.com/garguttt/".
+  TIKTOK_URL = "https://www.tiktok.com/@gargutttt".
+
+  SITE_URL = "https://garguttieneunchingodeferia.com".
+  SITE_TITLE = "Garguttieneunchingodeferia".
+  SITE_DESCRIPTION = "Garguttieneunchingodeferia — Escucha 'YO TE KIERO SOLO' ya disponible. Música urbana desde Guadalajara, México."
+  SITE_KEYWORDS = [...]
+  SITE_AUTHOR = "Gargut".
+  SITE_THEME_COLOR = "#000000".
+  OG_IMAGE_URL = KAZTA_IG_LOGO.
+
+  ARTIST_ORIGIN = "Guadalajara, México".
+  ARTIST_MONTHLY_LISTENERS = "1.7K".
+  ARTIST_FOLLOWERS = 272.
+
+  interface Track { title, year, streams?, type: "solo"|"colab", spotifyUrl, coverUrl, collaborators? }
+
+  DISCOGRAPHY: Track[] = [
+    Zackly Copula Freestyle (2025, 21089, colab: Jack Salchicha, Red Lean)
+    Yo te kiero solo (2026, 14572, colab: Buzk, ESSENZY, YESH!)
+    POLLY POCKET (2025, 4082, solo)
+    El Primer Artista (2026, 2168, solo)
+    Experiencia Espiritual (2026, colab: zacklyvibes)
+    Soy Artista o Eso Parece (2026, colab: zacklyvibes, Micro)
+    Red House (2025, solo)
+    Artesania (2025, colab: zacklyvibes)
+    Confleis (2025, colab: zacklyvibes)
+    FENTATRIP (2025, colab: zacklyvibes)
+    Gargut Nuevo (2025, solo)
+  ]
+
+  SCENE = [
+    zacklyvibes (Spotify URL)
+    Buzk (Spotify URL)
+    Jack Salchicha (Spotify URL)
+    ESSENZY (Spotify URL)
+    YESH! (sin URL)
+    Micro (sin URL)
+    Red Lean (sin URL)
+  ]
+
+▶ src/data/dropConfig.ts
+  export const dropConfig = {
+    latestReleaseName: "Yo te kiero solo",
+    latestReleaseUrl: "https://open.spotify.com/track/4KvIxXUbDzMicaBr2opF9e",
+    nextDropName: "FENTATRIP",
+    nextDropDate: "2026-11-15T00:00:00",
+    showCountdown: false,
+  };
+  Este archivo es el único punto de configuración para cambiar el estado del
+  contador. Si showCountdown = true y la fecha es futura, se muestra el
+  contador. Si es false, se muestra el último drop.
+
+▶ supabase/fans_gargut.sql
+  CREATE TABLE IF NOT EXISTS fans_gargut (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nombre TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    whatsapp TEXT NOT NULL,
+    acepto_privacidad BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  + índices por email y created_at DESC.
+  + Comentarios de RLS opcionales.
+
+================================================================================
+7. VARIABLES DE ENTORNO
+================================================================================
+
+Archivo .env.example (raíz del proyecto):
+
+  # Supabase (usar service_role key solo en server-side)
+  PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+  PRIVATE_SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
+
+  # Resend (email de bienvenida)
+  PRIVATE_RESEND_API_KEY=re_tu_api_key
+  PRIVATE_RESEND_FROM_EMAIL=welcome@gargut.com
+
+  # Spotify (Client Credentials flow)
+  SPOTIFY_CLIENT_ID=tu_spotify_client_id
+  SPOTIFY_CLIENT_SECRET=tu_spotify_client_secret
+  SPOTIFY_ARTIST_ID=3IWeUxh0WKXHNXJ6ahJUtX
+
+  # Token simple para proteger la API de fans (opcional, MVP)
+  PRIVATE_ADMIN_TOKEN=tu_token_secreto
+
+DÓNDE SE OBTIENE CADA UNA:
+
+  PUBLIC_SUPABASE_URL:
+    Supabase → Project Settings → API → URL
+    Valor real: https://coilzxaisyuvcsdbywrk.supabase.co
+
+  PRIVATE_SUPABASE_SERVICE_ROLE_KEY:
+    Supabase → Project Settings → API → "service_role secret"
+
+  SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET:
+    https://developer.spotify.com/dashboard → Create app → Dashboard
+
+  PRIVATE_RESEND_API_KEY:
+    https://resend.com → API Keys → Create API key
+
+  PRIVATE_RESEND_FROM_EMAIL:
+    Resend → Domains → email verificado
+
+  PRIVATE_ADMIN_TOKEN:
+    Definido por el usuario (ej. "gargut123")
+
+NOTA SOBRE PREFIJOS:
+  - PUBLIC_ → expuesto al cliente (browser).
+  - PRIVATE_ → solo accesible en el servidor (API routes).
+  - En Vercel, las variables se configuran en Settings → Environment Variables.
+
+================================================================================
+8. CONFIGURACIÓN DE DEPLOY (Vercel)
+================================================================================
+
+▶ vercel.json
+  - installCommand: npm install
+  - buildCommand: npm run build
+  - outputDirectory: dist
+  - Headers:
+    * Seguridad global: X-Frame-Options SAMEORIGIN, X-Content-Type-Options
+      nosniff, Referrer-Policy strict-origin-when-cross-origin.
+    * /videos/* → Cache-Control public, max-age=3600, s-maxage=86400,
+      stale-while-revalidate=604800.
+    * /audio/* → mismo cache.
+    * /_astro/* → public, max-age=31536000, immutable.
+    * favicon/manifest/robots/sitemap → public, max-age=86400, s-maxage=604800.
+
+▶ astro.config.mjs (estado actual)
+  output: "hybrid"  (cambiado desde "static" para permitir API routes)
+  site: "https://garguttieneunchingodeferia.com"
+  integrations: [sitemap(), vercel()]
+
+▶ Deployment
+  - Push a main → Vercel build automático.
+  - Vercel CLI 65.1.0 en el build.
+  - Node >=22.12.0 (engine en package.json, .nvmrc = 22).
+
+================================================================================
+9. HISTORIAL DE CAMBIOS Y ERRORES RESUELTOS
+================================================================================
+
+COMMITS REALIZADOS:
+  5a56ec4 → feat: MVP GARGUT - Drop Room, Admin, Spotify dinámico, contador drops
+   d18f981 → feat: add supabase and resend dependencies
+  0c15bb3 → fix: resolve DropCountdown SSR error by using frontmatter vars
+  f26dd1d → fix: DropCountdown Astro syntax (ternary instead of #if)
+  75f18ab → fix: AdminTable Astro syntax (JS instead of Svelte #if)
+  248bf98 → fix: disable prerender for API routes to avoid Supabase/Resend errors
+  d6d9fe2 → feat: add @astrojs/vercel adapter and change output to hybrid
+
+ERRORES DE BUILD ENCONTRADOS Y SOLUCIONADOS:
+
+  1. "Rollup failed to resolve import @supabase/supabase-js"
+     → Faltaban dependencias en package.json. Se agregaron @supabase/supabase-js
+       y resend.
+
+  2. "Expected 'in' but found 'dropConfig'" (DropCountdown.astro)
+     → Se usaba {#if} de Svelte en un componente Astro. Se cambió a ternario
+       de JavaScript y se extrajeron variables en el frontmatter.
+
+  3. "Expected 'in' but found 'loading'" (AdminTable.astro)
+     → Mismo problema: {#if} de Svelte. Se reescribió con JavaScript puro y
+       manipulación del DOM.
+
+  4. "supabaseUrl is required" durante el build
+     → Astro intentaba prerenderizar /api/fans sin las variables de entorno.
+       Se agregó `export const prerender = false;` a las 3 API routes.
+
+  5. "Cannot use server-rendered pages without an adapter"
+     → Faltaba el adapter de Vercel para las API routes. Se instaló
+       @astrojs/vercel y se cambió output a "hybrid".
+
+ESTADO DEL BUILD (último intento):
+  - Se espera que el deploy en Vercel pase tras el commit d6d9fe2.
+  - Pendiente: configurar las variables de entorno en Vercel y verificar.
+
+================================================================================
+10. ESTADO ACTUAL Y PENDIENTES
+================================================================================
+
+✅ COMPLETADO:
+  - Estructura base del sitio (páginas, layout, componentes).
+  - Diseño oscuro (#000), tipografías, animaciones, responsive.
+  - Discografía completa y embed de Spotify.
+  - Sección de videos con embeds.
+  - Drop Room: formulario + API + Supabase + Resend.
+  - Panel de admin: login simple, tabla, copiar WhatsApp individual y masivo.
+  - Reproductor dinámico de Spotify con fallback.
+  - Contador de drops configurable.
+  - Branding de WildForgeLabs en el footer.
+  - Configuración de Vercel y Supabase.
+  - Adapter de Vercel y output hybrid.
+  - Todos los cambios pusheados a main.
+
+⏳ PENDIENTE (por parte del usuario):
+  1. Configurar las 7 variables de entorno en Vercel:
+     - PUBLIC_SUPABASE_URL
+     - PRIVATE_SUPABASE_SERVICE_ROLE_KEY
+     - SPOTIFY_CLIENT_ID
+     - SPOTIFY_CLIENT_SECRET
+     - PRIVATE_RESEND_API_KEY
+     - PRIVATE_RESEND_FROM_EMAIL
+     - PRIVATE_ADMIN_TOKEN
+  2. Crear la tabla fans_gargut en Supabase (ejecutar el SQL).
+  3. Crear app en Spotify Developer Dashboard.
+  4. Crear cuenta en Resend y verificar dominio.
+  5. Verificar que el build final pase en Vercel.
+  6. Montar DropRoomForm en /artista o /musica (actualmente no está montado).
+  7. Probar:
+     - /musica → reproductor dinámico de Spotify.
+     - /admin → login + tabla + copiar.
+     - Formulario de registro.
+     - Envío de email.
+
+🔮 MEJORAS FUTURAS SUGERIDAS:
+  - Reemplazar la autenticación simple del admin por Supabase Auth real.
+  - Montar el DropRoomForm en una sección visible del sitio.
+  - Agregar el archivo /sw.js (o eliminar RegisterSW.astro si no se usa).
+  - Actualizar el README.md principal con la documentación real del proyecto.
+  - Añadir tests (Vitest / Playwright).
+  - Migrar el diseño a Tailwind si se desea (mencionado en el prompt maestro).
+  - Integrar el dropConfig con el ERP cuando esté listo.
+  - Agregar protección RLS real a la tabla de fans.
+  - Añadir rate limiting a las API routes.
+  - Optimizar el video del hero (comprimir, usar formatos modernos).
+
+================================================================================
+11. FLUJO DE USUARIO (FAN → ARTISTA)
+================================================================================
+
+  1. El fan entra a garguttieneunchingodeferia.com.
+  2. Ve el hero con el video y el título animado.
+  3. Navega a /artista, /musica o /videos.
+  4. En /musica ve el último lanzamiento de Spotify (dinámico) y la discografía.
+  5. Se registra en el Drop Room (nombre, email, WhatsApp, acepta privacidad).
+  6. El backend guarda sus datos en Supabase (fans_gargut).
+  7. Resend le envía un email de bienvenida con el link al canal de WhatsApp.
+  8. El artista (o su equipo) entra a /admin con la contraseña.
+  9. Ve la tabla de fans y puede copiar números de WhatsApp individuales o todos.
+ 10. Usa esos números para añadirlos al canal de difusión de WhatsApp.
+
+================================================================================
+12. FLUJO TÉCNICO DEL REPRODUCTOR DINÁMICO DE SPOTIFY
+================================================================================
+
+  1. El usuario carga /musica.
+  2. SpotifyLatestPlayer.astro (client:load) hace fetch a /api/latest-spotify.
+  3. /api/latest-spotify:
+     a. Pide token a https://accounts.spotify.com/api/token con
+        grant_type=client_credentials, client_id y client_secret.
+     b. Con el token, consulta:
+        GET https://api.spotify.com/v1/artists/{SPOTIFY_ARTIST_ID}/albums
+            ?include_groups=album,single&limit=1&sort=release_date_desc
+     c. Extrae el ID del track (items[0].tracks[0].id o items[0].id).
+     d. Retorna { id }.
+  4. El componente genera dinámicamente:
+     <iframe src="https://open.spotify.com/embed/track/{id}">
+  5. Si algo falla, usa SPOTIFY_TRACK_ID (4KvIxXUbDzMicaBr2opF9e) como
+     fallback.
+
+  IMPORTANTE: Spotify no tiene webhooks para nuevos lanzamientos. La única
+  forma de mantenerlo actualizado es consultar la API (como se hace aquí) o
+  usar un cron job. Este diseño consulta en cada carga de página.
+
+================================================================================
+13. SEGURIDAD Y CONSIDERACIONES
+================================================================================
+
+  - La service_role key de Supabase y la API key de Resend NUNCA se exponen al
+    cliente (solo en API routes server-side).
+  - El admin actual usa una contraseña simple (PRIVATE_ADMIN_TOKEN). Para
+    producción real se recomienda Supabase Auth.
+  - La API /api/fans no tiene autenticación server-side (cualquiera que conozca
+    la URL puede listar los fans). Se recomienda añadir un token o auth.
+  - La tabla fans_gargut no tiene RLS habilitado por defecto (comentado en el
+    SQL). Se recomienda habilitarlo y crear políticas adecuadas.
+  - El formulario valida email y WhatsApp en el cliente, pero el backend no
+    re-valida (se podría añadir validación con Zod o similar).
+  - Los headers de seguridad en vercel.json mitigan clickjacking, MIME sniffing
+    y filtrado de referrer.
+  - El correo de Resend usa un enlace placeholder a WhatsApp
+    (https://chat.whatsapp.com/XXXXX) que debe reemplazarse por el real.
+
+================================================================================
+14. IDENTIDAD DE MARCA
+================================================================================
+
+  - Artista: Gargut (Garguttieneunchingodeferia).
+  - Origen: Guadalajara, México.
+  - Género: Música urbana / trap / rap mexicano.
+  - Paleta: negro (#000000), blanco (#ffffff), rojo (#ff3333 / #990000),
+    verde Spotify (#1db954).
+  - Tipografías: Archivo Black (hero), Bebas Neue (títulos/nav), Inter (texto).
+  - Estética: under, oscura, minimalista, con glows rojos y scanlines sutiles.
+  - Desarrollador: WildForgeLabs.
+  - Colaboradores frecuentes: zacklyvibes, Buzk, Jack Salchicha, ESSENZY,
+    YESH!, Micro, Red Lean.
+
+================================================================================
+15. CONTACTO Y ENLACES OFICIALES
+================================================================================
+
+  Sitio: https://garguttieneunchingodeferia.com
+  Repo: https://github.com/redkazta/ggtucdf
+  Supabase: https://coilzxaisyuvcsdbywrk.supabase.co
+  YouTube: https://www.youtube.com/@Garguttt
+  Spotify (artista): https://open.spotify.com/artist/3IWeUxh0WKXHNXJ6ahJUtX
+  Instagram (Gargut): https://www.instagram.com/garguttt/
+  Instagram (Kazta): https://www.instagram.com/young_kazta/
+  TikTok: https://www.tiktok.com/@gargutttt
+
+================================================================================
+                               FIN DEL DOCUMENTO
+================================================================================

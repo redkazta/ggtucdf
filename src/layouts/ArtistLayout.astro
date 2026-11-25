@@ -1,7 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import MobileDrawer from "../components/MobileDrawer.astro";
-import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, OG_IMAGE_URL } from "../data/siteConfig";
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, OG_IMAGE_URL, WILDFORGE_LOGO, WILDFORGE_URL } from "../data/siteConfig";
 
 interface Props {
   title?: string;
@@ -283,11 +283,21 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
       <slot />
     </main>
 
-    <footer class="wildforge-branding" aria-label="WildForgeLabs">
+    <footer class="wildforge-branding" aria-label="Hecho por WildForgeLabs">
       <span class="wildforge-line" aria-hidden="true"></span>
-      <a href="https://wildforge.dev" target="_blank" rel="noopener" class="wildforge-link">
-        <span>Desarrollado por</span>
-        <strong>WildForgeLabs</strong>
+      <a href={WILDFORGE_URL} target="_blank" rel="noopener" class="wildforge-link">
+        <span class="wildforge-text">Hecho por</span>
+        <img
+          class="wildforge-logo"
+          src={WILDFORGE_LOGO}
+          alt="WildForgeLabs"
+          width="150"
+          height="30"
+          loading="lazy"
+          decoding="async"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+        />
+        <span class="wildforge-fallback" style="display:none;">WILDFORGELABS</span>
       </a>
     </footer>
   </body>
@@ -315,8 +325,8 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
   }
   .wildforge-link {
     display: inline-flex;
-    align-items: baseline;
-    gap: 0.45rem;
+    align-items: center;
+    gap: 0.55rem;
     text-decoration: none;
     font-family: var(--font-mono);
     font-size: 0.62rem;
@@ -327,8 +337,20 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     transition: color 0.2s;
   }
   .wildforge-link:hover { color: var(--text-soft); }
-  .wildforge-link strong {
-    color: var(--accent);
+  .wildforge-text { color: var(--text-dim); }
+  .wildforge-logo {
+    display: block;
+    width: auto;
+    height: 26px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 106, 0, 0.18));
+  }
+  .wildforge-fallback {
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
     font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #ff6a00;
   }
 </style>

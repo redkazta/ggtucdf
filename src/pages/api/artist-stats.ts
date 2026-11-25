@@ -20,12 +20,16 @@ export const GET: APIRoute = async () => {
         followers: overview.followers,
         topTrack: overview.topTrack,
         topCities: overview.topCities,
+        topTracks: overview.topTracks,
         latestRelease: overview.latestRelease,
         source: "spotify",
+        stale: overview.stale ?? false,
         fetchedAt: overview.fetchedAt,
       },
       200,
       {
+        // Datos frescos cada 30 min; si el origen falla, Vercel sirve la
+        // última copia buena mientras reintenta en segundo plano.
         "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=86400",
       }
     );
@@ -37,8 +41,10 @@ export const GET: APIRoute = async () => {
       followers: null,
       topTrack: null,
       topCities: null,
+      topTracks: null,
       latestRelease: LATEST_RELEASE,
       source: "config",
+      stale: false,
       fallback: {
         monthlyListeners: ARTIST_MONTHLY_LISTENERS,
         followers: ARTIST_FOLLOWERS,
