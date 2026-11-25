@@ -3,6 +3,10 @@ export const HERO_VIDEO_URL =
 
 export const TRACK_SRC = "/audio/track.mp3";
 
+/** Crédito del desarrollador original del sitio. */
+export const KAZTA_IG_LOGO = "/brand/kazta-logo.png";
+export const KAZTA_INSTAGRAM_URL = "https://www.instagram.com/young_kazta/";
+
 /** Marca del estudio que desarrolló el sitio. */
 export const WILDFORGE_LOGO = "/brand/wildforge-labs.png";
 export const WILDFORGE_URL = "https://wildforge.dev";

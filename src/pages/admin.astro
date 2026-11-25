@@ -18,7 +18,7 @@ const today = new Intl.DateTimeFormat("es-MX", {
 }).format(new Date());
 ---
 
-<ArtistLayout title="Admin" noindex>
+<ArtistLayout title="Admin" noindex theme="paper">
   <div class="internal-shell admin-page">
     <header class="internal-hero">
       <div class="internal-hero__top">
@@ -123,35 +123,37 @@ const today = new Intl.DateTimeFormat("es-MX", {
   }
 
   .admin-facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
     margin: 0;
+    border-top: 2px solid var(--ink);
   }
   .admin-facts div {
     display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    padding: 0.9rem 0.85rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--surface);
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--line);
   }
   .admin-facts dt {
     font-family: var(--font-mono);
     font-size: 0.58rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .admin-facts dd {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 3.4vw, 1.5rem);
-    line-height: 1;
-    text-transform: uppercase;
-    color: #ffffff;
+    font-size: clamp(1rem, 2.2vw, 1.35rem);
+    line-height: 1.05;
+    text-align: right;
+    white-space: nowrap;
+    color: var(--ink);
   }
 
   .auth-panel {
@@ -195,7 +197,7 @@ const today = new Intl.DateTimeFormat("es-MX", {
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .auth-panel__label span { color: var(--accent); letter-spacing: 0.08em; }
 
@@ -204,14 +206,14 @@ const today = new Intl.DateTimeFormat("es-MX", {
     padding: 0.9rem 1rem;
     border-radius: 12px;
     border: 1px solid var(--line);
-    background: #000000;
-    color: #ffffff;
+    background: var(--bg);
+    color: var(--ink);
     font-family: var(--font-mono);
     font-size: 0.95rem;
     letter-spacing: 0.12em;
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
   }
-  .password-input::placeholder { color: #ffffff; opacity: 0.75; }
+  .password-input::placeholder { color: var(--ink); opacity: 0.6; }
   .password-input:hover:not(:focus) { border-color: var(--line-strong); }
   .password-input:focus {
     outline: none;
@@ -252,7 +254,7 @@ const today = new Intl.DateTimeFormat("es-MX", {
     border-left: 3px solid var(--accent);
     border-radius: 8px;
     background: var(--accent-soft);
-    color: #ffffff;
+    color: var(--ink);
     font-family: var(--font-mono);
     font-size: 0.62rem;
     line-height: 1.7;
@@ -262,7 +264,7 @@ const today = new Intl.DateTimeFormat("es-MX", {
     border: 1px solid var(--line-strong);
     border-radius: 5px;
     background: var(--bg);
-    color: #ffffff;
+    color: var(--ink);
   }
   .auth-panel__foot {
     font-family: var(--font-mono);
@@ -270,7 +272,7 @@ const today = new Intl.DateTimeFormat("es-MX", {
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
 
   .admin-content { margin-top: 1.25rem; }
@@ -296,7 +298,7 @@ const today = new Intl.DateTimeFormat("es-MX", {
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .admin-toolbar__dot {
     width: 8px;
@@ -314,7 +316,7 @@ const today = new Intl.DateTimeFormat("es-MX", {
     border: 1px solid var(--line-strong);
     border-radius: 10px;
     background: transparent;
-    color: #ffffff;
+    color: var(--ink);
     font-family: var(--font-mono);
     font-size: 0.58rem;
     font-weight: 700;

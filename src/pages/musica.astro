@@ -30,7 +30,7 @@ const totalStreamsLabel = totalStreams >= 1000
   : String(totalStreams);
 ---
 
-<ArtistLayout title="Música" description="Discografía completa de Garguttieneunchingodeferia — singles 2025-2026.">
+<ArtistLayout title="Música" description="Discografía completa de Garguttieneunchingodeferia — singles 2025-2026." theme="paper">
   <div class="internal-shell music-page">
     <header class="internal-hero">
       <div class="internal-hero__top">
@@ -65,7 +65,7 @@ const totalStreamsLabel = totalStreams >= 1000
           </div>
           <div>
             <dt>Periodo</dt>
-            <dd>{firstYear}—{lastYear}</dd>
+            <dd>{firstYear}—{String(lastYear).slice(-2)}</dd>
           </div>
         </dl>
       </div>
@@ -261,14 +261,14 @@ const totalStreamsLabel = totalStreams >= 1000
     letter-spacing: 0.1em;
     line-height: 1.3;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .music-stats dd {
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(1.35rem, 4vw, 2.1rem);
     line-height: 1;
-    color: #ffffff;
+    color: var(--ink);
   }
 
   /* Paneles superiores */
@@ -294,7 +294,7 @@ const totalStreamsLabel = totalStreams >= 1000
     font-weight: 400;
     line-height: 0.95;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .last-drop__note {
     margin-top: 1rem;
@@ -302,7 +302,7 @@ const totalStreamsLabel = totalStreams >= 1000
     font-size: 0.66rem;
     line-height: 1.7;
     letter-spacing: 0.04em;
-    color: #ffffff;
+    color: var(--ink);
   }
 
   .drop-cta {
@@ -429,7 +429,7 @@ const totalStreamsLabel = totalStreams >= 1000
     font-family: var(--font-display);
     font-size: clamp(3rem, 10vw, 5rem);
     line-height: 1;
-    color: #ffffff;
+    color: var(--ink);
   }
 
   .track-card__type {
@@ -497,10 +497,10 @@ const totalStreamsLabel = totalStreams >= 1000
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .track-card__index { color: var(--accent); }
-  .track-card__year { color: #ffffff; }
+  .track-card__year { color: var(--ink); }
 
   .track-card__title {
     font-family: var(--font-display);
@@ -508,7 +508,7 @@ const totalStreamsLabel = totalStreams >= 1000
     font-weight: 400;
     line-height: 1.05;
     letter-spacing: 0.01em;
-    color: #ffffff;
+    color: var(--ink);
   }
   .track-card__meta {
     display: flex;
@@ -520,11 +520,11 @@ const totalStreamsLabel = totalStreams >= 1000
     letter-spacing: 0.06em;
     line-height: 1.45;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .track-card__meta [data-track-streams]:empty { display: none; }
   .track-card__collabs {
-    color: #ffffff;
+    color: var(--ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

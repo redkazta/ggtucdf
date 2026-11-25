@@ -244,7 +244,7 @@ const hasCountdown =
     line-height: 1;
     text-transform: uppercase;
     letter-spacing: 0.01em;
-    color: #ffffff;
+    color: var(--ink);
     text-decoration: none;
     transition: color 0.2s ease;
   }
@@ -257,7 +257,7 @@ const hasCountdown =
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
 
   /* Estado: contador */
@@ -276,7 +276,7 @@ const hasCountdown =
     font-weight: 400;
     line-height: 0.95;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .countdown-zone {
     font-family: var(--font-mono);
@@ -284,7 +284,7 @@ const hasCountdown =
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
     white-space: nowrap;
   }
 
@@ -301,13 +301,13 @@ const hasCountdown =
     padding: 0.7rem 0.3rem 0.6rem;
     border: 1px solid var(--line);
     border-radius: 12px;
-    background: #000000;
+    background: var(--bg);
   }
   .countdown-value {
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 8vw, 2.9rem);
     line-height: 0.9;
-    color: #ffffff;
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
   .countdown-unit-label {
@@ -316,7 +316,7 @@ const hasCountdown =
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .countdown-separator { display: none; }
 

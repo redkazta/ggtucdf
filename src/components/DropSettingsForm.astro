@@ -251,16 +251,16 @@ const updatedAtLabel =
     line-height: 1;
     text-transform: uppercase;
     letter-spacing: 0.01em;
-    color: #ffffff;
+    color: var(--ink);
   }
 
   .drop-settings-subtitle {
-    color: #ffffff;
+    color: var(--ink);
     font-size: 0.84rem;
     line-height: 1.6;
   }
   .drop-settings-subtitle a {
-    color: #ffffff;
+    color: var(--ink);
     text-underline-offset: 2px;
     text-decoration-color: var(--accent);
   }
@@ -276,7 +276,7 @@ const updatedAtLabel =
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
     white-space: nowrap;
   }
 
@@ -290,18 +290,18 @@ const updatedAtLabel =
     border-left: 3px solid var(--accent);
     border-radius: 12px;
     background: var(--accent-soft);
-    color: #ffffff;
+    color: var(--ink);
     font-family: var(--font-mono);
     font-size: 0.64rem;
     line-height: 1.7;
   }
-  .drop-settings-warning__hint { color: #ffffff; }
+  .drop-settings-warning__hint { color: var(--ink); }
   .drop-settings-warning code {
     padding: 0.08rem 0.3rem;
     border: 1px solid var(--line-strong);
     border-radius: 5px;
     background: var(--bg);
-    color: #ffffff;
+    color: var(--ink);
   }
 
   .drop-settings-form {
@@ -331,7 +331,7 @@ const updatedAtLabel =
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .field-label i {
     font-style: normal;
@@ -346,13 +346,13 @@ const updatedAtLabel =
     padding: 0.8rem 0.9rem;
     border-radius: 12px;
     border: 1px solid var(--line);
-    background: #000000;
-    color: #ffffff;
+    background: var(--bg);
+    color: var(--ink);
     font-family: var(--font-body);
     font-size: 0.88rem;
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
   }
-  .drop-settings input::placeholder { color: #ffffff; opacity: 0.7; }
+  .drop-settings input::placeholder { color: var(--ink); opacity: 0.55; }
   .drop-settings input:hover:not(:focus):not(:disabled) { border-color: var(--line-strong); }
   .drop-settings input:focus {
     outline: none;
@@ -363,12 +363,12 @@ const updatedAtLabel =
   .drop-settings input:disabled {
     opacity: 1;
     background: var(--bg-elevated);
-    color: #ffffff;
+    color: var(--ink);
     cursor: not-allowed;
   }
 
   .drop-settings small {
-    color: #ffffff;
+    color: var(--ink);
     font-family: var(--font-mono);
     font-size: 0.58rem;
     letter-spacing: 0.04em;
@@ -383,7 +383,7 @@ const updatedAtLabel =
     border: 1px solid var(--line);
     border-radius: 12px;
     background: var(--surface);
-    color: #ffffff !important;
+    color: var(--ink) !important;
     font-family: var(--font-mono) !important;
     font-size: 0.62rem !important;
     letter-spacing: 0.02em !important;
@@ -451,7 +451,7 @@ const updatedAtLabel =
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
     text-decoration: underline;
     text-underline-offset: 4px;
     text-decoration-color: var(--accent);
@@ -465,8 +465,8 @@ const updatedAtLabel =
     font-size: 0.64rem;
     line-height: 1.7;
   }
-  .drop-settings-message.success { color: #8bf0a8; }
-  .drop-settings-message.error { color: #ffffff; }
+  .drop-settings-message.success { color: var(--success); }
+  .drop-settings-message.error { color: var(--accent-bright); }
 
   @media (max-width: 640px) {
     .settings-head { flex-direction: column; }

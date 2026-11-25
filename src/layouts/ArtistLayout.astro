@@ -1,15 +1,23 @@
 ---
 import Header from "../components/Header.astro";
 import MobileDrawer from "../components/MobileDrawer.astro";
-import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL, OG_IMAGE_URL, WILDFORGE_LOGO, WILDFORGE_URL } from "../data/siteConfig";
+import {
+  SITE_TITLE,
+  SITE_DESCRIPTION,
+  SITE_URL,
+  OG_IMAGE_URL,
+  KAZTA_IG_LOGO,
+  KAZTA_INSTAGRAM_URL,
+} from "../data/siteConfig";
 
 interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  theme?: "dark" | "paper";
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, theme = "dark" } = Astro.props;
 const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
 const pageDesc = description || SITE_DESCRIPTION;
 const canonicalURL = new URL(Astro.url.pathname, SITE_URL).href;
@@ -49,11 +57,11 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
     />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
     />
 
     <style is:global>
@@ -87,6 +95,8 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         --accent-soft: rgba(255, 35, 56, 0.16);
         --accent-line: rgba(255, 35, 56, 0.7);
         --accent-glow: rgba(255, 35, 56, 0.45);
+        --success: #8bf0a8;
+        --success-deep: #3ddc73;
 
         /* Geometría dura */
         --radius-sm: 0px;
@@ -339,19 +349,19 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         color: var(--ink);
       }
       .btn--outline:hover {
-        background: #ffffff;
-        border-color: #ffffff;
-        color: #000000;
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--bg);
         transform: translateY(-2px);
-        box-shadow: 0 12px 28px rgba(255, 255, 255, 0.16);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
       }
 
       .btn--ghost {
         background: var(--surface);
         border-color: var(--line);
-        color: #ffffff;
+        color: var(--ink);
       }
-      .btn--ghost:hover { color: #ffffff; background: var(--surface-2); border-color: var(--line-strong); }
+      .btn--ghost:hover { color: var(--ink); background: var(--surface-2); border-color: var(--line-strong); }
 
       /* Rediseño compartido de páginas internas: tarjetas limpias y redondeadas. */
       .artist-main .page-head {
@@ -430,10 +440,10 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         font-weight: 700;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: #ffffff;
+        color: var(--ink);
       }
       .internal-hero__note {
-        color: #ffffff;
+        color: var(--ink);
         letter-spacing: 0.12em;
       }
       .internal-hero__live {
@@ -460,7 +470,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         line-height: 0.8;
         letter-spacing: -0.02em;
         text-transform: uppercase;
-        color: #ffffff;
+        color: var(--ink);
         text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
       }
       .internal-hero__title span {
@@ -479,7 +489,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
       .internal-hero__lead {
         max-width: 56ch;
         margin-top: 1.15rem;
-        color: #ffffff;
+        color: var(--ink);
         font-size: clamp(0.95rem, 1.5vw, 1.08rem);
         line-height: 1.7;
       }
@@ -504,7 +514,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         border: 1px solid var(--line);
         border-radius: 999px;
         background: var(--surface);
-        color: #ffffff;
+        color: var(--ink);
         font-family: var(--font-mono);
         font-size: 0.62rem;
         font-weight: 700;
@@ -533,7 +543,7 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
         font-size: clamp(1.9rem, 5vw, 3rem);
         line-height: 1;
         text-transform: uppercase;
-        color: #ffffff;
+        color: var(--ink);
       }
       .section-heading span {
         font-family: var(--font-mono);
@@ -569,6 +579,250 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
       .panel-card__bar span:last-child { color: #ffffff; }
       .panel-card__body { padding: clamp(1.15rem, 3vw, 1.75rem); }
 
+      /* ===== Tema editorial "papel y tinta" para páginas internas ===== */
+      main.theme-paper {
+        --bg: #f2eee4;
+        --bg-soft: #f8f4eb;
+        --bg-elevated: #fffdf8;
+        --ink: #0b0b0b;
+        --text: #0b0b0b;
+        --text-soft: #0b0b0b;
+        --text-muted: #0b0b0b;
+        --text-dim: #0b0b0b;
+        --line: rgba(11, 11, 11, 0.26);
+        --line-soft: rgba(11, 11, 11, 0.14);
+        --line-strong: rgba(11, 11, 11, 0.62);
+        --surface: rgba(11, 11, 11, 0.045);
+        --surface-2: rgba(11, 11, 11, 0.08);
+        --surface-3: rgba(11, 11, 11, 0.12);
+        --border: var(--line);
+        --border-strong: var(--line-strong);
+        --accent: #e1062c;
+        --accent-bright: #ff2338;
+        --accent-deep: #9e001b;
+        --accent-soft: rgba(225, 6, 44, 0.1);
+        --accent-line: rgba(225, 6, 44, 0.55);
+        --accent-glow: rgba(225, 6, 44, 0.3);
+        --success: #0a7a35;
+        --success-deep: #08612b;
+        --font-display: "Bodoni Moda", "Instrument Serif", Georgia, serif;
+        --font-body: "Archivo", "Space Grotesk", system-ui, sans-serif;
+        --shadow-deep: 10px 10px 0 rgba(11, 11, 11, 0.9);
+        --shadow-hard: 5px 5px 0 #0b0b0b;
+        position: relative;
+        color: var(--ink);
+        background-color: var(--bg);
+        background-image:
+          radial-gradient(900px 520px at 88% -12%, rgba(225, 6, 44, 0.1), transparent 62%),
+          linear-gradient(rgba(11, 11, 11, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(11, 11, 11, 0.04) 1px, transparent 1px);
+        background-size: 100% 100%, 72px 72px, 72px 72px;
+        font-family: var(--font-body);
+      }
+      main.theme-paper ::selection { background: var(--ink); color: var(--bg); }
+      main.theme-paper :focus-visible { outline-color: var(--accent); }
+
+      main.theme-paper .internal-hero {
+        border: 1px solid var(--line-strong);
+        border-top: 8px solid var(--ink);
+        border-radius: 0;
+        background:
+          radial-gradient(110% 120% at 100% 0%, rgba(225, 6, 44, 0.08), transparent 55%),
+          var(--bg-elevated);
+        box-shadow: 14px 14px 0 rgba(11, 11, 11, 0.9);
+      }
+      main.theme-paper .internal-hero__top { border-bottom: 1px solid var(--line-strong); }
+      main.theme-paper .internal-hero__title {
+        color: var(--ink);
+        font-weight: 500;
+        font-size: clamp(3rem, 12vw, 8.5rem);
+        line-height: 0.94;
+        letter-spacing: -0.035em;
+        text-transform: none;
+        text-shadow: none;
+      }
+      main.theme-paper .internal-hero__title span {
+        margin-top: 0.1em;
+        font-family: var(--font-mono);
+        font-size: 0.17em;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      main.theme-paper .section-heading {
+        border-bottom: 2px solid var(--ink);
+      }
+      main.theme-paper .section-heading h2 {
+        color: var(--ink);
+        letter-spacing: -0.025em;
+        text-transform: none;
+      }
+
+      main.theme-paper .panel-card {
+        border: 1px solid var(--line-strong);
+        border-radius: 0;
+        background: var(--bg-elevated);
+        box-shadow: 10px 10px 0 rgba(11, 11, 11, 0.9);
+      }
+      main.theme-paper .panel-card__bar {
+        background: var(--ink);
+        color: var(--bg);
+      }
+      main.theme-paper .panel-card__bar span:last-child { color: var(--bg); }
+
+      main.theme-paper .chip {
+        border-radius: 0;
+        border-color: var(--line-strong);
+        background: var(--bg);
+        color: var(--ink);
+      }
+      main.theme-paper .chip--accent {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
+      }
+
+      main.theme-paper .btn { border-radius: 0; }
+      main.theme-paper .btn--primary {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--bg);
+        box-shadow: 5px 5px 0 var(--accent);
+      }
+      main.theme-paper .btn--primary:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
+        box-shadow: 7px 7px 0 var(--ink);
+      }
+      main.theme-paper .btn--outline {
+        background: transparent;
+        border-color: var(--ink);
+        color: var(--ink);
+      }
+      main.theme-paper .btn--outline:hover {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--bg);
+        box-shadow: 5px 5px 0 var(--accent);
+      }
+      main.theme-paper .btn--ghost {
+        color: var(--ink);
+        border-color: var(--line-strong);
+      }
+      main.theme-paper .btn--ghost:hover {
+        color: var(--ink);
+        background: var(--surface-2);
+      }
+
+      main.theme-paper :is(
+        .track-card,
+        .featured-card,
+        .video-card,
+        .reel-card,
+        .drop-cta,
+        .drop-pitch,
+        .drop-room-form,
+        .drop-room-form input,
+        .drop-room-form button,
+        .drop-countdown,
+        .countdown-unit,
+        .spotify-player,
+        .checkbox-label,
+        .music-stats div,
+        .video-stats div,
+        .drop-facts div,
+        .admin-facts div,
+        .benefits li,
+        .privacy-card,
+        .privacy-end,
+        .privacy-index a,
+        .legal-item,
+        .auth-panel,
+        .auth-error,
+        .auth-error code,
+        .password-input,
+        .login-btn,
+        .logout-btn,
+        .admin-toolbar,
+        .drop-settings,
+        .drop-settings-warning,
+        .drop-settings-check,
+        .drop-settings input,
+        .drop-settings-actions button,
+        .admin-table-container,
+        .table-shell,
+        .table-count,
+        .copy-btn,
+        .copy-all-btn,
+        .media-tag,
+        .media-index,
+        .track-card__type,
+        .panel-card,
+        .footer-link
+      ) { border-radius: 0 !important; }
+      main.theme-paper .spotify-iframe { border-radius: 0; }
+
+      main.theme-paper :is(
+        .last-drop__head h2,
+        .drop-pitch__head h2,
+        .benefits strong,
+        .legal-item h2,
+        .featured-card__title,
+        .video-card__title,
+        .reel-card__title,
+        .table-head h2,
+        .drop-settings h2,
+        .drop-cta h2,
+        .section-head h2,
+        .city__name,
+        .release__info strong,
+        .connect-copy h3,
+        .social-grid a
+      ) {
+        text-transform: none !important;
+        letter-spacing: -0.015em !important;
+      }
+
+      main.theme-paper .drop-cta .btn--primary {
+        background: var(--bg-elevated);
+        border-color: var(--bg-elevated);
+        color: var(--ink);
+      }
+      main.theme-paper .drop-cta .btn--primary:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
+      }
+
+      main.theme-paper :is(
+        .hero,
+        .card,
+        .quick-stats article,
+        .metric,
+        .release,
+        .release__cover,
+        .embed-frame,
+        .social-grid a,
+        .portrait__frame,
+        .tabs,
+        .tabs__btn,
+        .city__bar
+      ) { border-radius: 0 !important; }
+      main.theme-paper .hero {
+        border-top: 8px solid var(--ink);
+        box-shadow: 14px 14px 0 rgba(11, 11, 11, 0.9);
+      }
+      main.theme-paper .card { box-shadow: 10px 10px 0 rgba(11, 11, 11, 0.9); }
+      main.theme-paper .hero__title {
+        text-shadow: none;
+        letter-spacing: -0.03em;
+      }
+      main.theme-paper .tabs { background: var(--ink); }
+      main.theme-paper .tabs__btn:hover { background: rgba(255, 255, 255, 0.14); }
+
+      main.theme-paper .footer-link { border-radius: 0; }
+
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
         .btn, .btn:hover { transition: none; transform: none; }
@@ -580,25 +834,25 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     <Header />
     <MobileDrawer />
 
-    <main class="artist-main">
+    <main class:list={["artist-main", theme === "paper" && "theme-paper"]}>
       <slot />
     </main>
 
-    <footer class="wildforge-branding" aria-label="Hecho por WildForgeLabs">
+    <footer class="wildforge-branding" aria-label="Hecho por dev_kazta">
       <span class="wildforge-line" aria-hidden="true"></span>
-      <a href={WILDFORGE_URL} target="_blank" rel="noopener" class="wildforge-link">
+      <a href={KAZTA_INSTAGRAM_URL} target="_blank" rel="noopener" class="wildforge-link">
         <span class="wildforge-text">Hecho por</span>
         <img
           class="wildforge-logo"
-          src={WILDFORGE_LOGO}
-          alt="WildForgeLabs"
+          src={KAZTA_IG_LOGO}
+          alt="dev_kazta"
           width="150"
-          height="30"
+          height="48"
           loading="lazy"
           decoding="async"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
         />
-        <span class="wildforge-fallback" style="display:none;">WILDFORGELABS</span>
+        <span class="wildforge-fallback" style="display:none;">DEV_KAZTA</span>
       </a>
     </footer>
   </body>
@@ -642,9 +896,8 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
   .wildforge-logo {
     display: block;
     width: auto;
-    height: 26px;
+    height: 24px;
     object-fit: contain;
-    filter: drop-shadow(0 0 10px rgba(255, 106, 0, 0.18));
   }
   .wildforge-fallback {
     align-items: center;
@@ -652,6 +905,6 @@ const ogImageURL = new URL(OG_IMAGE_URL, SITE_URL).href;
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.14em;
-    color: #ff6a00;
+    color: #ffffff;
   }
 </style>

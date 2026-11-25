@@ -38,7 +38,7 @@ const instagramReels = [
 const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
 ---
 
-<ArtistLayout title="Videos" description="Videos oficiales de Garguttieneunchingodeferia — YouTube, Instagram y TikTok.">
+<ArtistLayout title="Videos" description="Videos oficiales de Garguttieneunchingodeferia — YouTube, Instagram y TikTok." theme="paper">
   <div class="internal-shell videos-page">
     <header class="internal-hero">
       <div class="internal-hero__top">
@@ -169,7 +169,7 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
               </a>
               <span class="media-index">{String(i + 1).padStart(2, "0")}</span>
             </div>
-            {r.title && <h3 class="reel-card__title">{r.title}</h3>}
+            <h3 class="reel-card__title">{r.title || "Ver reel"}</h3>
           </article>
         ))}
       </div>
@@ -220,14 +220,14 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
     letter-spacing: 0.1em;
     line-height: 1.3;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .video-stats dd {
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(1.35rem, 4vw, 2.1rem);
     line-height: 1;
-    color: #ffffff;
+    color: var(--ink);
   }
 
   /* Tarjetas de video */
@@ -235,16 +235,19 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
+    align-items: start;
   }
   .video-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
+    align-items: start;
   }
   .reel-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.8rem;
+    align-items: start;
   }
 
   .featured-card,
@@ -252,6 +255,7 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
   .reel-card {
     display: flex;
     flex-direction: column;
+    align-self: start;
     border: 1px solid var(--line);
     border-radius: 18px;
     overflow: hidden;
@@ -310,8 +314,8 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
   .media-index {
     top: 0.6rem;
     right: 0.6rem;
-    background: #ffffff;
-    color: #000000;
+    background: var(--ink);
+    color: var(--bg);
   }
 
   .featured-card__title,
@@ -323,7 +327,7 @@ const youtubeEmbed = (id: string) => `https://www.youtube.com/embed/${id}`;
     font-size: clamp(1rem, 2.6vw, 1.3rem);
     line-height: 1.1;
     text-transform: uppercase;
-    color: #ffffff;
+    color: var(--ink);
   }
   .video-card__title {
     display: -webkit-box;
